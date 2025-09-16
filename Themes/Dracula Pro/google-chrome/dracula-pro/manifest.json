@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Dracula PRO",
+  "description": "Premium dark theme for Chrome",
+  "version": "2.0",
+  "theme": {
+    "colors": {
+      "frame": [34, 33, 44],
+      "frame_inactive": [69, 65, 88],
+      "frame_incognito": [34, 33, 44],
+      "frame_incognito_inactive": [34, 33, 44],
+      "bookmark_text": [248, 248, 242],
+      "tab_text": [248, 248, 242],
+      "tab_background_text": [248, 248, 242],
+      "tab_background_text_inactive": [121, 112, 169],
+      "tab_background_text_incognito": [149, 128, 255],
+      "tab_background_text_incognito_inactive": [121, 112, 169],
+      "toolbar": [69, 65, 88],
+      "toolbar_button_icon": [121, 112, 169],
+      "omnibox_text": [149, 128, 255],
+      "omnibox_background": [34, 33, 44],
+      "ntp_background": [34, 33, 44],
+      "ntp_link": [149, 128, 255],
+      "ntp_text": [248, 248, 242],
+      "button_background": [34, 33, 44]
+    }
+  }
+}

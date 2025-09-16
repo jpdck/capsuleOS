@@ -1,0 +1,1291 @@
+{
+  "meta": {
+    "theme.name": "Dracula Pro (Blade)",
+    "theme.kind": "Dark",
+    "theme.version": 1
+  },
+  "colors": {
+    "focusOutline": "Selection",
+    "background.primary": "Background",
+    "background.dimmed": "BackgroundLight",
+    "background.disabled": "BackgroundLighter",
+    "background.error": "FunctionalRed",
+    "swatch.fill": "Orange",
+    "border": "Selection",
+    "fill": "Background",
+    "focusRing": "9580FF80%",
+    "shadow.border": "Background",
+    "shadow.background.small": "00000020%",
+    "shadow.background.medium": "00000040%",
+    "shadow.background.large": "00000060%",
+    "border.focused": "Purple",
+    "text.primary": "Foreground",
+    "text.secondary": "Comment",
+    "text.dimmed": "Comment",
+    "text.disabled": "Comment",
+    "text.error": "FunctionalRed",
+    "text.success": "FunctionalGreen",
+    "fill.disabled": "Transparent",
+    "background.@error": "Background",
+    "background.success": "Background",
+    "banner.border.@error": "FunctionalRed",
+    "banner.fill.@error": "212C2ADark",
+    "banner.border.@warning": "Yellow",
+    "banner.fill.@warning": "212C2ADark",
+    "button.border": "BackgroundDarker",
+    "button.fill": "BackgroundDark",
+    "button.text": "Foreground",
+    "button.border.@disabled": "BackgroundLight",
+    "button.fill.@disabled": "Transparent",
+    "button.text.@disabled": "Foreground",
+    "button.border.@focused": "Purple",
+    "button.fill.@hovered": "BackgroundDarker",
+    "button.text.@hovered": "Foreground",
+    "button.fill.@pressed": "BackgroundDark",
+    "button.text.@pressed": "Foreground",
+    "checkbox.off.border.hovered": "Comment",
+    "checkbox.on.border.hovered": "Comment",
+    "checkbox.on.background.pressed": "Background",
+    "checkbox.on.border.pressed": "Comment",
+    "checkbox.on.background.hovered": "BackgroundDark",
+    "checkbox.focusBorder": "Foreground",
+    "checkbox.on.border.default": "BackgroundDarker",
+    "checkbox.icon.default": "Foreground",
+    "checkbox.on.background.default": "BackgroundDark",
+    "checkbox.off.border.default": "BackgroundDarker",
+    "checkbox.icon.disabled": "BackgroundLight",
+    "checkbox.text.disabled": "BackgroundLight",
+    "checkbox.off.background.disabled": "Background",
+    "action.button.fill": "Selection",
+    "action.button.border": "BackgroundDark",
+    "action.button.border.@hovered": "BackgroundDark",
+    "action.button.border.@pressed": "BackgroundDark",
+    "action.button.fill.@hovered": "41585490%",
+    "action.button.fill.@pressed": "BackgroundDark",
+    "dangerous.button.fill": "Red",
+    "dangerous.button.focusRing": "Red",
+    "dangerous.button.text": "WhiteColor",
+    "dangerous.button.border": "Transparent",
+    "dangerous.button.fill.@hovered": "Red",
+    "dangerous.button.fill.@pressed": "Red",
+    "dangerous.button.border.@disabled": "FF958050%",
+    "dangerous.button.fill.@disabled": "FF958070%",
+    "dangerous.button.text.@disabled": "Comment",
+    "dangerous.button.border.@focused": "Red",
+    "dialog.fill": "BackgroundDark",
+    "dialog.itemCell.text.@secondary.@focused": "Comment",
+    "dialog.itemCell.text.@secondary.@focused.@selected": "Foreground",
+    "dialog.tab.border.@focused.@selected": "FF80BF80%",
+    "dialog.itemCell.text.@focused": "Foreground",
+    "dialog.itemCell.fill.@focused.@selected": "41585450%",
+    "dialog.itemCell.fill.@hovered": "Background",
+    "dialog.editor.fill": "Background",
+    "dialog.tab.fill": "Background",
+    "listItem.border.default": "Transparent",
+    "listItem.border.hovered": "Transparent",
+    "listItem.border.selected": "Transparent",
+    "listItem.border.focused": "Transparent",
+    "listItem.background.default": "BackgroundDark",
+    "listItem.background.hovered": "Background",
+    "listItem.background.selected": "BackgroundLight",
+    "listItem.background.focused": "BackgroundLight",
+    "listItem.focusBorder": "Selection",
+    "listItem.text.secondary": "Comment",
+    "listItem.text.hovered": "Foreground",
+    "listItem.text.selected": "Foreground",
+    "listItem.text.focused": "Foreground",
+    "dialog.tab.border.@selected": "Purple",
+    "dialog.tab.pane.border": "9580FF50%",
+    "dialog.tab.pane.border.@focused.@selected": "Transparent",
+    "dialog.tab.fill.@focused.@selected": "Transparent",
+    "dialog.tab.pane.fill": "BackgroundDarker",
+    "diff.added.fill": "Green",
+    "diff.deleted.fill": "Red",
+    "diff.modified.fill": "Cyan",
+    "diff.conflict.fill": "Yellow",
+    "diff.added.text": "Green",
+    "diff.modified.text": "Cyan",
+    "diff.conflict.text": "Yellow",
+    "diff.deleted.text": "Red",
+    "git.blame.fill": "Yellow",
+    "dnd.fill": "BackgroundDark",
+    "error.expanded.fill": "Red",
+    "warning.expanded.fill": "Yellow",
+    "weakWarning.expanded.fill": "Yellow",
+    "error.expanded.border": "Red",
+    "warning.expanded.border": "Yellow",
+    "weakWarning.expanded.border": "Yellow",
+    "rename.postline.border": "Selection",
+    "rename.postline.fill": "Background",
+    "rename.postline.text": "Foreground",
+    "rename.postline.usages.text": "Comment",
+    "editor.foldIndicator.icon.default": "Comment",
+    "editor.foldIndicator.icon.hovered": "Foreground",
+    "editor.foldIndicator.background.hovered": "41585410%",
+    "editor.foldedMark.text": "Foreground",
+    "editor.foldedMark.background": "41585410%",
+    "editor.renamePostline.border": "41585475%",
+    "editor.renamePostline.background": "LineHighlightColor",
+    "editor.renamePostline.description.text": "F8F8F280%",
+    "editor.renamePostline.usages.text": "Comment",
+    "editor.background": "Background",
+    "editor.text": "Foreground",
+    "editor.caret.fill": "Foreground",
+    "editor.block.caret.text": "Foreground",
+    "editor.currentLine.background": "Background",
+    "editor.currentLine.background.focused": "41585440%",
+    "editor.lineNumber.default": "Comment",
+    "editor.lineNumber.current": "Foreground",
+    "editor.whitespaceIndicator": "9580FF50%",
+    "mainToolbar.background": "BackgroundDark",
+    "statusBar.background": "BackgroundDark",
+    "smartMode.enabled.fill": "Purple",
+    "smartMode.loader.border": "Purple",
+    "smartMode.error.fill": "FunctionalRed",
+    "editor.selectableFolded.fill.@active": "BackgroundDarker",
+    "editor.selectableFolded.fill.@inactive": "Transparent",
+    "editor.selectableFolded.border.@active": "BackgroundDark",
+    "editor.selectableFolded.border.@inactive": "Transparent",
+    "editor.selectableFolded.text.@inactive": "BackgroundDarker",
+    "editor.selectableFolded.text.@active": "BackgroundDark",
+    "editor.selectableFolded.background.focused": "BackgroundDarker",
+    "editor.selectableFolded.background.default": "Transparent",
+    "editor.selectableFolded.border.focused": "BackgroundDark",
+    "editor.selectableFolded.border.default": "Transparent",
+    "editor.selectableFolded.text.default": "Foreground",
+    "editor.selectableFolded.text.focused": "BackgroundDark",
+    "icon.background.blue": "Cyan",
+    "icon.background.green": "Green",
+    "icon.background.orange": "Orange",
+    "icon.background.red": "Red",
+    "icon.background.cyan": "Cyan",
+    "iconButton.off.border.default": "Transparent",
+    "iconButton.off.focusBorder": "Transparent",
+    "iconButton.off.background.default": "Transparent",
+    "iconButton.off.background.hovered": "41585475%",
+    "iconButton.off.background.pressed": "LineHighlightColor",
+    "iconButton.off.text.disabled": "Comment",
+    "iconButton.on.background.default": "LineHighlightColor",
+    "iconButton.on.background.disabled": "41585475%",
+    "iconButton.on.background.hovered": "Selection",
+    "iconButton.on.focusBorder": "Transparent",
+    "iconButton.on.text.default": "Foreground",
+    "iconButton.on.text.hovered": "Foreground",
+    "iconButton.on.text.pressed": "Foreground",
+    "inputField.selectionBackground.default": "Selection",
+    "inputField.background.disabled": "BackgroundLight",
+    "inputField.background.default": "Background",
+    "inputField.background.error": "Background",
+    "inputField.text.disabled": "Comment",
+    "inputField.border.error": "FunctionalRed",
+    "inputField.border.disabled": "Comment",
+    "inputField.caret.default": "White",
+    "inputField.caret.error": "White",
+    "inputField.focusOutline.default": "693687",
+    "inputField.focusOutline.error": "993750",
+    "inputField.focusBorder.default": "814f9e",
+    "inputField.focusBorder.error": "d4677a",
+    "icon.fill": "Foreground",
+    "input.border.@disabled": "BackgroundDarker",
+    "input.selection.fill": "BackgroundLight",
+    "input.fill": "BackgroundDark",
+    "input.border": "BackgroundDarker",
+    "input.fill.@disabled": "Transparent",
+    "input.fill.@error": "Background",
+    "input.text.@disabled": "Foreground",
+    "input.border.@error": "Red",
+    "input.border.@focused": "Purple",
+    "input.border.@error.@focused": "d4677a",
+    "input.focusRing.@error.@focused": "Red",
+    "input.caret.fill": "WhiteColor",
+    "input.caret.fill.@error": "WhiteColor",
+    "link.text": "Foreground",
+    "link.focusOutline": "Purple",
+    "list.cursor.border": "Purple",
+    "popup.shortcut.fill": "Foreground",
+    "popup.shortcut.text": "13201E50%",
+    "input.validation.popup.fill": "Red",
+    "input.validation.popup.text": "WhiteColor",
+    "primary.button.fill": "Purple",
+    "primary.button.text": "WhiteColor",
+    "primary.button.text.@hovered": "WhiteColor",
+    "primary.button.focusRing": "9580FF30%",
+    "primary.button.border": "Purple",
+    "primary.button.fill.@hovered": "9580FF90%",
+    "primary.button.fill.@pressed": "Purple",
+    "primary.button.border.@disabled": "9580FF40%",
+    "primary.button.fill.@disabled": "9580FF30%",
+    "primary.button.text.@disabled": "FFFFFF30%",
+    "primary.button.border.@focused": "Purple",
+    "accept.button.fill": "Purple",
+    "accept.button.focusRing": "Purple",
+    "accept.button.text": "WhiteColor",
+    "accept.button.border": "Purple",
+    "accept.button.border.@hovered": "Transparent",
+    "accept.button.border.@pressed": "Transparent",
+    "accept.button.border.@disabled": "9580FF30%",
+    "accept.button.fill.@disabled": "Transparent",
+    "accept.button.text.@disabled": "FFFFFF30%",
+    "accept.button.border.@focused": "Purple",
+    "accept.button.border.@focused.@hovered": "Purple",
+    "accept.button.border.@focused.@pressed": "Purple",
+    "accept.button.fill.@hovered": "Purple",
+    "accept.button.fill.@pressed": "Purple",
+    "accept.button.fill.@focused": "Purple",
+    "accept.button.text.@hovered": "WhiteColor",
+    "accept.button.text.@pressed": "WhiteColor",
+    "accept.button.fill.@disabled.@hovered": "9580FF30%",
+    "accept.button.text.@disabled.@hovered": "FFFFFF30%",
+    "accept.button.fill.@disabled.@pressed": "9580FF30%",
+    "accept.button.text.@disabled.@pressed": "FFFFFF30%",
+    "accept.button.fill.@focused.@hovered": "Purple",
+    "accept.button.fill.@focused.@pressed": "Purple",
+    "progressBar.determinate.foreground": "Purple",
+    "progressBar.determinate.background": "BackgroundDark",
+    "progressBar.indeterminate.foreground": "Purple",
+    "progressBar.indeterminate.foregroundAccent": "FunctionalCyan",
+    "scrollbar.fill": "Comment",
+    "scrollbar.fill.@pressed": "Foreground",
+    "scrollbar.fill.@hovered": "Foreground",
+    "scrolltrack.fill": "Transparent",
+    "scrolltrack.fill.@pressed": "41585430%",
+    "scrolltrack.fill.@hovered": "41585430%",
+    "interline.itemCell.fill": "Background",
+    "interline.block.fill": "Background",
+    "popup.border": "BackgroundDark",
+    "popup.fill": "BackgroundDark",
+    "popup.listItem.text.secondary": "Comment",
+    "popup.listItem.text.hovered": "Foreground",
+    "popup.listItem.text.selected": "Foreground",
+    "popup.listItem.text.focused": "Foreground",
+    "popup.listItem.background.default": "Background",
+    "popup.listItem.background.focused": "LineHighlightColor",
+    "popup.listItem.background.hovered": "41585460%",
+    "popup.listItem.background.selected": "41585460%",
+    "popup.background": "Background",
+    "popup.editor.background": "Background",
+    "popup.tabPanel.background": "BackgroundDark",
+    "popup.tab.border": "Background",
+    "pillButton.background.default": "Background",
+    "pillButton.background.disabled": "BackgroundLight",
+    "pillButton.background.focused": "BackgroundDark",
+    "pillButton.background.hovered": "BackgroundDark",
+    "pillButton.background.pressed": "Purple",
+    "pillButton.border.default": "Background",
+    "pillButton.border.disabled": "BackgroundLight",
+    "pillButton.border.focused": "BackgroundDark",
+    "pillButton.border.hovered": "BackgroundDark",
+    "pillButton.border.pressed": "Purple",
+    "pillButton.focusBorder": "Background",
+    "pillButton.focusOutline": "Background",
+    "pillButton.text.default": "WhiteColor",
+    "pillButton.text.disabled": "WhiteColor",
+    "pillButton.text.focused": "WhiteColor",
+    "pillButton.text.hovered": "WhiteColor",
+    "pillButton.text.pressed": "WhiteColor",
+    "dialog.itemCell.fill": "BackgroundLight",
+    "tool.itemCell.fill": "BackgroundDark",
+    "tool.itemCell.text": "Foreground",
+    "tool.itemCell.text.@focused": "Foreground",
+    "tool.itemCell.text.@hovered": "Foreground",
+    "tool.itemCell.fill.@hovered": "41585430%",
+    "tool.itemCell.fill.@focused": "BackgroundDark",
+    "tool.itemCell.fill.@focused.@selected": "BackgroundDarker",
+    "tool.itemCell.text.@focused.@selected": "Foreground",
+    "tool.itemCell.border.@focused.@selected": "9580FF80%",
+    "tool.itemCell.fill.@selected": "BackgroundDarker",
+    "tool.itemCell.text.@selected": "Foreground",
+    "tool.itemCell.text.@secondary": "Foreground",
+    "tool.itemCell.text.@secondary.@focused": "Foreground",
+    "tool.itemCell.text.@secondary.@selected": "Foreground",
+    "tool.itemCell.text.@secondary.@focused.@selected": "Foreground",
+    "itemCell.border": "Transparent",
+    "itemCell.text.@focused": "Comment",
+    "itemCell.text.@focused.@selected": "BackgroundDarker",
+    "itemCell.text.@secondary.@focused.@selected": "Foreground",
+    "itemCell.text.@selected": "Foreground",
+    "itemCell.fill.@focused": "BackgroundDark",
+    "itemCell.fill.@focused.@hovered": "BackgroundDarker",
+    "itemCell.fill.@selected": "BackgroundDarker",
+    "itemCell.fill.@focused.@selected": "BackgroundDark",
+    "itemCell.border.@hovered": "Transparent",
+    "itemCell.border.@selected": "Transparent",
+    "itemCell.border.@focused": "Transparent",
+    "separator.default": "BackgroundDark",
+    "separator.hovered": "Purple",
+    "switch.on.thumb": "Orange",
+    "switch.on.track.default": "Orange",
+    "switch.on.track.hovered": "Orange",
+    "switch.off.thumb": "Orange",
+    "switch.off.track.hovered": "Orange",
+    "switch.off.track.default": "Orange",
+    "search.match.background": "Selection",
+    "search.match.text": "Foreground",
+    "completion.match.fill": "Transparent",
+    "completion.match.text": "Foreground",
+    "parameterInfo.match.text": "Foreground",
+    "tab.background.default": "BackgroundLight",
+    "tab.background.selected": "Background",
+    "tab.background.hovered": "Background",
+    "tabPanel.background": "BackgroundLight",
+    "tab.text": "Foreground",
+    "tab.indicator": "Comment",
+    "notification.background.default": "BackgroundDark",
+    "notification.background.unread": "Background",
+    "notification.separator": "LineHighlightColor",
+    "notification.text": "Foreground",
+    "notification.timestamp": "Comment",
+    "terminal.ansiColors.background.ansiBlack": "ANSIBlack",
+    "terminal.ansiColors.foreground.ansiBlack": "ANSIWhite",
+    "terminal.ansiColors.background.ansiCyan": "ANSICyan",
+    "terminal.ansiColors.foreground.ansiCyan": "ANSIWhite",
+    "terminal.ansiColors.background.ansiBrightBlack": "ANSIDarkGray",
+    "terminal.ansiColors.foreground.ansiBrightBlack": "ANSIWhite",
+    "terminal.ansiColors.background.ansiBrightCyan": "ANSILightCyan",
+    "terminal.ansiColors.foreground.ansiBrightCyan": "ANSIWhite",
+    "terminal.ansiColors.background.ansiBrightBlue": "ANSILightCyan",
+    "terminal.ansiColors.foreground.ansiBrightBlue": "ANSIWhite",
+    "terminal.ansiColors.background.ansiBrightGreen": "ANSILightGreen",
+    "terminal.ansiColors.foreground.ansiBrightGreen": "ANSIWhite",
+    "terminal.ansiColors.background.ansiBrightMagenta": "ANSILightPink",
+    "terminal.ansiColors.foreground.ansiBrightMagenta": "ANSIWhite",
+    "terminal.ansiColors.background.ansiBrightRed": "ANSILightRed",
+    "terminal.ansiColors.foreground.ansiBrightRed": "ANSIBlack",
+    "terminal.ansiColors.background.ansiBrightWhite": "ANSIBlack",
+    "terminal.ansiColors.foreground.ansiBrightWhite": "ANSIBlack",
+    "terminal.ansiColors.background.ansiBrightYellow": "ANSILightYellow",
+    "terminal.ansiColors.foreground.ansiBrightYellow": "ANSIBlack",
+    "terminal.ansiColors.background.ansiBlue": "ANSICyan",
+    "terminal.ansiColors.foreground.ansiBlue": "ANSIWhite",
+    "terminal.ansiColors.background.ansiGreen": "ANSIGreen",
+    "terminal.ansiColors.foreground.ansiGreen": "ANSIWhite",
+    "terminal.ansiColors.background.ansiMagenta": "ANSIPink",
+    "terminal.ansiColors.foreground.ansiMagenta": "ANSIWhite",
+    "terminal.ansiColors.background.ansiRed": "ANSIRed",
+    "terminal.ansiColors.foreground.ansiRed": "ANSIWhite",
+    "terminal.ansiColors.background.ansiWhite": "ANSIBlack",
+    "terminal.ansiColors.foreground.ansiWhite": "ANSIBlack",
+    "terminal.ansiColors.background.ansiYellow": "ANSIYellow",
+    "terminal.ansiColors.foreground.ansiYellow": "ANSIBlack",
+    "tool.background": "BackgroundDark",
+    "tab.background": "BackgroundDark",
+    "tooltip.background": "BackgroundLight",
+    "tooltip.compactFolder.separator": "LineHighlightColor",
+    "tooltip.compactFolder.metadata.text": "Comment",
+    "header.background": "BackgroundLight",
+    "separator.tooltip.text": "Foreground",
+    "path.tooltip.metadata.text": "Comment",
+    "tree.cursor.border": "BackgroundDark",
+    "tree.focusBorder": "BackgroundDark",
+    "tree.compactFolder.separator.background": "BackgroundLight",
+    "tree.compactFolder.underscore.background": "BackgroundLight",
+    "tree.compactFolder.underscore.background.@focused": "Foreground",
+    "windows.close.button.background.@hovered": "Red",
+    "windows.close.button.text.@hovered": "Foreground",
+    "windows.close.button.background.@pressed": "Red",
+    "windows.close.button.text.@pressed": "Foreground",
+    "gitBranchTag.local.text": "Cyan",
+    "gitBranchTag.local.background": "Transparent",
+    "gitBranchTag.local.border": "Cyan",
+    "gitBranchTag.remote.text": "Purple",
+    "gitBranchTag.remote.background": "Transparent",
+    "gitBranchTag.remote.border": "Purple",
+    "editor.gitDiff.background.blame": "Comment",
+    "editor.gitDiff.background.deleted": "FunctionalRed",
+    "editor.gitDiff.background.modified": "Cyan",
+    "editor.gitDiff.background.conflict": "FunctionalOrange",
+    "editor.gitDiff.background.added": "FunctionalGreen",
+    "dragAndDrop.background": "41585445%",
+    "problemsWidget.checkmark.background": "7DE97220%",
+    "problemsWidget.checkmark.foreground": "FunctionalGreen",
+    "problemsWidget.status.expanded.background.error": "Background",
+    "problemsWidget.status.expanded.background.warning": "Background",
+    "problemsWidget.status.expanded.background.weakWarning": "Background",
+    "problemsWidget.status.expanded.border.error": "FunctionalRed",
+    "problemsWidget.status.expanded.border.warning": "FunctionalOrange",
+    "problemsWidget.status.expanded.border.weakWarning": "FunctionalYellow",
+    "remote.label.text": "WhiteColor",
+    "toggleButton.off.background.default": "Background",
+    "toggleButton.off.background.disabled": "BackgroundLight",
+    "toggleButton.off.background.hovered": "BackgroundDark",
+    "toggleButton.off.background.pressed": "BackgroundDark",
+    "toggleButton.off.text.disabled": "Comment",
+    "toggleButton.off.text.pressed": "Foreground",
+    "toggleButton.off.border.default": "Transparent",
+    "toggleButton.off.border.disabled": "Transparent",
+    "toggleButton.off.focusBorder": "Background",
+    "toggleButton.on.border.default": "Purple",
+    "toggleButton.on.focusBorder": "Purple",
+    "toggleButton.on.background.default": "Purple",
+    "toggleButton.on.background.disabled": "BackgroundLight",
+    "toggleButton.on.background.hovered": "Purple",
+    "toggleButton.on.background.pressed": "Purple",
+    "remote.userColor.background.one": "Red",
+    "remote.userColor.background.two": "Orange",
+    "remote.userColor.background.three": "Yellow",
+    "remote.userColor.background.four": "Green",
+    "remote.userColor.background.five": "Cyan",
+    "remote.userColor.background.six": "ANSILightCyan",
+    "remote.userColor.background.seven": "Cyan",
+    "remote.userColor.background.eight": "Purple",
+    "remote.userColor.background.nine": "ANSIPink",
+    "remote.userColor.background.ten": "Pink",
+    "settings.modified.indicator": "Yellow",
+    "ai.input.border.@focused": "Purple",
+    "ai.input.focusRing.@focused": "Purple",
+    "ai.icon.fill": "Purple",
+    "ai.icon.fill.@secondary": "9580FF7%",
+    "ai.icon.text": "Cyan",
+    "ai.banner.border": "Purple",
+    "ai.user.icon.fill": "Background",
+    "ai.user.icon.fill.secondary": "Purple",
+    "ai.user.icon.text": "Cyan",
+    "ai.button.border": "Transparent",
+    "ai.button.border.@hovered": "Transparent",
+    "ai.button.border.@pressed": "Transparent",
+    "ai.button.fill": "BackgroundDark",
+    "ai.button.focusRing": "Comment",
+    "ai.button.text": "Foreground",
+    "ai.error.border": "Red",
+    "ai.error.fill": "FunctionalRed",
+    "ai.inputField.background.disabled": "Background",
+    "ai.inputField.background.default": "Background",
+    "ai.inputField.text.disabled": "Comment",
+    "ai.inputField.border.disabled": "Comment",
+    "ai.inputField.focusOutline.default": "Comment",
+    "ai.inputField.focusBorder.default": "Comment",
+    "ai.icon.background": "Comment",
+    "ai.icon.background.secondary": "80FFEA10%",
+    "ai.snippet.border": "Selection",
+    "ai.snippet.editor.background": "BackgroundLight",
+    "ai.snippet.header.background": "BackgroundLighter",
+    "ai.user.icon.background": "Background",
+    "ai.user.icon.background.secondary": "Purple",
+    "ai.warning.border": "Orange",
+    "ai.warning.fill": "FunctionalOrange",
+    "ai.button.default.border.default": "Transparent",
+    "ai.button.default.border.hovered": "Transparent",
+    "ai.button.default.border.pressed": "Transparent",
+    "ai.button.default.background.default": "Purple",
+    "ai.button.default.background.disabled": "Purple",
+    "ai.button.default.background.hovered": "Purple",
+    "ai.button.default.background.pressed": "Purple",
+    "ai.button.default.text.disabled": "Comment",
+    "ai.button.recipe.border.hovered": "Transparent",
+    "ai.button.recipe.border.pressed": "Transparent"
+  },
+  "text-attributes": {
+    "editor.selection": {
+      "bgColor": "LineHighlightColor",
+      "layer": 2000
+    },
+    "editor.text.scheme": {
+      "fgColor": "Foreground",
+      "layer": 40
+    },
+    "editor.text.composable": {
+      "fgColor": "Foreground"
+    },
+    "editor.selection.focused": {
+      "bgColor": "LineHighlightColor",
+      "layer": 500
+    },
+    "editor.search.results": {
+      "bgColor": "036A9620%",
+      "decoration": {
+        "style": "BORDER",
+        "color": "LineHighlightColor"
+      },
+      "layer": 505
+    },
+    "editor.rename.entries": {
+      "bgColor": "036A9660%",
+      "layer": 300,
+      "showEmptyIntervals": true
+    },
+    "editor.rename.current": {
+      "layer": 300,
+      "showEmptyIntervals": true,
+      "decoration": {
+        "color": "Selection",
+        "style": "BORDER"
+      }
+    },
+    "editor.brace.match": {
+      "bgColor": "Transparent",
+      "decoration": {
+        "style": "BORDER",
+        "color": "Comment"
+      },
+      "layer": 300
+    },
+    "comment": {
+      "fgColor": "Comment",
+      "layer": 5
+    },
+    "comment.doc": {
+      "fgColor": "Comment",
+      "layer": 6
+    },
+    "comment.doc.tag": {
+      "fgColor": "Pink",
+      "layer": 10
+    },
+    "comment.doc.value": {
+      "fgColor": "Orange",
+      "layer": 10
+    },
+    "comment.todo": {
+      "fgColor": "Comment",
+      "layer": 10000
+    },
+    "link": {},
+    "link.always.visible": {
+      "decoration": {}
+    },
+    "link.hovered": {
+      "fgColor": "FunctionalCyan",
+      "layer": 1000,
+      "decoration": {
+        "color": "Cyan"
+      }
+    },
+    "error.hovered": {
+      "bgColor": "FunctionalRed",
+      "layer": 220
+    },
+    "keyword": {
+      "fgColor": "Pink",
+      "layer": 20
+    },
+    "keyword.json": {
+      "fgColor": "Cyan",
+      "layer": 20
+    },
+    "keyword.typeModifier": {
+      "fgColor": "Cyan",
+      "layer": 20
+    },
+    "metadata": {},
+    "number": {
+      "fgColor": "Purple",
+      "layer": 10
+    },
+    "boolean": {
+      "fgColor": "Purple",
+      "layer": 10
+    },
+    "string": {
+      "fgColor": "Yellow",
+      "layer": 15
+    },
+    "string.binary": {
+      "fgColor": "Yellow",
+      "layer": 15
+    },
+    "string.escape": {
+      "fgColor": "Red",
+      "layer": 25
+    },
+    "string.escape.unicode": {
+      "fgColor": "Purple",
+      "layer": 25
+    },
+    "string.escape.alternative": {
+      "fgColor": "Orange",
+      "layer": 25
+    },
+    "string.formatItem": {
+      "fgColor": "Red",
+      "layer": 25
+    },
+    "string.regexp": {
+      "fgColor": "Red",
+      "layer": 25
+    },
+    "identifier": {
+      "fgColor": "Cyan",
+      "layer": 10
+    },
+    "identifier.this": {
+      "fgColor": "Purple",
+      "fontModifier": {
+        "italic": true
+      },
+      "decoration": {
+        "bold": false,
+        "color": "Transparent"
+      },
+      "layer": 20
+    },
+    "identifier.this.mutable": {},
+    "identifier.underCaret": {},
+    "identifier.constant": {
+      "fgColor": "Purple",
+      "layer": 20
+    },
+    "identifier.constant.predefined": {
+      "fgColor": "Purple",
+      "layer": 20
+    },
+    "identifier.variable": {
+      "fgColor": "Foreground",
+      "layer": 10
+    },
+    "identifier.variable.mutable": {
+      "fgColor": "Orange",
+      "layer": 20
+    },
+    "identifier.variable.local": {
+      "fgColor": "Red",
+      "layer": 20
+    },
+    "identifier.variable.local.reassigned": {
+      "decoration": {
+        "color": "Red"
+      },
+      "fgColor": "Red",
+      "layer": 20
+    },
+    "identifier.parameter": {
+      "fgColor": "Orange",
+      "layer": 5,
+      "fontModifier": {
+        "italic": true
+      }
+    },
+    "identifier.parameter.js": {
+      "fgColor": "Orange",
+      "layer": 5,
+      "fontModifier": {
+        "italic": true
+      }
+    },
+    "identifier.function.declaration": {
+      "fgColor": "Green",
+      "layer": 20
+    },
+    "identifier.function.declaration.js": {
+      "fgColor": "Green",
+      "layer": 20
+    },
+    "identifier.function.call": {
+      "fgColor": "Foreground",
+      "layer": 20
+    },
+    "identifier.function.call.js": {
+      "fgColor": "Green",
+      "layer": 20
+    },
+    "identifier.function.call.package": {
+      "fgColor": "Foreground",
+      "layer": 20
+    },
+    "identifier.function.call.composable": {
+      "fgColor": "Green",
+      "layer": 20
+    },
+    "identifier.method.static": {
+      "fgColor": "Foreground",
+      "layer": 20,
+      "fontModifier": {
+        "italic": true
+      }
+    },
+    "identifier.method.static.js": {
+      "fgColor": "Green",
+      "layer": 20
+    },
+    "identifier.type": {
+      "fgColor": "Cyan",
+      "layer": 50,
+      "fontModifier": {
+        "italic": true
+      }
+    },
+    "identifier.typeParameter": {
+      "fgColor": "Cyan",
+      "layer": 20,
+      "fontModifier": {
+        "italic": true
+      }
+    },
+    "identifier.field": {
+      "fgColor": "Orange",
+      "layer": 10,
+      "fontModifier": {
+        "italic": true
+      }
+    },
+    "identifier.field.static": {
+      "fgColor": "Foreground",
+      "layer": 20
+    },
+    "identifier.interface": {
+      "fgColor": "Cyan",
+      "layer": 20
+    },
+    "identifier.type.class": {
+      "fgColor": "Cyan",
+      "layer": 20
+    },
+    "identifier.type.enum": {
+      "fgColor": "Cyan",
+      "layer": 20
+    },
+    "identifier.type.struct": {
+      "fgColor": "Foreground",
+      "layer": 20
+    },
+    "identifier.type.valueType": {
+      "fgColor": "Purple",
+      "layer": 20
+    },
+    "identifier.namedArgument": {
+      "fgColor": "Cyan",
+      "layer": 20
+    },
+    "identifier.other": {
+      "fgColor": "Foreground",
+      "layer": 20
+    },
+    "attributeName.html": {
+      "fgColor": "Green",
+      "layer": 20
+    },
+    "attributeValue.html": {
+      "fgColor": "Yellow",
+      "layer": 20
+    },
+    "entityReference.html": {
+      "fgColor": "Cyan",
+      "layer": 20
+    },
+    "tag.html": {
+      "fgColor": "Foreground",
+      "layer": 20
+    },
+    "tagName.html": {
+      "fgColor": "Pink",
+      "layer": 20
+    },
+    "tagName.custom.html": {
+      "fgColor": "Pink",
+      "layer": 20
+    },
+    "attributeName.css": {
+      "fgColor": "Green",
+      "layer": 20,
+      "fontModifier": {
+        "italic": true
+      }
+    },
+    "hex.css": {
+      "fgColor": "Purple",
+      "layer": 20
+    },
+    "identifier.css": {
+      "fgColor": "Pink",
+      "layer": 20
+    },
+    "identifier.function.css": {
+      "fgColor": "Green",
+      "layer": 20
+    },
+    "identifier.variable.css": {
+      "fgColor": "Foreground",
+      "layer": 20
+    },
+    "identifier.variable.php": {
+      "fgColor": "Foreground",
+      "layer": 20
+    },
+    "property.php": {
+      "fgColor": "Cyan",
+      "layer": 20
+    },
+    "property.static.php": {
+      "fgColor": "Cyan",
+      "layer": 20,
+      "fontModifier": {
+        "italic": true
+      }
+    },
+    "generic.php": {
+      "fgColor": "Cyan",
+      "layer": 20
+    },
+    "interpolation.css": {
+      "fgColor": "Foreground",
+      "layer": 20
+    },
+    "jsCodeDelimiter.css": {
+      "fgColor": "Green",
+      "layer": 20
+    },
+    "jsCodeInjection.css": {
+      "fgColor": "Foreground",
+      "layer": 20
+    },
+    "keyword.css": {
+      "fgColor": "Pink",
+      "layer": 20
+    },
+    "keyword.extend.css": {
+      "fgColor": "Purple",
+      "layer": 20
+    },
+    "keyword.global.css": {
+      "fgColor": "Purple",
+      "layer": 20
+    },
+    "keyword.important.css": {
+      "fgColor": "Pink",
+      "layer": 20
+    },
+    "mixin.css": {
+      "fgColor": "Foreground",
+      "layer": 20
+    },
+    "number.css": {
+      "fgColor": "Purple",
+      "layer": 20
+    },
+    "number.unit.css": {
+      "fgColor": "Pink",
+      "layer": 20
+    },
+    "propertyName.css": {
+      "fgColor": "Cyan",
+      "layer": 20
+    },
+    "propertyValue.css": {
+      "fgColor": "Purple",
+      "layer": 25
+    },
+    "punctuation.css": {
+      "fgColor": "Foreground",
+      "layer": 20
+    },
+    "selector.css": {
+      "fgColor": "Foreground",
+      "layer": 20
+    },
+    "selector.class.css": {
+      "fgColor": "Green",
+      "layer": 21,
+      "fontModifier": {
+        "italic": true
+      }
+    },
+    "selector.pseudo.css": {
+      "fgColor": "Green",
+      "layer": 21,
+      "fontModifier": {
+        "italic": true
+      }
+    },
+    "selector.tag.css": {
+      "fgColor": "Pink",
+      "layer": 20
+    },
+    "selector.id.css": {
+      "fgColor": "Green",
+      "layer": 20,
+      "fontModifier": {
+        "italic": true
+      }
+    },
+    "string.css": {
+      "fgColor": "Yellow",
+      "layer": 20
+    },
+    "url.css": {
+      "fgColor": "Orange",
+      "fontModifier": {
+        "italic": true
+      },
+      "layer": 50
+    },
+    "attribute.cpp": {
+      "fgColor": "Green",
+      "layer": 20
+    },
+    "markup.heading": {
+      "fgColor": "Purple",
+      "layer": 20
+    },
+    "markup.bold": {
+      "fgColor": "Foreground",
+      "layer": 20,
+      "fontModifier": {
+        "bold": true
+      }
+    },
+    "markup.italic": {
+      "fgColor": "Foreground",
+      "layer": 20,
+      "fontModifier": {
+        "italic": true
+      }
+    },
+    "markup.code.block": {
+      "fgColor": "Green",
+      "layer": 20
+    },
+    "markup.href": {
+      "fgColor": "Cyan",
+      "layer": 20,
+      "fontModifier": {
+        "italic": true
+      },
+      "decoration": {}
+    },
+    "punctuation": {
+      "fgColor": "Foreground",
+      "layer": 20
+    },
+    "punctuation.operator": {
+      "fgColor": "Foreground",
+      "layer": 20
+    },
+    "snippet": {
+      "layer": 2001,
+      "showEmptyIntervals": true,
+      "borderColor": "Comment"
+    },
+    "snippet.selected": {
+      "layer": 2001,
+      "showEmptyIntervals": true,
+      "borderColor": "Purple"
+    },
+    "debug.currentFrame": {
+      "bgColor": "E1E2EA30%",
+      "layer": -68,
+      "fullLine": true,
+      "decoration": {
+        "style": "BORDER",
+        "color": "Purple"
+      }
+    },
+    "diff.added": {
+      "bgColor": "Selection",
+      "stripeColor": "Green",
+      "layer": -60,
+      "fullLine": true
+    },
+    "diff.added.word": {
+      "bgColor": "Selection",
+      "layer": -60
+    },
+    "diff.added.withBorder": {
+      "bgColor": "Selection",
+      "layer": -60,
+      "fullLine": true,
+      "decoration": {
+        "color": "Green",
+        "style": "BORDER"
+      }
+    },
+    "diff.added.empty": {
+      "bgColor": "Selection",
+      "layer": -60,
+      "showEmptyIntervals": true
+    },
+    "diff.added.resolved": {
+      "bgColor": "Selection",
+      "layer": -60,
+      "fullLine": true,
+      "decoration": {
+        "color": "Green",
+        "style": "BORDER"
+      }
+    },
+    "diff.deleted": {
+      "bgColor": "Selection",
+      "stripeColor": "Red",
+      "layer": -60,
+      "fullLine": true
+    },
+    "diff.deleted.word": {
+      "bgColor": "Selection",
+      "layer": -60,
+      "showEmptyIntervals": true
+    },
+    "diff.deleted.withBorder": {
+      "bgColor": "Selection",
+      "layer": -69,
+      "fullLine": true,
+      "decoration": {
+        "color": "Red",
+        "style": "BORDER"
+      }
+    },
+    "diff.deleted.empty": {
+      "bgColor": "Selection",
+      "layer": -60,
+      "showEmptyIntervals": true
+    },
+    "diff.deleted.resolved": {
+      "bgColor": "Selection",
+      "layer": -69,
+      "fullLine": true,
+      "decoration": {
+        "color": "Red",
+        "style": "BORDER"
+      }
+    },
+    "diff.modified": {
+      "bgColor": "Selection",
+      "stripeColor": "Cyan",
+      "layer": -69,
+      "fullLine": true
+    },
+    "diff.modified.word": {
+      "bgColor": "Selection",
+      "layer": -60
+    },
+    "diff.modified.withBorder": {
+      "bgColor": "Selection",
+      "layer": -69,
+      "fullLine": true,
+      "decoration": {
+        "color": "Cyan",
+        "style": "BORDER"
+      }
+    },
+    "diff.modified.resolved": {
+      "bgColor": "Selection",
+      "layer": -69,
+      "fullLine": true,
+      "decoration": {
+        "color": "Cyan",
+        "style": "BORDER"
+      }
+    },
+    "diff.conflict.withBorder": {
+      "bgColor": "Red",
+      "layer": -68,
+      "fullLine": true,
+      "decoration": {
+        "color": "Red",
+        "style": "BORDER"
+      }
+    },
+    "diff.conflict.resolved": {
+      "bgColor": "Transparent",
+      "layer": -68,
+      "fullLine": true,
+      "decoration": {
+        "color": "Red",
+        "style": "BORDER"
+      }
+    },
+    "refactoring.modified.code": {
+      "bgColor": "Selection",
+      "layer": -60
+    },
+    "problem.error": {
+      "stripeColor": "FunctionalRed",
+      "layer": 70,
+      "decoration": {
+        "color": "FunctionalRed",
+        "style": "WAVY"
+      }
+    },
+    "problem.error.badCharacter": {
+      "stripeColor": "FunctionalRed",
+      "layer": 100,
+      "showEmptyIntervals": true,
+      "decoration": {
+        "color": "FunctionalRed",
+        "style": "WAVY"
+      }
+    },
+    "problem.warning": {
+      "stripeColor": "Orange",
+      "layer": 60,
+      "decoration": {
+        "color": "FunctionalYellow",
+        "style": "WAVY"
+      }
+    },
+    "problem.warning.weak": {
+      "stripeColor": "Selection",
+      "layer": 40,
+      "decoration": {
+        "color": "Yellow",
+        "style": "WAVY"
+      }
+    },
+    "problem.deprecated": {
+      "layer": 30,
+      "decoration": {
+        "color": "Selection",
+        "position": "THROUGH"
+      }
+    },
+    "problem.info": {
+      "stripeColor": "FunctionalCyan",
+      "layer": 50,
+      "decoration": {
+        "color": "FunctionalCyan",
+        "style": "BORDER"
+      }
+    },
+    "problem.unknown": {
+      "layer": 50
+    },
+    "problem.unused": {
+      "opacity": 0.5,
+      "layer": 60
+    },
+    "transparent": {},
+    "comment.buildConstraint.go": {
+      "fgColor": "Foreground",
+      "layer": 5
+    },
+    "identifier.methodReceiver.go": {
+      "fgColor": "Cyan",
+      "layer": 20
+    },
+    "identifier.package.go": {
+      "fgColor": "Green",
+      "layer": 20
+    },
+    "identifier.typeDeclaration.go": {
+      "fgColor": "Foreground",
+      "layer": 20
+    },
+    "identifier.typeReference.go": {
+      "fgColor": "Cyan",
+      "layer": 20
+    },
+    "identifier.variable.shadowing.go": {
+      "fgColor": "Green",
+      "layer": 20
+    },
+    "metadata.structTag.arbitraryText.go": {
+      "fgColor": "Comment",
+      "layer": 25
+    },
+    "metadata.structTag.key.go": {
+      "fgColor": "Foreground",
+      "layer": 25
+    },
+    "metadata.structTag.value.go": {
+      "fgColor": "Green",
+      "layer": 25
+    },
+    "identifier.anchor.yaml": {
+      "fgColor": "Purple",
+      "layer": 20
+    },
+    "identifier.field.yaml": {
+      "fgColor": "Foreground",
+      "layer": 20
+    },
+    "identifier.alias.yaml": {
+      "fgColor": "Green",
+      "fontModifier": {
+        "italic": true
+      },
+      "layer": 20
+    },
+    "punctuation.operator.merge.yaml": {
+      "fgColor": "Cyan",
+      "layer": 20
+    },
+    "schema.yaml": {
+      "fgColor": "Yellow",
+      "layer": 20
+    },
+    "key.yaml": {
+      "fgColor": "Cyan",
+      "layer": 20
+    },
+    "value.yaml": {
+      "fgColor": "Yellow",
+      "layer": 2
+    },
+    "ai.generated": {
+      "bgColor": "E1E2EA30%",
+      "layer": 10
+    },
+    "identifier.dependency.scope.amper": {
+      "fgColor": "Yellow",
+      "layer": 20
+    },
+    "identifier.dependency.annotator.amper": {
+      "fgColor": "Foreground",
+      "layer": 20
+    },
+    "identifier.dependency.add.amper": {
+      "fgColor": "Purple",
+      "layer": 20
+    },
+    "editor.indent.guide": {
+      "fgColor": "Comment",
+      "decoration": {
+        "style": "DASHED"
+      }
+    },
+    "editor.indent.guide.current": {
+      "fgColor": "NonTextCharacterColor 50%",
+      "decoration": {
+        "style": "DASHED"
+      }
+    },
+    "editor.indent.guide.declaration": {
+      "fgColor": "Selection"
+    },
+    "editor.indent.guide.declaration.current": {
+      "fgColor": "Purple",
+      "decoration": {
+        "style": "DASHED"
+      }
+    }
+  },
+  "palette": {
+    "Background": "212C2A",
+    "Foreground": "F8F8F2",
+    "Selection": "415854",
+    "Comment": "70a99f",
+    "Cyan": "80FFEA",
+    "Green": "8AFF80",
+    "Orange": "FFCA80",
+    "Pink": "FF80BF",
+    "Purple": "9580FF",
+    "Red": "FF9580",
+    "Yellow": "FFFF80",
+    "FunctionalCyan": "73ECE0",
+    "FunctionalGreen": "7DE972",
+    "FunctionalPurple": "8C70E6",
+    "FunctionalRed": "E67070",
+    "FunctionalYellow": "E6E370",
+    "ANSIBlack": "21222C",
+    "ANSIRed": "FF9580",
+    "ANSIGreen": "8AFF80",
+    "ANSIYellow": "FFFF80",
+    "ANSIPurple": "9580FF",
+    "ANSIPink": "FF80BF",
+    "ANSICyan": "80FFEA",
+    "ANSILightWhite": "F8F8F2",
+    "ANSIDarkGray": "70a99f",
+    "ANSILightRed": "FFBFB3",
+    "ANSILightGreen": "B9FFB3",
+    "ANSILightYellow": "FFFFB3",
+    "ANSILightPurple": "BFB3FF",
+    "ANSILightPink": "FFB3D9",
+    "ANSILightCyan": "B3FFF2",
+    "ANSIWhite": "FFFFFF",
+    "LineHighlightColor": "415854",
+    "NonTextCharacterColor": "9580FF",
+    "WhiteColor": "FFFFFF",
+    "TabDropBackgroundColor": "415854",
+    "BackgroundDark": "0A100F",
+    "BackgroundDarker": "050807",
+    "BackgroundLight": "13201E",
+    "BackgroundLighter": "26403C"
+  }
+}

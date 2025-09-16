@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Dracula PRO - Van Helsing",
+  "description": "Premium dark theme for Chrome",
+  "version": "2.0",
+  "theme": {
+    "colors": {
+      "frame": [11, 13, 15],
+      "frame_inactive": [65, 77, 88],
+      "frame_incognito": [11, 13, 15],
+      "frame_incognito_inactive": [11, 13, 15],
+      "bookmark_text": [248, 248, 242],
+      "tab_text": [248, 248, 242],
+      "tab_background_text": [248, 248, 242],
+      "tab_background_text_inactive": [112, 140, 169],
+      "tab_background_text_incognito": [149, 128, 255],
+      "tab_background_text_incognito_inactive": [112, 140, 169],
+      "toolbar": [65, 77, 88],
+      "toolbar_button_icon": [112, 140, 169],
+      "omnibox_text": [149, 128, 255],
+      "omnibox_background": [11, 13, 15],
+      "ntp_background": [11, 13, 15],
+      "ntp_link": [149, 128, 255],
+      "ntp_text": [248, 248, 242],
+      "button_background": [11, 13, 15]
+    }
+  }
+}

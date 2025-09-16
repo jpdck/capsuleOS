@@ -1,0 +1,50 @@
+theme = "dracula-pro"
+
+[editor]
+line-number = "relative"
+cursorline = true
+auto-completion = true
+auto-format = true
+auto-save = true
+completion-trigger-len = 2
+rulers = [100]
+bufferline = "multiple"
+
+[editor.statusline]
+left = ["mode", "spinner"]
+center = ["file-name"]
+right = ["diagnostics", "selections", "position", "file-encoding", "file-line-ending", "file-type"]
+
+[editor.cursor-shape]
+insert = "bar"
+normal = "block"
+select = "underline"
+
+[editor.file-picker]
+hidden = false
+
+[editor.auto-pairs]
+'(' = ')'
+'{' = '}'
+'[' = ']'
+'"' = '"'
+'`' = '`'
+
+[editor.indent-guides]
+render = true
+character = "┊"
+
+[keys.normal]
+# Vim-style bindings are default in Helix
+# Additional useful bindings for Rust development
+"space" = "command_palette"
+"C-s" = ":write"
+"C-q" = ":quit"
+
+[keys.insert]
+"C-c" = "normal_mode"
+"C-s" = ":write"
+
+[keys.select]
+"C-c" = "normal_mode"
+

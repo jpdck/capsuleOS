@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Dracula PRO - Blade",
+  "description": "Premium light theme for Chrome",
+  "version": "1.0",
+  "theme": {
+    "colors": {
+      "frame": [245, 245, 245],
+      "frame_inactive": [207, 207, 222],
+      "frame_incognito": [245, 245, 245],
+      "frame_incognito_inactive": [245, 245, 245],
+      "bookmark_text": [31, 31, 31],
+      "tab_text": [31, 31, 31],
+      "tab_background_text": [31, 31, 31],
+      "tab_background_text_inactive": [99, 93, 151],
+      "tab_background_text_incognito": [100, 74, 201],
+      "tab_background_text_incognito_inactive": [99, 93, 151],
+      "toolbar": [207, 207, 222],
+      "toolbar_button_icon": [99, 93, 151],
+      "omnibox_text": [100, 74, 201],
+      "omnibox_background": [245, 245, 245],
+      "ntp_background": [245, 245, 245],
+      "ntp_link": [100, 74, 201],
+      "ntp_text": [31, 31, 31],
+      "button_background": [245, 245, 245]
+    }
+  }
+}

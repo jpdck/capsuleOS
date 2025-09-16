@@ -1,0 +1,122 @@
+# Dracula Pro theme for Helix
+# Based on the original Dracula Pro by Zeno Rocha
+
+[palette]
+background = "#22212C"
+foreground = "#f8f8f2"
+caret = "#f8f8f0"
+selection = "#454158"
+lineHighlight = "#454158"
+comment = "#7970A9"
+
+# Core colors - match Warp exactly
+cyan = "#80FFEA"
+green = "#8AFF80"
+orange = "#FFCA80"
+pink = "#FF80BF"
+purple = "#9580FF"
+red = "#FF80BF"      # Fixed: was #F83333, now matches Warp's Dracula Pro
+yellow = "#FFFF80"
+white = "#f8f8f2"
+
+# Bright variants - added from Warp theme for cohesion
+bright-cyan = "#A0FFF3"
+bright-green = "#C8FFAE"
+bright-orange = "#FFCAFF"
+bright-pink = "#FFAC9B"
+bright-purple = "#B7A2FF"
+bright-red = "#FFAC9B"
+bright-yellow = "#effb7b"
+bright-white = "#FFFFFF"
+
+# Additional colors for syntax variety
+light-gray = "#CFCFC2"
+cyan-alt = "#66d9ef"
+cyan-alt2 = "#6be5fd"
+
+# UI Elements
+"ui.background" = { bg = "background" }
+"ui.cursor" = { fg = "caret", modifiers = ["reversed"] }
+"ui.cursor.match" = { fg = "yellow", bg = "background" }
+"ui.cursor.insert" = { fg = "white" }
+"ui.cursor.select" = { fg = "white" }
+"ui.selection" = { bg = "selection" }
+"ui.selection.primary" = { bg = "selection" }
+"ui.linenr" = { fg = "comment" }
+"ui.linenr.selected" = { fg = "foreground" }
+"ui.statusline" = { fg = "foreground", bg = "background" }
+"ui.statusline.inactive" = { fg = "comment", bg = "background" }
+"ui.text" = { fg = "foreground" }
+"ui.text.focus" = { fg = "cyan" }
+"ui.help" = { fg = "foreground", bg = "background" }
+"ui.popup" = { bg = "background" }
+"ui.window" = { fg = "comment" }
+"ui.menu" = { fg = "foreground", bg = "background" }
+"ui.menu.selected" = { fg = "background", bg = "cyan" }
+
+# Syntax highlighting
+"comment" = { fg = "comment" }
+"string" = { fg = "yellow" }
+"constant" = { fg = "purple" }
+"constant.numeric" = { fg = "purple" }
+"constant.builtin" = { fg = "bright-purple" }
+"constant.character" = { fg = "purple" }
+"constant.character.escape" = { fg = "pink" }
+"type" = { fg = "cyan", modifiers = ["italic"] }
+"type.builtin" = { fg = "cyan-alt", modifiers = ["italic"] }
+"constructor" = { fg = "cyan" }
+"variable" = { fg = "foreground" }
+"variable.parameter" = { fg = "orange", modifiers = ["italic"] }
+"variable.other.member" = { fg = "foreground" }
+"variable.function" = { fg = "green" }
+"variable.builtin" = { fg = "purple" }
+"variable.other.readwrite.instance" = { fg = "orange" }
+"function" = { fg = "green" }
+"function.builtin" = { fg = "cyan" }
+"function.method" = { fg = "green" }
+"keyword" = { fg = "pink" }
+"keyword.control" = { fg = "bright-pink" }
+"keyword.operator" = { fg = "pink" }
+"keyword.storage" = { fg = "pink" }
+"keyword.storage.type" = { fg = "cyan", modifiers = ["italic"] }
+"operator" = { fg = "pink" }
+"punctuation" = { fg = "foreground" }
+"punctuation.bracket" = { fg = "white" }
+"punctuation.delimiter" = { fg = "foreground" }
+"tag" = { fg = "pink" }
+"attribute" = { fg = "green" }
+"namespace" = { fg = "cyan" }
+"special" = { fg = "pink" }
+"label" = { fg = "purple" }
+
+# Markup (Markdown)
+"markup.heading" = { fg = "cyan" }
+"markup.list" = { fg = "pink" }
+"markup.bold" = { fg = "orange", modifiers = ["bold"] }
+"markup.italic" = { fg = "orange", modifiers = ["italic"] }
+"markup.strikethrough" = { fg = "orange", modifiers = ["crossed_out"] }
+"markup.link.url" = { fg = "purple", modifiers = ["underlined"] }
+"markup.link.text" = { fg = "purple" }
+"markup.quote" = { fg = "comment", modifiers = ["italic"] }
+"markup.raw.inline" = { fg = "green" }
+"markup.raw.block" = { fg = "light-gray" }
+
+# Diff
+"diff.plus" = { fg = "green" }
+"diff.minus" = { fg = "pink" }
+"diff.delta" = { fg = "yellow" }
+
+# JSON
+"string.special.key" = { fg = "bright-cyan" }
+
+# Error/Warning/Info - using proper Dracula Pro colors
+"error" = { fg = "bright-red" }
+"warning" = { fg = "orange" }
+"info" = { fg = "cyan" }
+"hint" = { fg = "comment" }
+
+# Diagnostic - match above
+"diagnostic.error" = { fg = "bright-red" }
+"diagnostic.warning" = { fg = "orange" }
+"diagnostic.info" = { fg = "cyan" }
+"diagnostic.hint" = { fg = "comment" }

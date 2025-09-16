@@ -1,0 +1,41 @@
+[user]
+	email = jeff@jpdck.dev
+	name = Jeff Pidcock
+	signingKey = 82E103947A9FCD461F88F593550E624E062EC194
+
+[init]
+	defaultBranch = main
+
+[gpg]
+	program = /opt/homebrew/bin/gpg
+	format = openpgp
+
+[push]
+	default = simple
+
+[pull]
+	rebase = true
+
+[core]
+	editor = hx
+
+[diff]
+	tool = delta
+
+[merge]
+	tool = delta
+
+[commit]
+	gpgsign = true
+
+[delta]
+	navigate = true
+	light = false
+	syntax-theme = Dracula
+	features = side-by-side line-numbers decorations
+	whitespace-error-style = 22 reverse
+
+[delta "decorations"]
+	commit-decoration-style = bold yellow box ul
+	file-style = bold yellow ul
+	file-decoration-style = none

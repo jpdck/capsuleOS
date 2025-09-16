@@ -1,0 +1,58 @@
+# Installation logs
+install.log
+*.log
+
+# macOS system files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# 1Password service tokens and secrets
+.env
+.env.local
+**/service-token*
+**/*token*
+**/*secret*
+
+# Temporary files
+*.tmp
+*.temp
+.tmp/
+temp/
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Homebrew lock files (if any)
+Brewfile.lock.json
+
+# Local customizations
+local/
+*.local
+
+# SSH keys (safety measure)
+id_*
+*.pem
+*.key
+!*.pub
+
+# Cache directories
+.cache/
+cache/
+
+# User-specific dotfiles that shouldn't be tracked
+dotfiles/*/.*rc.local
+dotfiles/*/.local*

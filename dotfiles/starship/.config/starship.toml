@@ -1,0 +1,178 @@
+# Starship Pills Theme - Nerd Font Icons, FULL FEATURE RESTORED
+
+add_newline = false
+palette = "default"
+
+format = """
+[╭─](fg:separator)\
+$status\
+$directory\
+$git_branch\
+$git_status\
+$git_metrics\
+$conda\
+$rust\
+$python\
+$nodejs\
+$package\
+$container\
+$docker_context\
+$memory_usage\
+$battery\
+$cmd_duration\
+$time\
+$line_break\
+[╰](fg:separator)\
+$character\
+"""
+
+[palettes.default]
+prompt_ok  = "#8AFF80"
+prompt_err = "#F83333"
+icon       = "#22212C"
+separator  = "#454158"
+background = "#22212C"
+
+directory   = "#80FFEA"
+duration    = "#E6DB74"
+status      = "#F83333"
+git_branch  = "#9580FF"
+git_status  = "#8AFF80"
+git_metrics = "#FFCA80"
+rust        = "#FFAC9B"
+python      = "#FFFF80"
+nodejs      = "#8AFF80"
+conda       = "#80FFEA"
+container   = "#FF80BF"
+docker      = "#66d9ef"
+memory      = "#FFCA80"
+battery     = "#8AFF80"
+
+[character]
+success_symbol = "[](fg:prompt_ok)"
+error_symbol   = "[](fg:prompt_err)"
+
+[status]
+format = "[](fg:status)[$status](bg:status)[](fg:status bg:background)"
+pipestatus = true
+pipestatus_separator = ""
+pipestatus_segment_format = "$status"
+pipestatus_format = "[](fg:status)[$pipestatus](bg:status)[](fg:status bg:background)"
+disabled = false
+
+[directory]
+format = "[](fg:directory)[$path](bg:directory)[](fg:directory bg:background)"
+truncate_to_repo = false
+truncation_length = 0
+
+[directory.substitutions]
+"Documents" = "󰈙"
+"Downloads" = ""
+"Music"     = "󰝚"
+"Pictures"  = ""
+"Projects"  = "󰲋"
+"Desktop"   = ""
+"Videos"    = "󰕧"
+".config"   = ""
+".local"    = ""
+".cache"    = ""
+
+[git_branch]
+format = "([](fg:git_branch)[ $branch](bg:git_branch)[](fg:git_branch bg:background))"
+
+[git_status]
+format = "([](fg:git_status)[$all_status$ahead_behind](bg:git_status)[](fg:git_status bg:background))"
+conflicted = "ﲅ"
+ahead      = "${count}"
+behind     = "${count}"
+diverged   = "${ahead_count}${behind_count}"
+untracked  = ""
+stashed    = ""
+modified   = ""
+staged     = ""
+renamed    = ""
+deleted    = ""
+
+[git_metrics]
+format = "([](fg:git_metrics)[( $added)](fg:icon bg:git_metrics)[( $deleted)](fg:icon bg:git_metrics)[](fg:git_metrics bg:background))"
+added_style   = "fg:icon bg:git_metrics"
+deleted_style = "fg:icon bg:git_metrics"
+ignore_submodules = true
+disabled = false
+
+[conda]
+format = "[](fg:conda)[ conda:$environment](bg:conda)[](fg:conda bg:background)"
+style = "fg:background bg:conda"
+
+[rust]
+format = "[](fg:rust)[ $version](bg:rust)[](fg:rust bg:background)"
+symbol = " "
+version_format = "${raw}"
+style = "fg:background bg:rust"
+detect_files = ["Cargo.toml", "Cargo.lock"]
+detect_folders = []
+detect_extensions = []
+
+[python]
+format = "[](fg:python)[ $version](bg:python)[](fg:python bg:background)"
+symbol = " "
+version_format = "${raw}"
+style = "fg:background bg:python"
+detect_files = ["requirements.txt", "pyproject.toml", "setup.py", ".python-version"]
+detect_folders = []
+detect_extensions = []
+
+[nodejs]
+format = "[](fg:nodejs)[ $version](bg:nodejs)[](fg:nodejs bg:background)"
+version_format = "${raw}"
+style = "fg:background bg:nodejs"
+detect_files = ["package-lock.json", "yarn.lock"]
+detect_folders = ["node_modules"]
+detect_extensions = []
+
+[package]
+format = "[](fg:nodejs)[ $version](bg:nodejs)[](fg:nodejs bg:background)"
+version_format = "${raw}"
+style = "fg:background bg:nodejs"
+
+[container]
+format = "[](fg:container)[ $name](bg:container)[](fg:container bg:background)"
+style = "fg:background bg:container"
+
+[docker_context]
+format = "[](fg:docker)[ $context](bg:docker)[](fg:docker bg:background)"
+style = "fg:background bg:docker"
+
+[memory_usage]
+format = "[](fg:memory)[󰍛 ${ram}](bg:memory)[](fg:memory bg:background)"
+style = "fg:background bg:memory"
+disabled = false
+threshold = 75
+
+[battery]
+format = "[](fg:battery)[$percentage $symbol](bg:battery)[](fg:battery bg:background)"
+full_symbol        = "󰁹"
+charging_symbol    = "󰂄"
+discharging_symbol = "󰂃"
+unknown_symbol     = "󰂎"
+empty_symbol       = "󰁺"
+
+[[battery.display]]
+threshold = 20
+style = "fg:background bg:prompt_err"
+
+[[battery.display]]
+threshold = 60
+style = "fg:background bg:battery"
+
+[[battery.display]]
+threshold = 70
+style = "fg:background bg:battery"
+
+[cmd_duration]
+format = "[](fg:duration)[󱐋 $duration](bg:duration)[](fg:duration bg:background)"
+min_time = 1000
+
+[time]
+format = "[](fg:duration)[󰥔 $time](bg:duration)[](fg:duration bg:background)"
+disabled = true

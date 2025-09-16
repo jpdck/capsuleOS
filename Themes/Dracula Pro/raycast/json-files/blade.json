@@ -1,0 +1,21 @@
+{
+  "appearance": "dark",
+  "name": "Dracula PRO - Blade",
+  "version": "1",
+  "author": "Lucas de França",
+  "authorUsername": "luxonauta",
+  "colors": {
+    "background": "#212C2A",
+    "backgroundSecondary": "#212C2A",
+    "text": "#F8F8F2",
+    "selection": "#70A99F",
+    "loader": "#415854",
+    "red": "#FFA680",
+    "orange": "#FFCA80",
+    "yellow": "#FFFF80",
+    "green": "#8AFF80",
+    "blue": "#80FFEA",
+    "purple": "#9580FF",
+    "magenta": "#FF80BF"
+  }
+}
