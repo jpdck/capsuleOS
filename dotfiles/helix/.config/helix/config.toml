@@ -9,6 +9,9 @@ auto-save = true
 completion-trigger-len = 2
 rulers = [100]
 bufferline = "multiple"
+mouse = true
+popup-border = "menu"
+end-of-line-diagnostics = "hint"
 
 [editor.statusline]
 left = ["mode", "spinner"]
@@ -34,12 +37,34 @@ hidden = false
 render = true
 character = "┊"
 
+[editor.lsp]
+display-inlay-hints = true
+display-signature-help-docs = true
+snippets = true
+
+[editor.inline-diagnostics]
+cursor-line = "warning"
+
+[editor.soft-wrap]
+enable = true
+max-wrap = 25
+max-indent-retain = 0
+wrap-indicator = ""
+
+[editor.gutters]
+layout = ["diff", "diagnostics", "line-numbers", "spacer"]
+
+[editor.auto-save.after-delay]
+enable = true
+timeout = 1500
+
 [keys.normal]
 # Vim-style bindings are default in Helix
 # Additional useful bindings for Rust development
 "space" = "command_palette"
 "C-s" = ":write"
 "C-q" = ":quit"
+"C-w" = ":write-quit"
 
 [keys.insert]
 "C-c" = "normal_mode"

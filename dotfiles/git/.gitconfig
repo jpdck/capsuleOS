@@ -10,6 +10,10 @@
 	program = /opt/homebrew/bin/gpg
 	format = openpgp
 
+[gpg "ssh"]
+	program =
+	allowedSignersFile =
+
 [push]
 	default = simple
 
@@ -18,6 +22,7 @@
 
 [core]
 	editor = hx
+	excludesfile = ~/.gitignore_global
 
 [diff]
 	tool = delta
@@ -26,7 +31,10 @@
 	tool = delta
 
 [commit]
-	gpgsign = true
+	gpgSign = true
+
+[tag]
+	forceSignAnnotated = true
 
 [delta]
 	navigate = true
