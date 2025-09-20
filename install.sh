@@ -62,6 +62,7 @@ confirm() {
 #########################################
 
 print_status "Phase 1: System Prerequisites"
+sleep 2
 
 # Check macOS version
 macos_version=$(sw_vers -productVersion)
@@ -119,6 +120,7 @@ brew update
 #########################################
 
 print_status "Phase 2: Package Installation"
+sleep 2
 
 # Check for Brewfile
 if [[ ! -f "Brewfile" ]]; then
@@ -140,6 +142,7 @@ fi
 #########################################
 
 print_status "Phase 3: 1Password Integration"
+sleep 2
 
 # Check if 1Password CLI is available
 if command_exists op; then
@@ -273,22 +276,23 @@ fi
 #########################################
 
 print_status "Phase 4: Repository Setup"
+sleep 2
 
 # Create Projects directory
-print_status "Creating ~/Projects directory..."
-mkdir -p ~/Projects
+print_status "Creating $HOME/Projects directory..."
+mkdir -p "$HOME/Projects"
 
 # Clone the capsuleOS repository
 print_status "Cloning capsuleOS repository..."
-if [[ -d "~/Projects/capsuleOS" ]]; then
-    print_warning "~/Projects/capsuleOS already exists, removing..."
-    rm -rf ~/Projects/capsuleOS
+if [[ -d "$HOME/Projects/capsuleOS" ]]; then
+    print_warning "$HOME/Projects/capsuleOS already exists, removing..."
+    rm -rf "$HOME/Projects/capsuleOS"
 fi
 
-if git clone ssh://git@github.com/jpdck/capsuleOS.git ~/Projects/capsuleOS; then
+if git clone ssh://git@github.com/jpdck/capsuleOS.git "$HOME/Projects/capsuleOS"; then
     print_success "Repository cloned successfully"
-    cd ~/Projects/capsuleOS
-    print_status "Changed working directory to ~/Projects/capsuleOS"
+    cd "$HOME/Projects/capsuleOS"
+    print_status "Changed working directory to $HOME/Projects/capsuleOS"
 else
     print_error "Failed to clone repository. Please check your SSH keys and try again."
     exit 1
@@ -312,6 +316,7 @@ print_success "Repository setup completed"
 #########################################
 
 print_status "Phase 5: Dotfiles Setup"
+sleep 2
 
 # Verify stow is installed
 if ! command_exists stow; then
@@ -323,10 +328,31 @@ fi
 print_status "Setting up dotfiles with stow..."
 cd dotfiles
 
+# Handle potential conflicts before stowing
+print_status "Checking for potential dotfile conflicts..."
+
+# Remove common conflicting files that tools auto-create
+conflicting_files=(
+    "$HOME/.gitconfig"
+    "$HOME/.gitignore_global"
+    "$HOME/.bashrc"
+    "$HOME/.zshrc"
+    "$HOME/.zshenv"
+    "$HOME/.zprofile"
+)
+
+for file in "${conflicting_files[@]}"; do
+    if [[ -f "$file" && ! -L "$file" ]]; then
+        print_warning "Found conflicting file: $file (backing up and removing)"
+        mv "$file" "${file}.backup-$(date +%Y%m%d%H%M%S)"
+        print_status "Backed up and removed $file"
+    fi
+done
+
 for package in */; do
     package_name=$(basename "$package")
     print_status "Stowing $package_name..."
-    stow --verbose "$package_name" || print_warning "Failed to stow $package_name"
+    stow --target="$HOME" --verbose "$package_name" || print_warning "Failed to stow $package_name"
 done
 
 cd ..
@@ -351,6 +377,7 @@ print_success "Dotfiles setup completed"
 #########################################
 
 print_status "Phase 5b: ClaudeCode Managed Settings"
+sleep 2
 
 # Source and target paths
 CLAUDE_SOURCE_FILE="Settings/ClaudeCode/managed-settings.json"
@@ -426,34 +453,66 @@ fi
 #########################################
 
 print_status "Phase 6: macOS System Configuration"
+sleep 2
 
 if confirm "Apply recommended macOS system settings?"; then
     print_status "Applying macOS system settings..."
 
-    # Enable key repeat (disable press and hold)
+    # Global Interface Settings
+    print_status "Configuring global interface settings..."
     defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
-
-    # Show hidden files in Finder
-    defaults write com.apple.finder AppleShowAllFiles -bool true
-
-    # Disable natural scrolling
-    defaults write NSGlobalDomain com.apple.swipescrolldirection -bool false
-
-    # Set faster key repeat
-    defaults write NSGlobalDomain KeyRepeat -int 2
-    defaults write NSGlobalDomain InitialKeyRepeat -int 15
-
-    # Show file extensions
     defaults write NSGlobalDomain AppleShowAllExtensions -bool true
-
-    # Disable the "Are you sure you want to open this application?" dialog
-    defaults write com.apple.LaunchServices LSQuarantine -bool false
-
-    # Enable full keyboard access for all controls
+    defaults write NSGlobalDomain InitialKeyRepeat -int 14
+    defaults write NSGlobalDomain KeyRepeat -int 1
+    defaults write NSGlobalDomain AppleInterfaceStyle -string "Dark"
+    defaults write NSGlobalDomain AppleScrollerPagingBehavior -bool true
+    defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true
+    defaults write NSGlobalDomain PMPrintingExpandedStateForPrint -bool true
+    defaults write NSGlobalDomain "com.apple.trackpad.scaling" -float 2.0
+    defaults write NSGlobalDomain "com.apple.mouse.tapBehavior" -int 1
     defaults write NSGlobalDomain AppleKeyboardUIMode -int 3
+    defaults write NSGlobalDomain com.apple.swipescrolldirection -bool true
+
+    # Dock Configuration
+    print_status "Configuring dock settings..."
+    defaults write com.apple.dock autohide -bool false
+    defaults write com.apple.dock orientation -string "bottom"
+    defaults write com.apple.dock showhidden -bool true
+    defaults write com.apple.dock mineffect -string "genie"
+    defaults write com.apple.dock show-recents -bool false
+    defaults write com.apple.dock tilesize -int 36
+    defaults write com.apple.dock magnification -bool true
+    defaults write com.apple.dock largesize -int 48
+    defaults write com.apple.dock autohide-delay -float 0.0
+    defaults write com.apple.dock autohide-time-modifier -float 0.5
+
+    # Finder Settings
+    print_status "Configuring Finder settings..."
+    defaults write com.apple.finder AppleShowAllFiles -bool true
+    defaults write com.apple.finder AppleShowAllExtensions -bool true
+    defaults write com.apple.finder ShowPathbar -bool true
+    defaults write com.apple.finder ShowStatusBar -bool true
+    defaults write com.apple.finder _FXSortFoldersFirst -bool true
+    defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
+    defaults write com.apple.finder QuitMenuItem -bool true
+
+    # Trackpad Settings
+    print_status "Configuring trackpad settings..."
+    defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
+    defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true
+    defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadRightClick -bool true
+    defaults write com.apple.AppleMultitouchTrackpad TrackpadRightClick -bool true
+
+    # Screensaver Security
+    print_status "Configuring screensaver security..."
+    defaults write com.apple.screensaver askForPassword -bool true
+    defaults write com.apple.screensaver askForPasswordDelay -int 5
 
     # Restart affected services
+    print_status "Restarting affected system services..."
+    killall Dock
     killall Finder
+    killall SystemUIServer
 
     print_success "macOS system settings applied"
 else
@@ -485,6 +544,7 @@ print_success "Additional directory structure created"
 #########################################
 
 print_status "Phase 7: App Store Installation"
+sleep 2
 
 if command_exists mas; then
     # Check if user is signed into Mac App Store
@@ -538,6 +598,7 @@ fi
 #########################################
 
 print_status "Phase 8: Language-Specific Tools Installation"
+sleep 2
 
 # Install additional Rust tools
 if command_exists cargo; then

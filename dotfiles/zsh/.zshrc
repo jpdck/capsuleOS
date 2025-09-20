@@ -34,7 +34,7 @@ setopt HIST_VERIFY               # Don't execute immediately upon history expans
 
 # Completion system
 autoload -U compinit
-compinit -d ~/.cache/zsh/zcompdump-$ZSH_VERSION
+compinit -d ~/.cache/zsh/zcompdump-$ZSH_VERSION -i
 
 # Case-insensitive completion
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*'
@@ -46,8 +46,6 @@ zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-
 
 # Key bindings (emacs mode for better terminal compatibility)
 bindkey -e
-bindkey '^[[A' history-substring-search-up
-bindkey '^[[B' history-substring-search-down
 bindkey '^R' history-incremental-search-backward
 
 # === ENVIRONMENT SETUP ===
@@ -75,13 +73,14 @@ warpify_support() {
     if [[ "$warp_detected" == true ]]; then
         export WARP_ENABLED=1
 
-        # Send Warp initialization hook for remote sessions
-        printf '\eP$f{"hook": "SourcedRcFileForWarp", "value": { "shell": "zsh", "hostname": "%s", "remote": %s}}\x9c' \
-            "$HOSTNAME_LC" "$([[ -n "$SSH_CONNECTION" ]] && echo "true" || echo "false")"
-
         # Enhanced remote session support
         if [[ -n "$SSH_CONNECTION" ]]; then
             export WARP_REMOTE_SESSION=1
+
+            # Send Warp initialization hook for remote sessions only
+            printf '\eP$f{"hook": "SourcedRcFileForWarp", "value": { "shell": "zsh", "hostname": "%s", "remote": true}}\x9c' \
+                "$HOSTNAME_LC"
+
             # Configure for optimal remote Warp performance
             export TERM="${TERM:-xterm-256color}"
             stty -ixon  # Disable XON/XOFF flow control for better responsiveness
@@ -164,6 +163,13 @@ fi
 if [[ -f /opt/homebrew/share/zsh-fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh ]]; then
   source /opt/homebrew/share/zsh-fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
 fi
+
+if [[ -f /opt/homebrew/share/zsh-history-substring-search/zsh-history-substring-search.zsh ]]; then
+    source /opt/homebrew/share/zsh-history-substring-search/zsh-history-substring-search.zsh
+    # Bind keys after plugin is loaded
+    bindkey '^[[A' history-substring-search-up
+    bindkey '^[[B' history-substring-search-down
+  fi
 
 # === ALIASES ===
 

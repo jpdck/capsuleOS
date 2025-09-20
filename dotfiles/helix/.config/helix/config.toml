@@ -5,7 +5,6 @@ line-number = "relative"
 cursorline = true
 auto-completion = true
 auto-format = true
-auto-save = true
 completion-trigger-len = 2
 rulers = [100]
 bufferline = "multiple"

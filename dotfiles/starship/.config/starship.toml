@@ -1,7 +1,8 @@
-# Starship Pills Theme - Nerd Font Icons, FULL FEATURE RESTORED
+# Starship Pills Theme - Dracula Pro Colors
+# Based on official Dracula Pro XML for perfect consistency across development environment
 
 add_newline = false
-palette = "default"
+palette = "dracula_pro"
 
 format = """
 [╭─](fg:separator)\
@@ -26,27 +27,29 @@ $line_break\
 $character\
 """
 
-[palettes.default]
-prompt_ok  = "#8AFF80"
-prompt_err = "#F83333"
-icon       = "#22212C"
-separator  = "#454158"
-background = "#22212C"
+[palettes.dracula_pro]
+# Core UI colors from official Dracula Pro XML
+prompt_ok  = "#8AFF80"   # green - for success
+prompt_err = "#F83333"   # red - for errors
+icon       = "#22212C"   # background - for icon backgrounds
+separator  = "#454158"   # selection - for separators
+background = "#22212C"   # background
 
-directory   = "#80FFEA"
-duration    = "#E6DB74"
-status      = "#F83333"
-git_branch  = "#9580FF"
-git_status  = "#8AFF80"
-git_metrics = "#FFCA80"
-rust        = "#FFAC9B"
-python      = "#FFFF80"
-nodejs      = "#8AFF80"
-conda       = "#80FFEA"
-container   = "#FF80BF"
-docker      = "#66d9ef"
-memory      = "#FFCA80"
-battery     = "#8AFF80"
+# Semantic colors using official Dracula Pro palette
+directory   = "#80FFEA"  # cyan - for paths/directories
+duration    = "#E6DB74"  # filename color from XML - for durations
+status      = "#F83333"  # red - for error status
+git_branch  = "#9580FF"  # purple - for git branches
+git_status  = "#8AFF80"  # green - for git status
+git_metrics = "#FFCA80"  # orange - for git metrics
+rust        = "#FFCA80"  # orange - consistent with git metrics
+python      = "#FFFF80"  # yellow - string color from XML
+nodejs      = "#8AFF80"  # green - function color from XML
+conda       = "#80FFEA"  # cyan - type color from XML
+container   = "#FF80BF"  # pink - keyword color from XML
+docker      = "#66d9ef"  # cyan-alt - library function color from XML
+memory      = "#FFCA80"  # orange - parameter color from XML
+battery     = "#8AFF80"  # green - success color
 
 [character]
 success_symbol = "[](fg:prompt_ok)"
