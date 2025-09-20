@@ -1,13 +1,17 @@
 # Dracula Pro theme for Helix
-# Based on the original Dracula Pro by Zeno Rocha
+# Based on the official Dracula Pro by Zeno Rocha
+# Colors sourced from DraculaPro.xml to ensure perfect consistency
 
 [palette]
+# Core UI colors from official XML
 background = "#22212C"
 foreground = "#f8f8f2"
 caret = "#f8f8f0"
 selection = "#454158"
 lineHighlight = "#454158"
 comment = "#7970A9"
+
+# Primary accent colors from official XML
 cyan = "#80FFEA"
 green = "#8AFF80"
 orange = "#FFCA80"
@@ -16,6 +20,8 @@ purple = "#9580FF"
 red = "#F83333"
 yellow = "#FFFF80"
 white = "#ffffff"
+
+# Additional colors from official XML
 light-gray = "#CFCFC2"
 cyan-alt = "#66d9ef"
 cyan-alt2 = "#6be5fd"

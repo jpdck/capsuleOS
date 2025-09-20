@@ -1,7 +1,7 @@
 [user]
 	email = jeff@jpdck.dev
 	name = Jeff Pidcock
-	signingKey = 82E103947A9FCD461F88F593550E624E062EC194
+	signingKey = 606A583082CD84C2CE8457C15EB34422E5D66AD8
 
 [init]
 	defaultBranch = main
@@ -39,11 +39,22 @@
 [delta]
 	navigate = true
 	light = false
-	syntax-theme = Dracula
 	features = side-by-side line-numbers decorations
-	whitespace-error-style = 22 reverse
+	# Dracula Pro colors from official XML for perfect consistency
+	syntax-theme = base16
+	plus-style = "#8AFF80"
+	minus-style = "#FF80BF"
+	plus-emph-style = "#8AFF80 bold"
+	minus-emph-style = "#FF80BF bold"
+	line-numbers-plus-style = "#8AFF80"
+	line-numbers-minus-style = "#FF80BF"
+	line-numbers-zero-style = "#7970A9"
+	whitespace-error-style = "#F83333 reverse"
+	file-style = "#E6DB74 bold"
+	hunk-header-style = "#9580FF bold"
 
 [delta "decorations"]
-	commit-decoration-style = bold yellow box ul
-	file-style = bold yellow ul
+	commit-decoration-style = "#FFFF80 bold box ul"
+	file-style = "#E6DB74 bold ul"
 	file-decoration-style = none
+	hunk-header-decoration-style = "#80FFEA box ul"

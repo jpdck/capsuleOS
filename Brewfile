@@ -22,8 +22,9 @@ brew "tree"                   # Directory tree
 brew "stow"                   # Symlink manager
 
 # Zsh plugins
-brew "zsh-autosuggestions"    # Intelligent suggestions
+brew "zsh-autosuggestions"           # Intelligent suggestions
 brew "zsh-fast-syntax-highlighting"  # Fast syntax highlighting
+brew "zsh-history-substring-search"  # Search history by substring
 
 # File Management & Network Tools
 brew "rsync"                  # File synchronization
