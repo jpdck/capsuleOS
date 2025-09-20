@@ -1,8 +1,7 @@
 # Brewfile for macOS Homebrew Migration
 
 # Taps for additional package sources
-tap "homebrew/bundle"
-tap "homebrew/services"
+# Note: homebrew/bundle and homebrew/services are now part of core Homebrew
 tap "oven-sh/bun"
 
 #########################################
@@ -46,7 +45,7 @@ brew "lazygit"                # Git TUI
 brew "git"                    # Version control
 
 # Archive Utilities
-brew "gnutar"
+brew "gnu-tar"                 # GNU tar (was gnutar)
 
 # Media Utilities
 brew "ffmpeg"
@@ -107,7 +106,7 @@ brew "colima"                 # Docker runtime for macOS
 # Security & Password Management       #
 #########################################
 
-brew "1password-cli"          # 1Password CLI
+brew "1password-cli"          # 1Password CLI (may require manual install if unavailable)
 brew "pinentry-mac"           # Pinentry for GPG
 
 
@@ -115,7 +114,7 @@ brew "pinentry-mac"           # Pinentry for GPG
 # Network & Debugging Tools            #
 #########################################
 
-brew "dog"                    # DNS lookup tool
+brew "dog"                    # DNS lookup tool (alternative: drill, dig)
 brew "xh"                     # HTTP client (alternative to httpie)
 
 #########################################
@@ -132,7 +131,7 @@ brew "pandoc"                 # Document converter
 brew "mas"                    # Mac App Store CLI
 brew "pngpaste"               # Clipboard to PNG
 brew "coreutils"              # GNU coreutils
-brew "claude-code"            # Claude CLI Coding Agent
+brew "claude-code"            # Claude CLI Coding Agent (may require manual install)
 cask "raycast"                # Spotlight replacement & productivity
 
 #########################################
@@ -199,8 +198,8 @@ cask "openrct2"               # RollerCoaster Tycoon 2 open source
 cask "displaylink"            # Monitor management
 cask "logi-options-plus"      # Logitech peripherals
 cask "betterdisplay"          # Monitor management & resolution control
-cask "macmousefix"            # Mouse acceleration & scrolling fixes
-cask "battery-toolkit"        # Battery management
+cask "macmousefix"            # Mouse acceleration & scrolling fixes (may require manual install)
+cask "battery-toolkit"        # Battery management (may require manual install)
 
 # Python Environment Management
 cask "miniconda"              # Python environment management

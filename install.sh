@@ -7,6 +7,9 @@
 
 set -euo pipefail
 
+# Initialize variables to prevent unbound variable errors
+OP_SERVICE_ACCOUNT_TOKEN_TO_ADD=""
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -132,6 +135,29 @@ if brew bundle install --verbose; then
     print_success "All packages installed successfully"
 else
     print_warning "Some packages may have failed to install"
+    print_status "Checking for common missing packages and suggesting alternatives..."
+    
+    # Check for specific packages that commonly fail and suggest alternatives
+    if ! brew list gnutar >/dev/null 2>&1 && ! brew list gnu-tar >/dev/null 2>&1; then
+        print_warning "Neither gnutar nor gnu-tar found. Consider: brew install gnu-tar"
+    fi
+    
+    if ! brew list dog >/dev/null 2>&1; then
+        print_warning "dog not found. Alternatives available: dig (built-in), drill"
+    fi
+    
+    if ! brew list claude-code >/dev/null 2>&1; then
+        print_warning "claude-code not found. This may require manual installation"
+    fi
+    
+    if ! brew list --cask macmousefix >/dev/null 2>&1; then
+        print_warning "macmousefix cask not found. This may require manual installation"
+    fi
+    
+    if ! brew list --cask battery-toolkit >/dev/null 2>&1; then
+        print_warning "battery-toolkit cask not found. This may require manual installation"
+    fi
+    
     print_status "Continuing with available tools..."
 fi
 
@@ -326,7 +352,18 @@ cd dotfiles
 for package in */; do
     package_name=$(basename "$package")
     print_status "Stowing $package_name..."
-    stow --verbose "$package_name" || print_warning "Failed to stow $package_name"
+    
+    # Handle claude package specially to avoid conflicts with existing CLAUDE.md
+    if [[ "$package_name" == "claude" ]]; then
+        print_status "Handling claude dotfiles with conflict resolution..."
+        if stow --verbose --adopt "$package_name"; then
+            print_success "Successfully stowed $package_name with conflict adoption"
+        else
+            print_warning "Failed to stow $package_name even with --adopt"
+        fi
+    else
+        stow --verbose "$package_name" || print_warning "Failed to stow $package_name"
+    fi
 done
 
 cd ..
