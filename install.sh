@@ -347,6 +347,81 @@ fi
 print_success "Dotfiles setup completed"
 
 #########################################
+# Phase 5b: ClaudeCode Managed Settings
+#########################################
+
+print_status "Phase 5b: ClaudeCode Managed Settings"
+
+# Source and target paths
+CLAUDE_SOURCE_FILE="Settings/ClaudeCode/managed-settings.json"
+CLAUDE_TARGET_DIR="/Library/Application Support/ClaudeCode"
+CLAUDE_TARGET_FILE="$CLAUDE_TARGET_DIR/managed-settings.json"
+
+if [[ -f "$CLAUDE_SOURCE_FILE" ]]; then
+    print_status "Preparing ClaudeCode managed settings deployment..."
+
+    # Ensure target directory exists
+    if [[ ! -d "$CLAUDE_TARGET_DIR" ]]; then
+        print_status "Creating target directory: $CLAUDE_TARGET_DIR"
+        if sudo mkdir -p "$CLAUDE_TARGET_DIR"; then
+            print_success "Created directory $CLAUDE_TARGET_DIR"
+        else
+            print_error "Failed to create $CLAUDE_TARGET_DIR"
+        fi
+    fi
+
+    if [[ -f "$CLAUDE_TARGET_FILE" ]]; then
+        # Compare hashes to detect changes
+        new_hash=$(shasum -a 256 "$CLAUDE_SOURCE_FILE" | awk '{print $1}')
+        existing_hash=$(shasum -a 256 "$CLAUDE_TARGET_FILE" | awk '{print $1}')
+
+        if [[ "$new_hash" == "$existing_hash" ]]; then
+            print_success "ClaudeCode managed settings already up to date"
+        else
+            print_warning "Existing ClaudeCode managed settings differ from repository version"
+            if confirm "Backup and overwrite existing ClaudeCode managed settings?"; then
+                timestamp=$(date +%Y%m%d%H%M%S)
+                backup_file="$CLAUDE_TARGET_DIR/managed-settings.json.backup-$timestamp"
+                if sudo cp "$CLAUDE_TARGET_FILE" "$backup_file"; then
+                    print_status "Backup created: $backup_file"
+                else
+                    print_warning "Failed to create backup before overwrite"
+                fi
+                if sudo cp "$CLAUDE_SOURCE_FILE" "$CLAUDE_TARGET_FILE"; then
+                    print_success "Updated ClaudeCode managed settings"
+                else
+                    print_error "Failed to overwrite ClaudeCode managed settings"
+                fi
+            else
+                print_status "Keeping existing ClaudeCode managed settings"
+            fi
+        fi
+    else
+        # Fresh install
+        print_status "Installing ClaudeCode managed settings..."
+        if sudo cp "$CLAUDE_SOURCE_FILE" "$CLAUDE_TARGET_FILE"; then
+            print_success "Installed ClaudeCode managed settings"
+        else
+            print_error "Failed to install ClaudeCode managed settings"
+        fi
+    fi
+
+    # Ownership & permissions (best-effort)
+    if sudo chown root:wheel "$CLAUDE_TARGET_FILE" 2>/dev/null; then
+        :
+    else
+        print_warning "Could not set ownership root:wheel (may not be macOS or insufficient privileges)"
+    fi
+    if sudo chmod 644 "$CLAUDE_TARGET_FILE" 2>/dev/null; then
+        :
+    else
+        print_warning "Could not set permissions 644 on ClaudeCode managed settings"
+    fi
+else
+    print_warning "ClaudeCode managed settings source file not found at $CLAUDE_SOURCE_FILE"
+fi
+
+#########################################
 # Phase 6: macOS Configuration
 #########################################
 
@@ -497,7 +572,7 @@ if command_exists conda; then
 else
     print_warning "conda not found, skipping Python packages installation"
 fi
-Dr
+
 # Source new shell configuration
 print_status "Sourcing new shell configuration..."
 if [[ -f ~/.zshrc ]]; then
