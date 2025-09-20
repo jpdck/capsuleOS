@@ -100,6 +100,9 @@ macos_profile() {
         FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
         export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
     fi
+
+    # LM Studio CLI integration
+    export PATH="$PATH:/Users/jeffreypidcock/.lmstudio/bin"
     
     # Terminal optimizations
     [[ "$TERM_PROGRAM" == "Apple_Terminal" ]] && export TERM="xterm-256color"
@@ -146,6 +149,11 @@ if [[ -f /opt/homebrew/opt/fzf/shell/key-bindings.zsh ]]; then
   if command -v eza >/dev/null 2>&1; then
     export FZF_ALT_C_OPTS='--preview "eza --tree --color=always {} | head -200" --preview-window=right:50%'
   fi
+fi
+
+# Conda integration
+if command -v conda >/dev/null 2>&1; then
+  eval "$(conda shell.zsh hook 2>/dev/null)"
 fi
 
 # ZSH plugins from Homebrew
@@ -266,6 +274,15 @@ localip() { ipconfig getifaddr en0; }
 # Performance Monitoring (macOS)
 cpu() { top -l 1 | grep "CPU usage"; }
 meminfo() { vm_stat | head -6; }
+
+# === SECURITY & AUTHENTICATION ===
+
+# SSH Agent Config - 1Password by default, Secretive for specific hosts via SSH config
+export SSH_AUTH_SOCK="/Users/jeffreypidcock/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+
+# GPG Configuration
+export GPG_TTY=$(tty)
+gpgconf --launch gpg-agent
 
 # === INITIALIZATION ===
 
