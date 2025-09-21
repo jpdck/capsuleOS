@@ -152,9 +152,13 @@ if command_exists op; then
     read -rs OP_SERVICE_ACCOUNT_TOKEN
 
     if [[ -n "$OP_SERVICE_ACCOUNT_TOKEN" ]]; then
-        # Store token for later addition to .zshrc (after dotfiles are stowed)
-        print_status "Storing 1Password service token for later configuration..."
-        export OP_SERVICE_ACCOUNT_TOKEN_TO_ADD="$OP_SERVICE_ACCOUNT_TOKEN"
+        # Store token in macOS Keychain for secure access
+        print_status "Storing 1Password service token in macOS Keychain..."
+        if security add-generic-password -a "$USER" -s "op-service-token" -w "$OP_SERVICE_ACCOUNT_TOKEN" -U 2>/dev/null; then
+            print_success "1Password service token stored securely in Keychain"
+        else
+            print_warning "Failed to store token in Keychain, you may need to add it manually"
+        fi
 
         # Test 1Password CLI with the token
         export OP_SERVICE_ACCOUNT_TOKEN="$OP_SERVICE_ACCOUNT_TOKEN"
@@ -357,18 +361,8 @@ done
 
 cd ..
 
-# Add 1Password service token to .zshrc if it was provided
-if [[ -n "$OP_SERVICE_ACCOUNT_TOKEN_TO_ADD" ]]; then
-    print_status "Adding 1Password service token to .zshrc..."
-    if ! grep -q "OP_SERVICE_ACCOUNT_TOKEN" ~/.zshrc; then
-        echo "" >> ~/.zshrc
-        echo "# 1Password Service Account Token" >> ~/.zshrc
-        echo "export OP_SERVICE_ACCOUNT_TOKEN=\"$OP_SERVICE_ACCOUNT_TOKEN_TO_ADD\"" >> ~/.zshrc
-        print_success "1Password service token added to .zshrc"
-    else
-        print_warning "1Password service token already exists in .zshrc"
-    fi
-fi
+# 1Password service token is now stored securely in macOS Keychain
+# and will be loaded automatically by .zshrc configuration
 
 print_success "Dotfiles setup completed"
 

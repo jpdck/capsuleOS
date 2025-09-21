@@ -1,8 +1,6 @@
 # Brewfile for macOS Homebrew Migration
 
 # Taps for additional package sources
-tap "homebrew/bundle"
-tap "homebrew/services"
 tap "oven-sh/bun"
 
 #########################################
@@ -47,7 +45,7 @@ brew "lazygit"                # Git TUI
 brew "git"                    # Version control
 
 # Archive Utilities
-brew "gnutar"
+brew "gnu-tar"
 
 # Media Utilities
 brew "ffmpeg"
@@ -108,15 +106,16 @@ brew "colima"                 # Docker runtime for macOS
 # Security & Password Management       #
 #########################################
 
-brew "1password-cli"          # 1Password CLI
+cask "1password-cli"          # 1Password CLI
 brew "pinentry-mac"           # Pinentry for GPG
+brew "gnupg"                  # GPG for encryption/signing
 
 
 #########################################
 # Network & Debugging Tools            #
 #########################################
 
-brew "dog"                    # DNS lookup tool
+brew "doggo"                  # DNS lookup tool
 brew "xh"                     # HTTP client (alternative to httpie)
 
 #########################################
@@ -133,7 +132,7 @@ brew "pandoc"                 # Document converter
 brew "mas"                    # Mac App Store CLI
 brew "pngpaste"               # Clipboard to PNG
 brew "coreutils"              # GNU coreutils
-brew "claude-code"            # Claude CLI Coding Agent
+cask "claude-code"            # Claude CLI Coding Agent
 cask "raycast"                # Spotlight replacement & productivity
 
 #########################################
@@ -200,7 +199,7 @@ cask "openrct2"               # RollerCoaster Tycoon 2 open source
 cask "displaylink"            # Monitor management
 cask "logi-options-plus"      # Logitech peripherals
 cask "betterdisplay"          # Monitor management & resolution control
-cask "macmousefix"            # Mouse acceleration & scrolling fixes
+cask "mac-mouse-fix"            # Mouse acceleration & scrolling fixes
 cask "battery-toolkit"        # Battery management
 
 # Python Environment Management
