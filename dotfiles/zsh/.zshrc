@@ -295,3 +295,12 @@ gpgconf --launch gpg-agent
 # Initialize environment setup
 warpify_support
 macos_profile
+
+# 1Password Service Account Token
+if command -v security >/dev/null 2>&1; then
+  OP_TOKEN=$(security find-generic-password -a "$USER" -s "op-service-token" -w 2>/dev/null)
+  if [[ -n "$OP_TOKEN" ]]; then
+    export OP_SERVICE_ACCOUNT_TOKEN="$OP_TOKEN"
+  fi
+  unset OP_TOKEN
+fi
