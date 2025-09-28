@@ -168,7 +168,7 @@ cask "jdownloader"            # Download manager
 cask "usenapp"                # Usenet client
 
 # Development Tools
-cask "warp"                   # Terminal
+cask "tabby"                  # Terminal
 cask "gitkraken"              # Git GUI
 cask "ghidra"                 # Reverse engineering
 cask "lm-studio"              # Local LLM hosting

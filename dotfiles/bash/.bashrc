@@ -4,3 +4,4 @@
 export PATH="$PATH:/Users/jpdck/.lmstudio/bin"
 # End of LM Studio CLI section
 
+. "$HOME/.cargo/env"
