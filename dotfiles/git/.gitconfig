@@ -11,8 +11,8 @@
 	format = openpgp
 
 [gpg "ssh"]
-	program =
-	allowedSignersFile =
+	program = /usr/bin/ssh
+	allowedSignersFile = ~/.config/git/allowed_signers
 
 [push]
 	default = simple

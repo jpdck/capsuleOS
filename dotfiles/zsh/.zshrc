@@ -102,6 +102,11 @@ macos_profile() {
 
     # LM Studio CLI integration
     export PATH="$PATH:/Users/jeffreypidcock/.lmstudio/bin"
+    # Rust/Cargo integration
+    export PATH="$PATH:/Users/jpdck/.cargo/bin"
+
+    # Bun integration
+    export PATH="/Users/jpdck/.bun/bin:$PATH"
     
     # Terminal optimizations
     [[ "$TERM_PROGRAM" == "Apple_Terminal" ]] && export TERM="xterm-256color"
@@ -151,9 +156,9 @@ if [[ -f /opt/homebrew/opt/fzf/shell/key-bindings.zsh ]]; then
 fi
 
 # Conda integration
-if command -v conda >/dev/null 2>&1; then
-  eval "$(conda shell.zsh hook 2>/dev/null)"
-fi
+# if command -v conda >/dev/null 2>&1; then
+#   eval "$(conda shell.zsh hook 2>/dev/null)"
+# fi
 
 # ZSH plugins from Homebrew
 if [[ -f /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
@@ -274,7 +279,7 @@ fdir() { find . -type d -name "*$1*" 2>/dev/null; }
 psg() { ps aux | grep -v grep | grep "$@" -i --color=auto; }
 
 # Network Utilities
-myip() { curl -s ipinfo.io/ip; }
+myip() { curl -s ipinfo.io/ip; echo; }
 localip() { ipconfig getifaddr en0; }
 
 # Performance Monitoring (macOS)
