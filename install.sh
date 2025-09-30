@@ -594,19 +594,32 @@ fi
 print_status "Phase 8: Language-Specific Tools Installation"
 sleep 2
 
-# Install additional Rust tools
+# Install Rust tools from Cargofile
 if command_exists cargo; then
-    print_status "Installing additional Rust tools..."
-    rust_tools=("cargo-edit" "cargo-watch" "cargo-nextest" "bacon" "cargo-audit" "tokei")
+    if [[ -f "Cargofile" ]]; then
+        print_status "Installing Rust tools from Cargofile..."
 
-    for tool in "${rust_tools[@]}"; do
-        print_status "Installing $tool..."
-        if cargo install "$tool"; then
-            print_success "$tool installed successfully"
-        else
-            print_warning "Failed to install $tool"
-        fi
-    done
+        while IFS= read -r line || [[ -n "$line" ]]; do
+            # Skip comments and empty lines
+            if [[ "$line" =~ ^[[:space:]]*# ]] || [[ -z "${line// /}" ]]; then
+                continue
+            fi
+
+            # Extract crate name (first word on the line)
+            crate=$(echo "$line" | awk '{print $1}')
+
+            if [[ -n "$crate" ]]; then
+                print_status "Installing $crate..."
+                if cargo install "$crate"; then
+                    print_success "$crate installed successfully"
+                else
+                    print_warning "Failed to install $crate"
+                fi
+            fi
+        done < "Cargofile"
+    else
+        print_warning "Cargofile not found, skipping Rust tools installation"
+    fi
 else
     print_warning "Cargo not found, skipping Rust tools installation"
 fi

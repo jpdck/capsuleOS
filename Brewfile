@@ -56,6 +56,7 @@ brew "neofetch"               # System info
 brew "htop"                   # Process monitor
 brew "hyperfine"              # Benchmarking
 brew "bandwhich"              # Network monitoring
+brew "gping"                  # Ping with graphs
 
 #########################################
 # Language Toolchains                  #
