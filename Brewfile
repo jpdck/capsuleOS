@@ -161,7 +161,6 @@ cask "handbrake"              # Video transcoding
 cask "iina"                   # Video player
 cask "calibre"                # eBook manager
 cask "kobo"                   # Kobo eBook reader
-cask "marta"                  # File manager
 cask "hiddenbar"              # Menu bar organization
 cask "keka"                   # Archive manager
 cask "transmission"           # BitTorrent client
@@ -169,11 +168,10 @@ cask "jdownloader"            # Download manager
 cask "usenapp"                # Usenet client
 
 # Development Tools
-cask "tabby"                  # Terminal
+cask "warp"                   # Terminal
 cask "gitkraken"              # Git GUI
 cask "ghidra"                 # Reverse engineering
 cask "lm-studio"              # Local LLM hosting
-cask "comfyui"                # UI for Stable Diffusion
 cask "balenaetcher"           # USB/SD card OS image flasher
 cask "kicad"                  # PCB design software
 

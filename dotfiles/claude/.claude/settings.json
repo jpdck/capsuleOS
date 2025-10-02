@@ -5,7 +5,7 @@
     "command": "bunx -y ccstatusline@latest",
     "padding": 0
   },
-  "alwaysThinkingEnabled": false,
+  "alwaysThinkingEnabled": true,
   "feedbackSurveyState": {
     "lastShownTime": 1754356350023
   }
