@@ -301,13 +301,25 @@ gpgconf --launch gpg-agent
 warpify_support
 macos_profile
 
-# 1Password Service Account Token
-if command -v security >/dev/null 2>&1; then
-  OP_TOKEN=$(security find-generic-password -a "$USER" -s "op-service-token" -w 2>/dev/null)
-  if [[ -n "$OP_TOKEN" ]]; then
-    export OP_SERVICE_ACCOUNT_TOKEN="$OP_TOKEN"
+# 1Password CLI Configuration
+if command -v op >/dev/null 2>&1; then
+  # Check if already signed in, only authenticate if needed
+  if ! op account list >/dev/null 2>&1; then
+    echo "[1Password] Not signed in, attempting to authenticate..."
+    # Only try to sign in if 1Password app is available and we're not already authenticated
+    if [ -f "/Applications/1Password.app/Contents/MacOS/op" ]; then
+      eval "$(/Applications/1Password.app/Contents/MacOS/op signin --raw)" 2>/dev/null
+    fi
   fi
-  unset OP_TOKEN
+else
+  # Fallback to service account token from keychain
+  if command -v security >/dev/null 2>&1; then
+    OP_TOKEN=$(security find-generic-password -a "$USER" -s "op-service-token" -w 2>/dev/null)
+    if [[ -n "$OP_TOKEN" ]]; then
+      export OP_SERVICE_ACCOUNT_TOKEN="$OP_TOKEN"
+    fi
+    unset OP_TOKEN
+  fi
 fi
 
 # >>> conda initialize >>>
