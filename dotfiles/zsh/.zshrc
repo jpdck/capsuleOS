@@ -303,23 +303,19 @@ macos_profile
 
 # 1Password CLI Configuration
 if command -v op >/dev/null 2>&1; then
-  # Check if already signed in, only authenticate if needed
-  if ! op account list >/dev/null 2>&1; then
-    echo "[1Password] Not signed in, attempting to authenticate..."
-    # Only try to sign in if 1Password app is available and we're not already authenticated
-    if [ -f "/Applications/1Password.app/Contents/MacOS/op" ]; then
-      eval "$(/Applications/1Password.app/Contents/MacOS/op signin --raw)" 2>/dev/null
+  # Helper function to sign in only when needed
+  op_signin() {
+    # Check if we have an active session
+    if op account list >/dev/null 2>&1; then
+      return 0
     fi
-  fi
-else
-  # Fallback to service account token from keychain
-  if command -v security >/dev/null 2>&1; then
-    OP_TOKEN=$(security find-generic-password -a "$USER" -s "op-service-token" -w 2>/dev/null)
-    if [[ -n "$OP_TOKEN" ]]; then
-      export OP_SERVICE_ACCOUNT_TOKEN="$OP_TOKEN"
-    fi
-    unset OP_TOKEN
-  fi
+
+    # Sign in and export session token for reuse
+    eval "$(op signin)" || echo "✗ 1Password sign-in failed"
+  }
+
+  # Alias for quick access
+  alias ops='op signin'
 fi
 
 # >>> conda initialize >>>
