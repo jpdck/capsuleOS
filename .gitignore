@@ -56,3 +56,4 @@ cache/
 # User-specific dotfiles that shouldn't be tracked
 dotfiles/*/.*rc.local
 dotfiles/*/.local*
+Gaming/
