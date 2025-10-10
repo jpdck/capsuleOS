@@ -52,8 +52,8 @@ brew "ffmpeg"
 brew "imagemagick"
 
 # System Info & Monitoring
-brew "neofetch"               # System info
-brew "htop"                   # Process monitor
+brew "nerdfetch"              # System info
+brew "btop"                   # Process monitor
 brew "hyperfine"              # Benchmarking
 brew "bandwhich"              # Network monitoring
 brew "gping"                  # Ping with graphs
@@ -133,7 +133,6 @@ brew "pandoc"                 # Document converter
 brew "mas"                    # Mac App Store CLI
 brew "pngpaste"               # Clipboard to PNG
 brew "coreutils"              # GNU coreutils
-cask "claude-code"            # Claude CLI Coding Agent
 cask "raycast"                # Spotlight replacement & productivity
 
 #########################################
