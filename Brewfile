@@ -67,21 +67,18 @@ brew "bun"                    # Fast JavaScript runtime & package manager
 
 # Rust Development
 brew "rust"                   # Rust compiler and cargo
-brew "rust-analyzer"          # Rust language server
 brew "bacon"                  # Rust build tool
 
 # Go Development
 brew "go"                     # Go compiler
-brew "gopls"                  # Go language server
 brew "delve"                  # Go debugger
 brew "golangci-lint"          # Go linter
 brew "air"                    # Go live reload
 
 # Python Development
-brew "python@3.13"            # Python 3
+brew "python@3.14"            # Python 3
 brew "ruff"                   # Fast Python linter/formatter
 brew "mypy"                   # Python type checking
-brew "black"                  # Python code formatter
 
 # Java Development
 brew "gradle"                 # Build tool
@@ -136,15 +133,6 @@ brew "coreutils"              # GNU coreutils
 cask "raycast"                # Spotlight replacement & productivity
 
 #########################################
-# Language Servers                     #
-#########################################
-
-brew "yaml-language-server"   # YAML language server
-brew "bash-language-server"   # Bash language server
-brew "marksman"               # Markdown language server
-brew "dockerfile-language-server"  # Docker language server
-
-#########################################
 # GUI Applications (Casks)             #
 #########################################
 
@@ -152,13 +140,11 @@ brew "dockerfile-language-server"  # Docker language server
 cask "1password"              # Password manager
 cask "visual-studio-code"     # Code editor
 cask "firefox"                # Web browser
-cask "discord"                # Communication
 cask "tailscale"              # VPN
 
 # Media & Productivity
 cask "handbrake"              # Video transcoding
 cask "iina"                   # Video player
-cask "calibre"                # eBook manager
 cask "kobo"                   # Kobo eBook reader
 cask "hiddenbar"              # Menu bar organization
 cask "keka"                   # Archive manager
@@ -185,13 +171,13 @@ cask "setapp"                 # Subscription app platform
 cask "proton-drive"           # Cloud storage
 cask "proton-mail"            # Email client
 cask "protonvpn"              # VPN client
-cask "onedrive"               # Microsoft cloud storage
 
 # Gaming & Entertainment
 cask "steam"                  # Gaming platform
 cask "pcsx2"                  # PlayStation 2 emulator
 cask "parallels"              # Virtualization
 cask "openrct2"               # RollerCoaster Tycoon 2 open source
+cask "crossover"              # Run Windows apps on macOS
 
 # Hardware & System Utilities
 cask "displaylink"            # Monitor management
