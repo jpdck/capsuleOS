@@ -184,14 +184,11 @@ cask "crossover"              # Run Windows apps on macOS
 cask "displaylink"            # Monitor management
 cask "logi-options-plus"      # Logitech peripherals
 cask "betterdisplay"          # Monitor management & resolution control
-cask "mac-mouse-fix"            # Mouse acceleration & scrolling fixes
+cask "bettermouse"            # Mouse acceleration & scrolling fixes
 cask "battery-toolkit"        # Battery management
 
 # Python Environment Management
 cask "miniconda"              # Python environment management
-
-# GitKraken CLI
-cask "gitkraken-cli"          # Git CLI tools
 
 #########################################
 # Fonts and Terminal Customization      #
