@@ -96,10 +96,10 @@ brew "gcc"
 #########################################
 
 # Container Management
-brew "docker"                 # Docker CLI
-brew "docker-compose"         # Container orchestration (plugin + standalone)
-brew "docker-credential-helper"  # macOS keychain integration
-brew "colima"                 # Docker runtime for macOS
+brew "docker"                       # Docker CLI
+brew "docker-compose"               # Container orchestration (plugin + standalone)
+brew "docker-credential-helper"     # macOS keychain integration
+brew "colima"                       # Docker runtime for macOS
 
 #########################################
 # Security & Password Management       #
