@@ -1,8 +1,2 @@
-[language-server.nil]
-command = "nil"
-
-[[language]]
-name = "nix"
-auto-format = true
-formatter = { command = "nixpkgs-fmt" }
-language-servers = ["nil"]
+# Language-specific configurations
+# LSP disabled - using JetBrains/VSCode for IDE features
