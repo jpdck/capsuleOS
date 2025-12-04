@@ -96,8 +96,9 @@ brew "gcc"
 #########################################
 
 # Container Management
-brew "docker"                 # Container runtime
-brew "docker-compose"         # Container orchestration
+brew "docker"                 # Docker CLI
+brew "docker-compose"         # Container orchestration (plugin + standalone)
+brew "docker-credential-helper"  # macOS keychain integration
 brew "colima"                 # Docker runtime for macOS
 
 #########################################
