@@ -114,6 +114,8 @@ fi
 # Update Homebrew
 print_status "Updating Homebrew..."
 brew update
+brew upgrade
+print_success "Homebrew is up to date"
 
 #########################################
 # Phase 2: Package Installation
