@@ -53,7 +53,8 @@ id_*
 .cache/
 cache/
 
-# User-specific dotfiles that shouldn't be tracked
+# User-specific files that shouldn't be tracked
 dotfiles/*/.*rc.local
 dotfiles/*/.local*
 Gaming/
+installer.sh
