@@ -2,47 +2,49 @@
 
 # Taps for additional package sources
 tap "oven-sh/bun"
+tap "italomandara/cxpatcher"
+tap "mhaeuser/mhaeuser"
+tap "probe-rs/probe-rs"
 
 #########################################
-# CLI Tools & Development Environment  #
+# CLI Tools & Development Environment   #
 #########################################
 
 # Shell Enhancement
-brew "zsh"                    # Shell
-brew "starship"               # Prompt
-brew "zoxide"                 # Smart cd
-brew "eza"                    # Better ls
-brew "bat"                    # Better cat
-brew "ripgrep"                # Better grep
-brew "fd"                     # Better find
-brew "fzf"                    # Fuzzy finder
-brew "tree"                   # Directory tree
-brew "stow"                   # Symlink manager
+brew "zsh"                              # Shell
+brew "starship"                         # Prompt
+brew "zoxide"                           # Smart cd
+brew "eza"                              # Better ls
+brew "bat"                              # Better cat
+brew "ripgrep"                          # Better grep
+brew "fd"                               # Better find
+brew "fzf"                              # Fuzzy finder
+brew "tree"                             # Directory tree
+brew "stow"                             # Symlink manager
 
 # Zsh plugins
-brew "zsh-autosuggestions"           # Intelligent suggestions
-brew "zsh-fast-syntax-highlighting"  # Fast syntax highlighting
-brew "zsh-history-substring-search"  # Search history by substring
+brew "zsh-autosuggestions"              # Intelligent suggestions
+brew "zsh-fast-syntax-highlighting"     # Fast syntax highlighting
+brew "zsh-history-substring-search"     # Search history by substring
 
 # File Management & Network Tools
-brew "rsync"                  # File synchronization
-brew "curl"                   # HTTP client
-brew "wget"                   # File downloader
+brew "rsync"                            # File synchronization
+brew "curl"                             # HTTP client
+brew "wget"                             # File downloader
 
 # Text Processing
-brew "sd"                     # sed alternative
-brew "jq"                     # JSON processor
-brew "yq"                     # YAML processor
+brew "sd"                               # sed alternative
+brew "jq"                               # JSON processor
+brew "yq"                               # YAML processor
 
 # Development Essentials
-brew "helix"                  # Modern editor
-brew "direnv"                 # Environment management
-brew "tmux"                   # Terminal multiplexer
-brew "gh"                     # GitHub CLI
-brew "git-delta"              # Git diff viewer
-brew "git-flow"               # Git branching model
-brew "lazygit"                # Git TUI
-brew "git"                    # Version control
+brew "helix"                            # Modern editor
+brew "direnv"                           # Environment management
+brew "tmux"                             # Terminal multiplexer
+brew "gh"                               # GitHub CLI
+brew "git-delta"                        # Git diff viewer
+brew "git-flow"                         # Git branching model
+brew "git"                              # Version control
 
 # Archive Utilities
 brew "gnu-tar"
@@ -141,6 +143,7 @@ cask "connectmenow"           # Mount network shares quick and easy
 # Essential Applications
 cask "1password"              # Password manager
 cask "visual-studio-code"     # Code editor
+cask "jetbrains-toolbox"      # JetBrains Toolbox
 cask "firefox"                # Web browser
 cask "tailscale"              # VPN
 
@@ -156,9 +159,8 @@ cask "usenapp"                # Usenet client
 
 # Development Tools
 cask "warp"                   # Terminal
-cask "gitkraken"              # Git GUI
+cask "fork"                   # Git GUI
 cask "ghidra"                 # Reverse engineering
-cask "lm-studio"              # Local LLM hosting
 cask "balenaetcher"           # USB/SD card OS image flasher
 cask "kicad"                  # PCB design software
 
@@ -189,7 +191,7 @@ cask "bettermouse"            # Mouse acceleration & scrolling fixes
 cask "battery-toolkit"        # Battery management
 
 # Python Environment Management
-cask "miniconda"              # Python environment management
+cask "miniconda"                        # Python environment management
 
 #########################################
 # Fonts and Terminal Customization      #

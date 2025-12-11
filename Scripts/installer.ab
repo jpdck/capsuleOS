@@ -7,7 +7,7 @@ import * from "std/text"
 import * from "std/env"
 import * from "std/date"
 import * from "std/fs"
-import * from "Scripts/installer_utils.ab"
+import * from "installer_utils.ab"
 
 const RED = 31
 const GREEN = 32
@@ -79,22 +79,31 @@ stage_footer(STAGE, "macOS Environment Setup")
 stage_header("Installing Homebrew packages", STAGE)
 {
     stage_step("Verifying Brewfile existence")
-    file_exists("./Brewfile")
+    if not file_exists("./Brewfile") {
+        let message = "Brewfile not found in current directory; Attempting download from repository..."
+        log_message(message)
+        step_update(message)
 
-// step_update("Installing Homebrew packages from Brewfile")
-// $ brew bundle install $ failed(code) {
-//     log_message("Failed to install Homebrew packages via Brewfile \{{code}\}")
-//     step_failed("Failed to install Homebrew packages via Brewfile")
-// }
-// let message = "Homebrew packages installed successfully from Brewfile"
-// step_success(message)
-// log_message(message)
+        $ curl -fsSL https://raw.githubusercontent.com/jpdck/capsuleOS/main/Brewfile -o ./Brewfile $ failed(code) {
+            let message = "Failed to download Brewfile \{{code}\}"
+            log_message(message)
+            step_failed(message)
+        }
+    }
 
+    // step_update("Installing Homebrew packages from Brewfile")
+    // $ brew bundle install $ failed(code) {
+    //     log_message("Failed to install Homebrew packages via Brewfile \{{code}\}")
+    //     step_failed("Failed to install Homebrew packages via Brewfile")
+    // }
+    // let message = "Homebrew packages installed successfully from Brewfile"
+    // step_success(message)
+    // log_message(message)
 }
 stage_footer(STAGE, "Installing Homebrew packages")
 
 stage_header("Setting up 1Password integration", STAGE)
-//{
+{
 //     stage_step("Retrieving 1Password Service Token")
 //     {
 //         let op_token = env_var_get("OP_SERVICE_ACCOUNT_TOKEN") failed {
@@ -156,7 +165,7 @@ stage_header("Setting up 1Password integration", STAGE)
 //     }
 
 
-// }
+}
 
 stage_footer(STAGE, "Setting up 1Password integration")
 

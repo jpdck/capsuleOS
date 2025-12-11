@@ -4,7 +4,9 @@ This file provides guidance to AI agents when working with code in this reposito
 
 ## Critical Instructions
 
-- **Amber Files**: When editing ANY `.amber` file, you MUST reference the [Amber Language Documentation](https://github.com/amber-lang/amber-docs).
+- **Amber Files**:
+  - When editing ANY `.amber` file, you MUST reference the [Amber Language Documentation](https://github.com/amber-lang/amber-docs).
+  - The amber script must pass `amber check` without errors.
 
 ## Repository Overview
 
