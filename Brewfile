@@ -132,6 +132,7 @@ brew "mas"                    # Mac App Store CLI
 brew "pngpaste"               # Clipboard to PNG
 brew "coreutils"              # GNU coreutils
 cask "raycast"                # Spotlight replacement & productivity
+cask "connectmenow"           # Mount network shares quick and easy
 
 #########################################
 # GUI Applications (Casks)             #
