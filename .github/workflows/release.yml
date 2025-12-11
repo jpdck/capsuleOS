@@ -25,7 +25,7 @@ jobs:
       - name: Prepare release script
         run: |
           # If you're using Amber source
-          amber Scripts/installer.ab Scripts/install.sh
+          amber build Scripts/installer.ab Scripts/install.sh --minify
           
           # For now, just copy bash script
           # mkdir -p Scripts

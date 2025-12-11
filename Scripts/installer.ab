@@ -7,6 +7,7 @@ import * from "std/text"
 import * from "std/env"
 import * from "std/date"
 import * from "std/fs"
+import { file_download } from "std/http"
 import * from "installer_utils.ab"
 
 const RED = 31
@@ -19,6 +20,49 @@ const LOG_FILE = "installer.log"
 const USER = trust env_var_get("USER")
 
 let STAGE = 0
+
+fun apply_macos_defaults(): Null? {
+    silent {
+        // Global Interface Settings
+        $ defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false $?
+        $ defaults write NSGlobalDomain AppleShowAllExtensions -bool true $?
+        $ defaults write NSGlobalDomain InitialKeyRepeat -int 14 $?
+        $ defaults write NSGlobalDomain KeyRepeat -int 1 $?
+        $ defaults write NSGlobalDomain AppleInterfaceStyle -string "Dark" $?
+        $ defaults write NSGlobalDomain AppleScrollerPagingBehavior -bool true $?
+        $ defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true $?
+        $ defaults write NSGlobalDomain PMPrintingExpandedStateForPrint -bool true $?
+        $ defaults write NSGlobalDomain "com.apple.trackpad.scaling" -float 2.0 $?
+        $ defaults write NSGlobalDomain "com.apple.mouse.tapBehavior" -int 1 $?
+        $ defaults write NSGlobalDomain AppleKeyboardUIMode -int 3 $?
+        $ defaults write NSGlobalDomain com.apple.swipescrolldirection -bool true $?
+
+        // Dock Configuration
+        $ defaults write com.apple.dock autohide -bool false $?
+        $ defaults write com.apple.dock orientation -string "bottom" $?
+        $ defaults write com.apple.dock showhidden -bool true $?
+        $ defaults write com.apple.dock mineffect -string "genie" $?
+        $ defaults write com.apple.dock show-recents -bool false $?
+        $ defaults write com.apple.dock tilesize -int 36 $?
+        $ defaults write com.apple.dock magnification -bool true $?
+        $ defaults write com.apple.dock largesize -int 48 $?
+        $ defaults write com.apple.dock autohide-delay -float 0.0 $?
+        $ defaults write com.apple.dock autohide-time-modifier -float 0.5 $?
+
+        // Finder Settings
+        $ defaults write com.apple.finder AppleShowAllFiles -bool true $?
+        $ defaults write com.apple.finder AppleShowAllExtensions -bool true $?
+        $ defaults write com.apple.finder ShowPathbar -bool true $?
+        $ defaults write com.apple.finder ShowStatusBar -bool true $?
+        $ defaults write com.apple.finder _FXSortFoldersFirst -bool true $?
+        $ defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv" $?
+        $ defaults write com.apple.finder QuitMenuItem -bool true $?
+
+        // Trackpad Settings
+        $ defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true $?
+        $ defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true $?
+    }
+}
 
 // Stage 1: macOS Environment Setup
 // Ensure the macOS environment is prepared for installation
@@ -84,21 +128,21 @@ stage_header("Installing Homebrew packages", STAGE)
         log_message(message)
         step_update(message)
 
-        $ curl -fsSL https://raw.githubusercontent.com/jpdck/capsuleOS/main/Brewfile -o ./Brewfile $ failed(code) {
+        file_download("https://raw.githubusercontent.com/jpdck/capsuleOS/main/Brewfile", "./Brewfile") failed(code) {
             let message = "Failed to download Brewfile \{{code}\}"
             log_message(message)
             step_failed(message)
         }
     }
 
-    // step_update("Installing Homebrew packages from Brewfile")
-    // $ brew bundle install $ failed(code) {
-    //     log_message("Failed to install Homebrew packages via Brewfile \{{code}\}")
-    //     step_failed("Failed to install Homebrew packages via Brewfile")
-    // }
-    // let message = "Homebrew packages installed successfully from Brewfile"
-    // step_success(message)
-    // log_message(message)
+    step_update("Installing Homebrew packages from Brewfile")
+    $ brew bundle install $ failed(code) {
+        log_message("Failed to install Homebrew packages via Brewfile \{{code}\}")
+        step_failed("Failed to install Homebrew packages via Brewfile")
+    }
+    let message = "Homebrew packages installed successfully from Brewfile"
+    step_success(message)
+    log_message(message)
 }
 stage_footer(STAGE, "Installing Homebrew packages")
 
@@ -169,49 +213,6 @@ stage_header("Setting up 1Password integration", STAGE)
 
 stage_footer(STAGE, "Setting up 1Password integration")
 
-fun apply_macos_defaults(): Null? {
-    silent {
-        // Global Interface Settings
-        $ defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false $?
-        $ defaults write NSGlobalDomain AppleShowAllExtensions -bool true $?
-        $ defaults write NSGlobalDomain InitialKeyRepeat -int 14 $?
-        $ defaults write NSGlobalDomain KeyRepeat -int 1 $?
-        $ defaults write NSGlobalDomain AppleInterfaceStyle -string "Dark" $?
-        $ defaults write NSGlobalDomain AppleScrollerPagingBehavior -bool true $?
-        $ defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true $?
-        $ defaults write NSGlobalDomain PMPrintingExpandedStateForPrint -bool true $?
-        $ defaults write NSGlobalDomain "com.apple.trackpad.scaling" -float 2.0 $?
-        $ defaults write NSGlobalDomain "com.apple.mouse.tapBehavior" -int 1 $?
-        $ defaults write NSGlobalDomain AppleKeyboardUIMode -int 3 $?
-        $ defaults write NSGlobalDomain com.apple.swipescrolldirection -bool true $?
-
-        // Dock Configuration
-        $ defaults write com.apple.dock autohide -bool false $?
-        $ defaults write com.apple.dock orientation -string "bottom" $?
-        $ defaults write com.apple.dock showhidden -bool true $?
-        $ defaults write com.apple.dock mineffect -string "genie" $?
-        $ defaults write com.apple.dock show-recents -bool false $?
-        $ defaults write com.apple.dock tilesize -int 36 $?
-        $ defaults write com.apple.dock magnification -bool true $?
-        $ defaults write com.apple.dock largesize -int 48 $?
-        $ defaults write com.apple.dock autohide-delay -float 0.0 $?
-        $ defaults write com.apple.dock autohide-time-modifier -float 0.5 $?
-
-        // Finder Settings
-        $ defaults write com.apple.finder AppleShowAllFiles -bool true $?
-        $ defaults write com.apple.finder AppleShowAllExtensions -bool true $?
-        $ defaults write com.apple.finder ShowPathbar -bool true $?
-        $ defaults write com.apple.finder ShowStatusBar -bool true $?
-        $ defaults write com.apple.finder _FXSortFoldersFirst -bool true $?
-        $ defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv" $?
-        $ defaults write com.apple.finder QuitMenuItem -bool true $?
-
-        // Trackpad Settings
-        $ defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true $?
-        $ defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true $?
-    }
-}
-
 stage_header("Configuring macOS settings", STAGE)
 {
     if input_confirm("Apply recommended macOS system settings?", true) {
@@ -241,4 +242,27 @@ stage_footer(STAGE, "Configuring macOS settings")
 // Repository Setup for capsuleOS
 stage_header("Setting up capsuleOS repository", STAGE)
 {
+    const HOME = env_var_get("HOME") failed(code) {
+        let message = "Failed to retrieve HOME environment variable"
+        log_message(message, code)
+        step_failed(message)
+    }
+
+    const REPO_DIR = "{HOME}/Projects/capsuleOS"
+    if not dir_exists(REPO_DIR) {
+        stage_step("Cloning capsuleOS repository")
+        silent $ git clone https://github.com/jpdck/capsuleOS.git "{REPO_DIR}" $ failed(code) {
+            let message = "Failed to clone capsuleOS repository"
+            log_message(message, code)
+            step_failed(message)
+        }
+    } else {
+        stage_step("Updating capsuleOS repository")
+        silent trust $ cd "{REPO_DIR}" $
+        silent $ git pull origin main $ failed(code) {
+            let message = "Failed to update capsuleOS repository"
+            log_message(message, code)
+            step_failed(message)
+        }
+    }
 }
