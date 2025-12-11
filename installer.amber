@@ -1,22 +1,23 @@
-//-----------------------------------------------//
-// Amber - CapsuleOS Installer                   //
-// https://github.com/jpdck/capsuleOS            //
-//-----------------------------------------------//
+// -----------------------------------------------//
+// capsuleOS Installer                            //
+// https://github.com/jpdck/capsuleOS             //
+// -----------------------------------------------//
 
 import * from "std/text"
 import * from "std/env"
 import * from "std/date"
 import * from "std/fs"
 
-let RED = 31
-let GREEN = 32
-let YELLOW=33
-let BLUE=34
-let NC=0
+const RED = 31
+const GREEN = 32
+const YELLOW=33
+const BLUE=34
+const NC=0
+
+const LOG_FILE = "installer.log"
+const USER = trust env_var_get("USER")
 
 let STAGE = 0
-
-let LOG_FILE = "logs/install.log"
 
 fun title_header(): Null {
     let border = "═══════════════════════════════════════════"
@@ -46,6 +47,10 @@ fun step_success(step_description: Text): Null {
     echo "│" + lpad("✓ {step_description}", " ", len(step_description) + 5)
 }
 
+fun step_warning(step_description: Text): Null {
+    echo "│" + lpad("⚠ {step_description}", " ", len(step_description) + 5)
+}
+
 fun step_update(step_description: Text): Null {
     echo "│" + lpad("⟲ {step_description}", " ", len(step_description) + 5)
 }
@@ -69,10 +74,10 @@ title_header()
 
 fun log_message(message: Text): Null {
     let timestamp = date_format_posix(date_now()) failed {
-        echo "UNKNOWN"
+        "UNKNOWN"
     }
     
-    file_append(LOG_FILE, "[{timestamp}] {message}") failed {
+    file_append(LOG_FILE, "[{timestamp}] {message}\n") failed {
         echo_error("Failed to write to log file: {LOG_FILE}")
     }
 }
@@ -132,4 +137,95 @@ if not is_command("brew") {
 }
 stage_footer(STAGE, "macOS Environment Setup")
 
+stage_spacer()
+
 stage_header("Installing Homebrew packages", STAGE)
+{
+    stage_step("Verifying Brewfile existence")
+    file_exists("./Brewfile") failed {
+        log_message("Brewfile not found for Homebrew package installation")
+        step_failed("Brewfile not found for Homebrew package installation")
+    } 
+
+    step_update("Installing Homebrew packages from Brewfile")
+    $ brew bundle install $ failed(code) {
+        log_message("Failed to install Homebrew packages via Brewfile \{{code}\}")
+        step_failed("Failed to install Homebrew packages via Brewfile")
+    }
+    let message = "Homebrew packages installed successfully from Brewfile"
+    step_success(message)
+    log_message(message)
+}
+stage_footer(STAGE, "Installing Homebrew packages")
+
+stage_spacer()
+
+stage_header("Setting up 1Password integration", STAGE)
+{
+    stage_step("Retrieving 1Password Service Token")
+    {
+        let op_token = env_var_get("OP_SERVICE_ACCOUNT_TOKEN") failed {
+            log_message("1Password Service Token not found in environment variables")
+            step_update("Token not in environment variables")
+            input_prompt("│  Please enter your 1Password Service Token: ")
+        }
+
+        silent $ printf '%s' "{op_token}" | security add-generic-password -a "{USER}" -s "op-service-token" -w -U $ succeeded {
+            let message = "1Password service token stored securely in Keychain"
+            step_success(message)
+            log_message(message)
+        } failed {
+            let message = "Failed to store token in Keychain, you may need to add it manually"
+            step_warning(message)
+            log_message(message)
+        }
+    }
+
+    stage_step("Initializing 1Password Vault")
+    {
+        let vault_list = silent $ op vault list --format=json | jq -r '.[].name' $ failed(code) {
+            log_message("Failed to list 1Password vaults: {code}")
+            step_failed("Failed to list 1Password vaults")
+        }
+
+        if not text_contains(vault_list, "ZettoSenshi") {
+            step_failed("Vault not found in 1Password account")
+        } else {
+            step_success("ZettoSenshi vault found")
+        }
+    }
+
+    stage_step("Importing SSH keys from ZettoSenshi vault")
+    {
+        let ssh_keys = $ op item list --vault="ZettoSenshi" --format=json | jq -r '.[] | select(.category=="SSH_KEY") | .title' $ failed(code) {
+            log_message("Warning: Failed to list SSH keys: {code}")
+            step_failed("Failed to list SSH keys")
+        }
+        
+        let ssh_keys_array = split_lines(ssh_keys)
+
+        if len(ssh_keys_array) == 0 {
+            step_warning("No SSH keys found in ZettoSenshi vault")
+            log_message("No SSH keys found in vault")
+        } else {
+            echo "│      Found {len(ssh_keys_array)} SSH key(s):"
+            for index, key in ssh_keys_array {
+                echo "│        [{index + 1}] {key}"
+            }
+            log_message("Found {len(ssh_keys_array)} SSH keys in vault")
+        }
+
+        let ssh_selection = ""
+
+        if len(trim(ssh_keys)) > 0 {
+            trust $ echo "{ssh_keys}" | nl -w2 -s'. ' $
+        } else {
+            echo "Warning: No SSH keys found in ZettoSenshi vault"
+            ssh_selection = "none"
+        }
+
+    }
+
+
+}
+stage_footer(STAGE, "Setting up 1Password integration")
