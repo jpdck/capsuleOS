@@ -641,6 +641,11 @@ else
     print_warning "conda not found, skipping Python packages installation"
 fi
 
+# Install Amber-lang via https://github.com/amber-lang/amber/releases/{latest}/install.sh
+if command_exists curl; then
+    print_status "Installing Amber-lang..."
+fi
+
 # Source new shell configuration
 print_status "Sourcing new shell configuration..."
 if [[ -f ~/.zshrc ]]; then
