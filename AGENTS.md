@@ -4,9 +4,38 @@ This file provides guidance to AI agents when working with code in this reposito
 
 ## Critical Instructions
 
-- **Amber Files**:
-  - When editing ANY `.amber` file, you MUST reference the [Amber Language Documentation](https://github.com/amber-lang/amber-docs).
-  - The amber script must pass `amber check` without errors.
+### Amber Language Files
+
+Amber file extensions: *.amber, *.ab
+
+When working with ANY Amber language files in this repository, you must follow these requirements:
+
+- **Documentation Reference**: Always reference the [Amber Language Documentation](https://github.com/amber-lang/amber-docs) when editing `.amber` or `.ab` files
+- **Validation**: The amber script must pass `amber check` without errors before committing
+- **Compilation**: Use `amber build` to compile Amber scripts to Bash when needed
+
+#### Available Amber Commands
+
+```text
+Usage: amber [OPTIONS] [INPUT] [ARGS]... [COMMAND]
+
+Commands:
+  eval        Execute Amber code fragment
+  run         Execute Amber script
+  check       Check Amber script for errors
+  build       Compile Amber script to Bash
+  docs        Generate Amber script documentation
+  completion  Generate Bash completion script
+  help        Print this message or the help of the given subcommand(s)
+```
+
+#### Development Workflow for Amber Files
+
+1. **Edit**: Modify the `.amber` or `.ab` source files in `Scripts/`
+2. **Check**: Run `amber check <file.amber>` or `amber check <file.ab>` to validate syntax and logic
+3. **Test**: Use `amber test <file.amber>` or `amber test <file.ab>` to test functionality
+4. **Build**: Compile with `amber build <file.amber>` or `amber build <file.ab>` to generate Bash scripts
+5. **Deploy**: The compiled Bash scripts are used in the installation process
 
 ## Repository Overview
 
