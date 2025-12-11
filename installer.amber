@@ -1,0 +1,135 @@
+//-----------------------------------------------//
+// Amber - CapsuleOS Installer                   //
+// https://github.com/jpdck/capsuleOS            //
+//-----------------------------------------------//
+
+import * from "std/text"
+import * from "std/env"
+import * from "std/date"
+import * from "std/fs"
+
+let RED = 31
+let GREEN = 32
+let YELLOW=33
+let BLUE=34
+let NC=0
+
+let STAGE = 0
+
+let LOG_FILE = "logs/install.log"
+
+fun title_header(): Null {
+    let border = "═══════════════════════════════════════════"
+    let width = len(border) + 2
+    
+    echo ""
+    echo "╔{border}╗"
+    let header = "capsuleOS BASH INSTALL SYSTEM v0.1"
+    let header_padding = (width - len(header)) / 2
+    let header_line = rpad(lpad(header, " ", header_padding + len(header)), " ", width-2)
+    echo "║{header_line}║"
+    echo "╚{border}╝"
+    echo ""
+}
+
+fun stage_header(stage_name: Text, ref stage: Int): Null {
+    stage = stage + 1
+    echo ""
+    echo "┌─ STAGE {stage}: {stage_name}"
+}
+
+fun stage_step(step_description: Text): Null {
+    echo "│" + lpad("→ {step_description}", " ", len(step_description) + 5)
+}
+
+fun step_success(step_description: Text): Null {
+    echo "│" + lpad("✓ {step_description}", " ", len(step_description) + 5)
+}
+
+fun step_update(step_description: Text): Null {
+    echo "│" + lpad("⟲ {step_description}", " ", len(step_description) + 5)
+}
+
+fun step_failed(step_description: Text): Null {
+    echo "│" + lpad("‼ {step_description}", " ", len(step_description) + 5)
+    echo "└─ ERROR ENCOUNTERED"
+    exit 1
+}
+
+fun stage_spacer(): Null {
+    echo "│"
+}
+
+fun stage_footer(stage: Int, stage_name: Text): Null {
+    echo "└─ STAGE {stage} COMPLETE: {stage_name}"
+    echo ""
+}
+
+title_header()
+
+fun log_message(message: Text): Null {
+    let timestamp = date_format_posix(date_now()) failed {
+        echo "UNKNOWN"
+    }
+    
+    file_append(LOG_FILE, "[{timestamp}] {message}") failed {
+        echo_error("Failed to write to log file: {LOG_FILE}")
+    }
+}
+
+// Stage 1: macOS Environment Setup
+// Ensure the macOS environment is prepared for installation
+stage_header("macOS Environment Setup", STAGE)
+
+// Verify Xcode Command Line Tools installation
+stage_step("Checking for Xcode CLI tools installation")
+if not is_command("xcode-select") {
+    step_update("Installing Xcode CLI tools")
+    $ xcode-select --install $ failed(code) {
+        log_message("Xcode CLI tools installation failed with code {code}")
+        step_failed("Failed to install Xcode CLI tools")
+    }
+    
+    let message = "Xcode CLI tools installed successfully"
+    step_success(message)
+    log_message(message)
+} else {
+    let message = "Xcode CLI tools are already installed"
+    step_success(message)
+    log_message(message)
+}
+
+stage_spacer()
+
+// Verify Homebrew installation
+stage_step("Checking for Homebrew installation")
+if not is_command("brew") {
+    step_update("Installing Homebrew")
+    $ /bin/bash -c "\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"$ failed(code) {
+        let message = "Failed to install Homebrew \{{code}\}"
+        log_message(message)
+        step_failed(message)
+    }
+    let message = "Homebrew installed successfully"
+    step_success(message)
+    log_message(message)
+} else {
+    step_update("Homebrew detected, performing update")
+    silent $ brew update $ failed(code) {
+        let message = "Failed to update Homebrew \{{code}\}"
+        log_message(message)
+        step_failed(message)
+    }
+    step_update("Upgrading existing Homebrew packages")
+    silent $ brew upgrade $ failed(code) {
+        let message = "Failed to upgrade Homebrew packages \{{code}\}"
+        log_message(message)
+        step_failed(message)
+    }
+    let message = "Homebrew is up to date"
+    step_success(message)
+    log_message(message)
+}
+stage_footer(STAGE, "macOS Environment Setup")
+
+stage_header("Installing Homebrew packages", STAGE)
