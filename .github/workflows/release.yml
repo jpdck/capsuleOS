@@ -1,0 +1,70 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:  # Manual trigger option
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Install Amber (if using Amber source)
+        run: |
+          curl -fsSL https://github.com/amber-lang/amber/releases/latest/download/install.sh | bash
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+        
+      - name: Prepare release script
+        run: |
+          # If you're using Amber source
+          amber Scripts/installer.ab Scripts/install.sh
+          
+          # For now, just copy bash script
+          # mkdir -p Scripts
+          # cp install.sh Scripts/install.sh
+          # chmod +x Scripts/install.sh
+      
+      - name: Generate checksums
+        run: |
+          cd Scripts
+          shasum -a 256 install.sh > install.sh.sha256
+          cat install.sh.sha256
+      
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            Scripts/install.sh
+            Scripts/install.sh.sha256
+            Brewfile
+            Cargofile
+          body: |
+            ## CapsuleOS Installer
+            
+            ### Quick Install
+            ```bash
+            curl -fsSL https://github.com/jpdck/capsuleOS/releases/download/${{ github.ref_name }}/install.sh | bash
+            ```
+            
+            ### Verify Checksum
+            ```bash
+            curl -fsSL https://github.com/jpdck/capsuleOS/releases/download/${{ github.ref_name }}/install.sh.sha256 | shasum -a 256 -c -
+            ```
+            
+            ### What's Included
+            - Homebrew packages from Brewfile
+            - Rust tools from Cargofile  
+            - Dotfiles configuration
+            - macOS system settings
+          draft: true
+          prerelease: true
+          make_latest: true
+          fail_on_unmatched_files: true

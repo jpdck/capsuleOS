@@ -1,0 +1,74 @@
+import { echo_error } from "std/env"
+import { lpad, rpad } from "std/text"
+import { date_now, date_format_posix } from "std/date"
+import { file_append } from "std/fs"
+
+const LOG_FILE = "installer.log"
+
+pub fun title_header(): Null {
+    let border = "═══════════════════════════════════════════"
+    let width = len(border) + 2
+    
+    echo ""
+    echo "╔{border}╗"
+    let header = "capsuleOS BASH INSTALL SYSTEM v0.1"
+    let header_padding = (width - len(header)) / 2
+    let header_line = rpad(lpad(header, " ", header_padding + len(header)), " ", width-2)
+    echo "║{header_line}║"
+    echo "╚{border}╝"
+    echo ""
+}
+
+pub fun stage_header(stage_name: Text, ref stage: Int): Null {
+    stage = stage + 1
+    echo ""
+    echo "┌─ STAGE {stage}: {stage_name}"
+}
+
+pub fun stage_step(step_description: Text): Null {
+    echo "│" + lpad("→ {step_description}", " ", len(step_description) + 5)
+}
+
+pub fun step_success(step_description: Text): Null {
+    echo "│" + lpad("✓ {step_description}", " ", len(step_description) + 5)
+}
+
+pub fun step_warning(step_description: Text): Null {
+    echo "│" + lpad("⚠ {step_description}", " ", len(step_description) + 5)
+}
+
+pub fun step_update(step_description: Text): Null {
+    echo "│" + lpad("⟲ {step_description}", " ", len(step_description) + 5)
+}
+
+pub fun step_failed(step_description: Text): Null {
+    echo "│" + lpad("‼ {step_description}", " ", len(step_description) + 5)
+    echo "└─ ERROR ENCOUNTERED"
+    exit 1
+}
+
+pub fun stage_spacer(): Null {
+    echo "│"
+    $ sleep 1 $ failed {
+        // Ignore sleep failures
+    }
+}
+
+pub fun stage_footer(stage: Int, stage_name: Text): Null {
+    echo "└─ STAGE {stage} COMPLETE: {stage_name}"
+    echo ""
+}
+
+pub fun log_message(message: Text, failure_code: Int = 0): Null {
+    let timestamp = date_format_posix(date_now()) failed {
+        "UNKNOWN"
+    }
+
+    let formatted_message = failure_code != 0
+        then "{message} (Error Code: {failure_code})"
+        else message
+    
+    file_append(LOG_FILE, "[{timestamp}] {formatted_message}\n") failed {
+        echo_error("Failed to write to log file: {LOG_FILE}")
+    }
+}
