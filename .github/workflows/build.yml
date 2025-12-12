@@ -7,7 +7,6 @@ on:
     paths:
       - 'Scripts/installer.ab'
       - 'Scripts/installer_utils.ab'
-      - 'install.sh'
 
 jobs:
   build:
@@ -24,7 +23,9 @@ jobs:
       
       - name: Build installer from Amber source
         run: |
-          amber build Scripts/installer.ab install.sh --minify
+          cd Scripts
+          amber build installer.ab ../install.sh --minify
+          cd ..
           chmod +x install.sh
       
       - name: Upload built installer as artifact

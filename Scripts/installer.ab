@@ -3,7 +3,7 @@
 // https://github.com/jpdck/capsuleOS             //
 // -----------------------------------------------//
 
-import { split, text_contains, split_lines, trim, join } from "std/text"
+import { split, text_contains, split_lines, trim, join, starts_with } from "std/text"
 import { is_command, env_var_get, env_var_set, input_confirm, input_hidden, echo_colored } from "std/env"
 import { file_exists, file_chmod, file_write, dir_exists, file_read, dir_create } from "std/fs"
 import { file_download } from "std/http"
@@ -13,6 +13,11 @@ const USER = trust env_var_get("USER")
 const HOME = trust env_var_get("HOME")
 const REPO_DIR = "{HOME}/Projects/capsuleOS"
 const TEMP_DIR = trust $ mktemp -d -t capsuleOS-installer $
+
+if TEMP_DIR == "" or not dir_exists(TEMP_DIR) {
+    echo_colored("Failed to create temporary directory. Exiting.", 31)
+    exit 1
+}
 
 let STAGE = 0
 
@@ -97,6 +102,15 @@ stage_header("macOS Environment Setup", STAGE)
         let message = "Homebrew installed successfully"
         step_success(message)
         log_message(message)
+
+        step_update("Configuring Homebrew environment")
+        if file_exists("/opt/homebrew/bin/brew") {
+            silent trust $ eval "\$(/opt/homebrew/bin/brew shellenv)" $
+        } else {
+            if file_exists("/usr/local/bin/brew") {
+                silent trust $ eval "\$(/usr/local/bin/brew shellenv)" $
+            }
+        }
     } else {
         step_update("Homebrew detected, performing update")
         silent $ brew update $ failed(code) {
@@ -261,6 +275,10 @@ stage_header("Setting up 1Password integration", STAGE)
     // Process each key
     for i, key_line in key_lines {
         let parts = split(key_line, "|")
+        if len(parts) < 2 {
+            log_message("Skipping invalid key line format: {key_line}")
+            continue
+        }
         let key_title = parts[0]
         let key_id = parts[1]
         
@@ -322,8 +340,7 @@ stage_header("Setting up 1Password integration", STAGE)
         }
         
         // Start SSH agent if not running
-        silent trust $ pgrep -x ssh-agent > /dev/null $
-        if status != 0 {
+        silent $ pgrep -x ssh-agent > /dev/null $ failed {
             silent trust $ eval "\$(ssh-agent -s)" $
         }
         
@@ -374,7 +391,7 @@ stage_header("Setting up capsuleOS repository", STAGE)
 {
     if not dir_exists(REPO_DIR) {
         stage_step("Cloning capsuleOS repository")
-        silent $ git clone https://github.com/jpdck/capsuleOS.git "{REPO_DIR}" $ failed(code) {
+        silent $ git clone git@github.com:jpdck/capsuleOS.git "{REPO_DIR}" $ failed(code) {
             let message = "Failed to clone capsuleOS repository"
             log_message(message, code)
             step_failed(message)
@@ -496,21 +513,49 @@ stage_header("Installing additional language-specific tools", STAGE)
         step_failed(message)
     }
     let tools = split_lines(trim(tools_raw))
-    for tool in tools {
-        step_update("Installing {tool} via Cargo")
-        silent $ cargo install {tool} $ failed(code) {
-            let message = "Failed to install {tool} via Cargo"
-            log_message(message, code)
-            step_failed(message)
+    for tool_raw in tools {
+        let tool = trim(tool_raw)
+        if len(tool) > 0 and not starts_with(tool, "#") {
+            step_update("Installing {tool} via Cargo")
+            silent $ cargo install {tool} $ failed(code) {
+                let message = "Failed to install {tool} via Cargo"
+                log_message(message, code)
+                step_failed(message)
+            }
+            step_success("{tool} installed successfully")
+            log_message("{tool} installed via Cargo")
         }
-        step_success("{tool} installed successfully")
-        log_message("{tool} installed via Cargo")
     }
 
     stage_spacer()
 
     stage_step("Installing Amber framework")
-    $ bash <(curl -sL "https://github.com/amber-lang/amber/releases/download/0.5.1-alpha/install.sh") $ failed(code) {
+    // Download install.sh to temp directory
+    const amber_installer = "{TEMP_DIR}/amber-install.sh"
+    const amber_url = "https://github.com/amber-lang/amber/releases/download/0.5.1-alpha/install.sh"
+    const amber_sha256 = "6c5455349fe9454aa2913438ee036275f3b0a2ed744b82a22e3496335bc9ac57"
+    
+    file_download(amber_url, amber_installer) failed(code) {
+        let message = "Failed to download Amber installer"
+        log_message(message, code)
+        step_failed(message)
+    }
+    
+    // Verify SHA256 checksum
+    let computed_sha256 = $ shasum -a 256 {amber_installer} | cut -d ' ' -f1 $ failed(code) {
+        let message = "Failed to compute SHA256 checksum of Amber installer"
+        log_message(message, code)
+        step_failed(message)
+    }
+    
+    if trim(computed_sha256) != amber_sha256 {
+        let message = "SHA256 verification failed for Amber installer (expected: {amber_sha256}, got: {trim(computed_sha256)})"
+        log_message(message, 1)
+        step_failed(message)
+    }
+    
+    // Execute installer after verification
+    $ bash {amber_installer} $ failed(code) {
         let message = "Failed to install Amber framework"
         log_message(message, code)
         step_failed(message)
@@ -522,8 +567,8 @@ stage_header("Installing additional language-specific tools", STAGE)
 
     stage_step("Installing Python packages via conda")
     if not is_command("conda") {
-        step_warning("conda not found; skipping Python packages installation")
         log_message("conda not found; skipped Python packages installation")
+        step_failed("conda not found; skipping Python packages installation")
     }
     let python_packages = ["pytest", "ipython", "python-lsp-server"]
     
