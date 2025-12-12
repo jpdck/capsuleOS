@@ -157,6 +157,15 @@
             "command": "ruff check {file}"
           }
         ]
+      },
+      {
+        "matcher": "*.ab, *.amber",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "amber check {file}"
+          }
+        ]
       }
     ]
   },
