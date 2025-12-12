@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'Scripts/installer.ab'
+      - 'Scripts/installer_utils.ab'
       - 'install.sh'
 
 jobs:
