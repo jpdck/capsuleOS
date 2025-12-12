@@ -94,7 +94,7 @@ stage_header("macOS Environment Setup", STAGE)
     stage_step("Checking for Homebrew installation")
     if not is_command("brew") {
         step_update("Installing Homebrew")
-        silent trust $ NONINTERACTIVE=1 CI=1 /bin/bash -c "\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" $ failed(code) {
+        silent $ NONINTERACTIVE=1 CI=1 /bin/bash -c "\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" $ failed(code) {
             let message = "Failed to install Homebrew"
             log_message(message, code)
             step_failed(message)
@@ -104,10 +104,11 @@ stage_header("macOS Environment Setup", STAGE)
         log_message(message)
 
         step_update("Configuring Homebrew environment")
-        if file_exists("/opt/homebrew/bin/brew") {
-            silent trust $ eval "\$(/opt/homebrew/bin/brew shellenv)" $
-        } else {
-            if file_exists("/usr/local/bin/brew") {
+        if {
+            file_exists("/opt/homebrew/bin/brew"): {
+                silent trust $ eval "\$(/opt/homebrew/bin/brew shellenv)" $
+            }
+            file_exists("/usr/local/bin/brew"): {
                 silent trust $ eval "\$(/usr/local/bin/brew shellenv)" $
             }
         }
@@ -263,7 +264,7 @@ stage_header("Setting up 1Password integration", STAGE)
             step_failed(message)
         }
     }
-    silent trust $ chmod 700 "{ssh_dir}" $ failed(code) {
+    silent $ chmod 700 "{ssh_dir}" $ failed(code) {
         let message = "Failed to set permissions on .ssh directory"
         log_message(message, code)
         step_failed(message)
