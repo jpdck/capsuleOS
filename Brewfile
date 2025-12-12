@@ -145,10 +145,10 @@ cask "1password"              # Password manager
 cask "visual-studio-code"     # Code editor
 cask "jetbrains-toolbox"      # JetBrains Toolbox
 cask "firefox"                # Web browser
-cask "tailscale"              # VPN
+cask "tailscale-app"              # VPN
 
 # Media & Productivity
-cask "handbrake"              # Video transcoding
+cask "handbrake-app"              # Video transcoding
 cask "iina"                   # Video player
 cask "kobo"                   # Kobo eBook reader
 cask "hiddenbar"              # Menu bar organization
@@ -160,7 +160,7 @@ cask "usenapp"                # Usenet client
 # Development Tools
 cask "warp"                   # Terminal
 cask "fork"                   # Git GUI
-cask "ghidra"                 # Reverse engineering
+brew "ghidra"                 # Reverse engineering
 cask "balenaetcher"           # USB/SD card OS image flasher
 cask "kicad"                  # PCB design software
 
