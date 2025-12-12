@@ -12,6 +12,7 @@ import * from "installer_utils.ab"
 const USER = trust env_var_get("USER")
 const HOME = trust env_var_get("HOME")
 const REPO_DIR = "{HOME}/Projects/capsuleOS"
+const TEMP_DIR = trust $ mktemp -d -t capsuleOS-installer $
 
 let STAGE = 0
 
@@ -120,21 +121,20 @@ stage_footer(STAGE, "macOS Environment Setup")
 // Install necessary packages via Homebrew using a Brewfile
 stage_header("Installing Homebrew packages", STAGE)
 {
-    stage_step("Verifying Brewfile existence")
-    if not file_exists("./Brewfile") {
-        let message = "Brewfile not found in current directory; Attempting download from repository..."
-        log_message(message)
-        step_update(message)
-
-        file_download("https://raw.githubusercontent.com/jpdck/capsuleOS/main/Brewfile", "./Brewfile") failed(code) {
-            let message = "Failed to download Brewfile"
-            log_message(message, code)
-            step_failed(message)
-        }
+    stage_step("Downloading latest Brewfile from repository")
+    let brewfile_path = "{TEMP_DIR}/Brewfile"
+    file_download("https://raw.githubusercontent.com/jpdck/capsuleOS/main/Brewfile", brewfile_path) failed(code) {
+        let message = "Failed to download Brewfile"
+        log_message(message, code)
+        step_failed(message)
     }
+    step_success("Brewfile downloaded successfully")
+    log_message("Brewfile downloaded to {brewfile_path}")
+
+    stage_spacer()
 
     step_update("Installing Homebrew packages from Brewfile")
-    $ brew bundle install $ failed(code) {
+    $ brew bundle install --file="{brewfile_path}" $ failed(code) {
         log_message("Failed to install Homebrew packages via Brewfile", code)
         step_failed("Failed to install Homebrew packages via Brewfile")
     }
@@ -379,14 +379,17 @@ stage_header("Setting up capsuleOS repository", STAGE)
             log_message(message, code)
             step_failed(message)
         }
+        step_success("capsuleOS repository cloned successfully")
+        log_message("Repository cloned to {REPO_DIR}")
     } else {
         stage_step("Updating capsuleOS repository")
-        silent trust $ cd "{REPO_DIR}" $
-        silent $ git pull origin main $ failed(code) {
+        silent $ git -C "{REPO_DIR}" pull origin main $ failed(code) {
             let message = "Failed to update capsuleOS repository"
             log_message(message, code)
             step_failed(message)
         }
+        step_success("capsuleOS repository updated successfully")
+        log_message("Repository updated at {REPO_DIR}")
     }
 }
 stage_footer(STAGE, "Setting up capsuleOS repository")
@@ -407,57 +410,54 @@ stage_header("Configuring user dotfiles", STAGE)
 
     stage_step("Applying dotfiles with GNU Stow")
     const DOTFILES_DIR = "{REPO_DIR}/dotfiles"
-    
+
     // Verify dotfiles directory exists (should exist since we cloned capsuleOS repo in Stage 5)
     if not dir_exists(DOTFILES_DIR) {
         let message = "Dotfiles directory not found in capsuleOS repository"
         log_message(message)
         step_failed(message)
     }
-    
-    cd DOTFILES_DIR
-    
-    // Get list of packages (directories) to stow
-    let packages_raw = trust $ ls -d */ | sed 's#/##' $
+
+    // Get list of packages (directories) to stow using absolute path
+    let packages_raw = trust $ ls -1d "{DOTFILES_DIR}"/*/ | xargs -n1 basename $
     let packages = split_lines(trim(packages_raw))
-    
+
     step_update("Found {len(packages)} package(s) to stow")
     log_message("Packages to stow: {join(packages, ", ")}")
-    
-    // Stow each package
+
+    // Stow each package using explicit directory flag
     for pkg in packages {
         step_update("Stowing {pkg}...")
-        
-        // First attempt to stow
-        $ stow -t {HOME} {pkg} $ failed(code) {
+
+        // First attempt to stow with explicit directory
+        $ stow -d "{DOTFILES_DIR}" -t "{HOME}" "{pkg}" $ failed(code) {
             // If it failed, remove conflicts and try again
             step_update("Removing conflicts for {pkg}...")
-            
-            // Get list of files that would be stowed
-            let files_to_stow = trust $ find {DOTFILES_DIR}/{pkg} -type f -o -type l $
+
+            // Get list of files that would be stowed using absolute path
+            let files_to_stow = trust $ find "{DOTFILES_DIR}/{pkg}" -type f -o -type l $
             let file_list = split_lines(trim(files_to_stow))
-            
+
             // Remove each conflicting file from HOME
             for file_path in file_list {
-                // Strip the dotfiles directory prefix using bash parameter expansion
-                let prefix = "{DOTFILES_DIR}/{pkg}/"
+                // Strip the dotfiles directory prefix
                 let relative_path = trust $ echo "{file_path}" | sed "s|{DOTFILES_DIR}/{pkg}/||" $
                 let target_file = "{HOME}/{trim(relative_path)}"
-                
+
                 if file_exists(target_file) {
                     silent trust $ rm -f "{target_file}" $
                     log_message("Removed conflicting file: {target_file}")
                 }
             }
-            
-            // Try stowing again
-            $ stow -t {HOME} {pkg} $ failed(retry_code) {
+
+            // Try stowing again with explicit directory
+            $ stow -d "{DOTFILES_DIR}" -t "{HOME}" "{pkg}" $ failed(retry_code) {
                 let message = "Failed to stow {pkg} after removing conflicts"
                 log_message(message, retry_code)
                 step_failed(message)
             }
         }
-        
+
         step_success("Successfully stowed {pkg}")
         log_message("Successfully stowed {pkg}")
     }
@@ -471,20 +471,24 @@ stage_footer(STAGE, "Configuring user dotfiles")
 // Cargofile (cargo), Amber, Conda
 stage_header("Installing additional language-specific tools", STAGE)
 {
+    stage_step("Downloading latest Cargofile from repository")
+    let cargofile_path = "{TEMP_DIR}/Cargofile"
+    file_download("https://raw.githubusercontent.com/jpdck/capsuleOS/main/Cargofile", cargofile_path) failed(code) {
+        let message = "Failed to download Cargofile"
+        log_message(message, code)
+        step_failed(message)
+    }
+    step_success("Cargofile downloaded successfully")
+    log_message("Cargofile downloaded to {cargofile_path}")
+
+    stage_spacer()
+
     stage_step("Installing Rust tools via Cargo")
     if not is_command("cargo") {
         step_failed("Cargo not found; skipping Rust tools installation")
         log_message("Cargo not found; skipped Rust tools installation")
     }
 
-    // Install tools by reading from Cargofile
-    let cargofile_path = "{REPO_DIR}/Cargofile"
-    if not file_exists(cargofile_path) {
-        let message = "Cargofile not found in capsuleOS repository"
-        log_message(message)
-        step_failed(message)
-    }
-    
     // Read tools from Cargofile and install
     let tools_raw = file_read(cargofile_path) failed(code) {
         let message = "Failed to read Cargofile"
@@ -557,5 +561,15 @@ stage_header("Finalizing and verifying installation", STAGE)
     log_message("Installation process finalized and verified")
 }
 stage_footer(STAGE, "Finalizing and verifying installation")
+
+// Cleanup: Remove temporary directory
+stage_header("Cleaning up temporary files", STAGE)
+{
+    stage_step("Removing temporary directory")
+    silent trust $ rm -rf "{TEMP_DIR}" $
+    step_success("Temporary files removed")
+    log_message("Cleaned up temporary directory: {TEMP_DIR}")
+}
+stage_footer(STAGE, "Cleaning up temporary files")
 
 title_footer()
