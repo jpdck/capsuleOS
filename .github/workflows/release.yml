@@ -35,7 +35,7 @@ jobs:
           shasum -a 256 install.sh > install.sh.sha256
           cat install.sh.sha256
       
-      - name: Create Release
+      - name: Create versioned release
         uses: softprops/action-gh-release@v2
         with:
           files: |
@@ -64,4 +64,42 @@ jobs:
           draft: true
           prerelease: true
           make_latest: true
+          fail_on_unmatched_files: true
+      
+      - name: Update latest tag
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git tag -f latest
+          git push -f origin latest
+      
+      - name: Create latest release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          files: |
+            install.sh
+            install.sh.sha256
+            Brewfile
+            Cargofile
+          body: |
+            ## CapsuleOS Installer (Latest)
+            
+            ### Quick Install
+            ```bash
+            curl -fsSL https://github.com/jpdck/capsuleOS/releases/download/latest/install.sh | bash
+            ```
+            
+            ### Verify Checksum
+            ```bash
+            curl -fsSL https://github.com/jpdck/capsuleOS/releases/download/latest/install.sh.sha256 | shasum -a 256 -c -
+            ```
+            
+            ### What's Included
+            - Homebrew packages from Brewfile
+            - Rust tools from Cargofile  
+            - Dotfiles configuration
+            - macOS system settings
+          draft: false
+          prerelease: false
           fail_on_unmatched_files: true
