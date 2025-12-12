@@ -162,6 +162,8 @@ stage_header("Setting up 1Password integration", STAGE)
 //             input_prompt("│  Please enter your 1Password Service Token: ")
 //         }
 
+//         //sanitize input
+
 //         silent $ printf '%s' "{op_token}" | security add-generic-password -a "{USER}" -s "op-service-token" -w -U $ failed(code) {
 //             let message = "Failed to store token in Keychain, you may need to add it manually"
 //             step_warning(message)
@@ -324,7 +326,7 @@ stage_header("Configuring user dotfiles", STAGE)
                 let target_file = "{HOME}/{trim(relative_path)}"
                 
                 if file_exists(target_file) {
-                    silent trust $ rm -f "{target_file}" $?
+                    silent trust $ rm -f "{target_file}" $
                     log_message("Removed conflicting file: {target_file}")
                 }
             }

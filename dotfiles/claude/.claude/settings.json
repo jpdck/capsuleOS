@@ -1,11 +1,168 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  
   "statusLine": {
     "type": "command",
     "command": "bunx -y ccstatusline@latest",
     "padding": 0
   },
+  
+  "permissions": {
+    "allow": [
+      "Bash(docker ps:*)",
+      "Bash(docker images:*)",
+      "Bash(docker logs:*)",
+      "Bash(docker inspect:*)",
+      "Bash(docker stats:*)",
+      "Bash(docker version:*)",
+      "Bash(docker info:*)",
+      "Bash(docker-compose ps:*)",
+      "Bash(docker-compose logs:*)",
+      "Bash(docker-compose config:*)",
+      "Bash(git status:*)",
+      "Bash(git log:*)",
+      "Bash(git diff:*)",
+      "Bash(git show:*)",
+      "Bash(git branch:*)",
+      "Bash(git checkout:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git pull:*)",
+      "Bash(conda list:*)",
+      "Bash(conda env list:*)",
+      "Bash(conda info:*)",
+      "Bash(cargo search:*)",
+      "Bash(systemctl status:*)",
+      "Bash(journalctl:*)",
+      "Read(~/.ssh/config)",
+      "Read(~/.gitconfig)",
+      "Read(.env.example)",
+      "Edit(.env.example)"
+    ],
+    "ask": [
+      "Bash(docker run:*)",
+      "Bash(docker exec:*)",
+      "Bash(docker build:*)",
+      "Bash(docker pull:*)",
+      "Bash(docker push:*)",
+      "Bash(docker rm:*)",
+      "Bash(docker rmi:*)",
+      "Bash(docker stop:*)",
+      "Bash(docker kill:*)",
+      "Bash(docker restart:*)",
+      "Bash(docker volume rm:*)",
+      "Bash(docker network rm:*)",
+      "Bash(docker system prune:*)",
+      "Bash(docker-compose up:*)",
+      "Bash(docker-compose down:*)",
+      "Bash(docker-compose build:*)",
+      "Bash(docker-compose pull:*)",
+      "Bash(docker-compose restart:*)",
+      "Bash(docker-compose stop:*)",
+      "Bash(docker-compose rm:*)",
+      "Bash(bun install:*)",
+      "Bash(bun add:*)",
+      "Bash(bun remove:*)",
+      "Bash(bunx:*)",
+      "Bash(conda install:*)",
+      "Bash(conda create:*)",
+      "Bash(conda remove:*)",
+      "Bash(conda update:*)",
+      "Bash(conda activate:*)",
+      "Bash(cargo install:*)",
+      "Bash(cargo uninstall:*)",
+      "Bash(git push:*)",
+      "Bash(git reset:*)",
+      "Bash(git rebase:*)",
+      "Bash(git merge:*)",
+      "Bash(git cherry-pick:*)",
+      "Bash(git revert:*)",
+      "Bash(git clean:*)",
+      "Bash(git stash drop:*)",
+      "Bash(git stash clear:*)",
+      "Bash(git branch -D:*)",
+      "Bash(git tag -d:*)",
+      "Bash(chmod:*)",
+      "Bash(chown:*)",
+      "Bash(rm:*)",
+      "Bash(sudo:*)",
+      "Bash(systemctl restart:*)",
+      "Bash(systemctl stop:*)",
+      "Edit(docker-compose.yml)",
+      "Edit(docker-compose.yaml)",
+      "Bash(curl:*)",
+      "Bash(wget:*)",
+      "WebFetch"
+    ],
+    "deny": [
+      "Bash(pip:*)",
+      "Read(.env)",
+      "Read(.env.*)",
+      "Read(*.key)",
+      "Read(*.pem)",
+      "Read(**/secrets/**)",
+      "Read(~/.ssh/id_*)",
+      "Read(~/.aws/credentials)",
+      "Read(~/.config/rclone/rclone.conf)",
+      "Edit(.env)",
+      "Edit(.env.*)",
+      "Edit(*.key)",
+      "Edit(*.pem)"
+    ]
+  },
+  
+  "env": {
+    "DOCKER_BUILDKIT": "1",
+    "COMPOSE_DOCKER_CLI_BUILD": "1",
+    "DOCKER_DEFAULT_PLATFORM": "linux/arm64",
+    "COMPOSE_PARALLEL_LIMIT": "12",
+    "DOCKER_SCAN_SUGGEST": "false",
+    "PYTHONUNBUFFERED": "1",
+    "CONDA_AUTO_ACTIVATE_BASE": "false",
+    "HOMEBREW_NO_ANALYTICS": "1",
+    "EDITOR": "helix",
+    "PAGER": "less",
+    "DO_NOT_TRACK": "1"
+  },
+  
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "*.rs",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cargo fmt --quiet"
+          },
+          {
+            "type": "command",
+            "command": "cargo clippy --quiet -- -D clippy::unwrap_used -W clippy::pedantic -W clippy::nursery"
+          }
+        ]
+      },
+      {
+        "matcher": "*.py",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "ruff format {file}"
+          },
+          {
+            "type": "command",
+            "command": "ruff check {file}"
+          }
+        ]
+      }
+    ]
+  },
+  
   "alwaysThinkingEnabled": false,
+  
   "feedbackSurveyState": {
     "lastShownTime": 1754356350023
   }
