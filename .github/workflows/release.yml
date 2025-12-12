@@ -25,7 +25,9 @@ jobs:
         
       - name: Build installer from Amber source
         run: |
-          amber build Scripts/installer.ab install.sh --minify
+          cd Scripts
+          amber build installer.ab ../install.sh --minify
+          cd ..
           chmod +x install.sh
       
       - name: Generate checksums

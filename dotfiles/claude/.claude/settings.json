@@ -159,7 +159,7 @@
         ]
       },
       {
-        "matcher": "*.ab, *.amber",
+        "matcher": "*.ab",
         "hooks": [
           {
             "type": "command",

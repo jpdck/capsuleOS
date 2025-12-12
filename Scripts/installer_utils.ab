@@ -1,12 +1,12 @@
 import { echo_error } from "std/env"
-import { lpad, rpad } from "std/text"
+import { lpad, rpad, trim } from "std/text"
 import { date_now, date_format_posix } from "std/date"
 import { file_append, file_read } from "std/fs"
 
 const LOG_FILE = "installer.log"
-const VERSION = file_read("VERSION") failed {
+const VERSION = trim(file_read("VERSION") failed {
     "v0.0"
-}
+})
 
 pub fun title_header(): Null {
     let border = "═══════════════════════════════════════════"
@@ -14,7 +14,7 @@ pub fun title_header(): Null {
     
     echo ""
     echo "╔{border}╗"
-    let header = "capsuleOS BASH INSTALL SYSTEM v{VERSION}"
+    let header = "capsuleOS AMBER INSTALL SYSTEM v{VERSION}"
     let header_padding = (width - len(header)) / 2
     let header_line = rpad(lpad(header, " ", header_padding + len(header)), " ", width-2)
     echo "║{header_line}║"
@@ -28,7 +28,7 @@ pub fun title_footer(): Null {
     
     echo ""
     echo "╔{border}╗"
-    let header = "capsuleOS BASH INSTALL SYSTEM v{VERSION}"
+    let header = "capsuleOS AMBER INSTALL SYSTEM v{VERSION}"
     let header_padding = (width - len(header)) / 2
     let header_line = rpad(lpad(header, " ", header_padding + len(header)), " ", width-2)
     echo "║{header_line}║"
