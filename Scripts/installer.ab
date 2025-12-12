@@ -528,10 +528,9 @@ stage_header("Installing additional language-specific tools", STAGE)
         log_message(message, code)
         step_failed(message)
     }
-    let computed_sha256_trimmed = trim(computed_sha256)
     
-    if computed_sha256_trimmed != amber_sha256 {
-        let message = "SHA256 verification failed for Amber installer (expected: {amber_sha256}, got: {computed_sha256_trimmed})"
+    if trim(computed_sha256) != amber_sha256 {
+        let message = "SHA256 verification failed for Amber installer (expected: {amber_sha256}, got: {trim(computed_sha256)})"
         log_message(message, 1)
         step_failed(message)
     }
