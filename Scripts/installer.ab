@@ -1,0 +1,620 @@
+// -----------------------------------------------//
+// capsuleOS Installer                            //
+// https://github.com/jpdck/capsuleOS             //
+// -----------------------------------------------//
+
+import { split, text_contains, split_lines, trim, join, starts_with } from "std/text"
+import { is_command, env_var_get, env_var_set, input_confirm, input_hidden, echo_colored } from "std/env"
+import { file_exists, file_chmod, file_write, dir_exists, file_read, dir_create } from "std/fs"
+import { file_download } from "std/http"
+import * from "installer_utils.ab"
+
+const USER = trust env_var_get("USER")
+const HOME = trust env_var_get("HOME")
+const REPO_DIR = "{HOME}/Projects/capsuleOS"
+const TEMP_DIR = trust $ mktemp -d -t capsuleOS-installer $
+
+if TEMP_DIR == "" or not dir_exists(TEMP_DIR) {
+    echo_colored("Failed to create temporary directory. Exiting.", 31)
+    exit 1
+}
+
+let STAGE = 0
+
+fun apply_macos_defaults(): Null? {
+    silent {
+        // Global Interface Settings
+        $ defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false $?
+        $ defaults write NSGlobalDomain AppleShowAllExtensions -bool true $?
+        $ defaults write NSGlobalDomain InitialKeyRepeat -int 14 $?
+        $ defaults write NSGlobalDomain KeyRepeat -int 1 $?
+        $ defaults write NSGlobalDomain AppleInterfaceStyle -string "Dark" $?
+        $ defaults write NSGlobalDomain AppleScrollerPagingBehavior -bool true $?
+        $ defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true $?
+        $ defaults write NSGlobalDomain PMPrintingExpandedStateForPrint -bool true $?
+        $ defaults write NSGlobalDomain "com.apple.trackpad.scaling" -float 2.0 $?
+        $ defaults write NSGlobalDomain "com.apple.mouse.tapBehavior" -int 1 $?
+        $ defaults write NSGlobalDomain AppleKeyboardUIMode -int 3 $?
+        $ defaults write NSGlobalDomain com.apple.swipescrolldirection -bool true $?
+
+        // Dock Configuration
+        $ defaults write com.apple.dock autohide -bool false $?
+        $ defaults write com.apple.dock orientation -string "bottom" $?
+        $ defaults write com.apple.dock showhidden -bool true $?
+        $ defaults write com.apple.dock mineffect -string "genie" $?
+        $ defaults write com.apple.dock show-recents -bool false $?
+        $ defaults write com.apple.dock tilesize -int 36 $?
+        $ defaults write com.apple.dock magnification -bool true $?
+        $ defaults write com.apple.dock largesize -int 48 $?
+        $ defaults write com.apple.dock autohide-delay -float 0.0 $?
+        $ defaults write com.apple.dock autohide-time-modifier -float 0.5 $?
+
+        // Finder Settings
+        $ defaults write com.apple.finder AppleShowAllFiles -bool true $?
+        $ defaults write com.apple.finder AppleShowAllExtensions -bool true $?
+        $ defaults write com.apple.finder ShowPathbar -bool true $?
+        $ defaults write com.apple.finder ShowStatusBar -bool true $?
+        $ defaults write com.apple.finder _FXSortFoldersFirst -bool true $?
+        $ defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv" $?
+        $ defaults write com.apple.finder QuitMenuItem -bool true $?
+
+        // Trackpad Settings
+        $ defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true $?
+        $ defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true $?
+    }
+}
+
+title_header()
+
+// Stage 1: macOS Environment Setup
+// Ensure the macOS environment is prepared for installation
+stage_header("macOS Environment Setup", STAGE)
+{
+    // Verify Xcode Command Line Tools installation
+    stage_step("Checking for Xcode CLI tools installation")
+    if not is_command("xcode-select") {
+        step_update("Installing Xcode CLI tools")
+        $ xcode-select --install $ failed(code) {
+            log_message("Xcode CLI tools installation failed with code", code)
+            step_failed("Failed to install Xcode CLI tools")
+        }
+        
+        let message = "Xcode CLI tools installed successfully"
+        step_success(message)
+        log_message(message)
+    } else {
+        let message = "Xcode CLI tools are already installed"
+        step_success(message)
+        log_message(message)
+    }
+
+    stage_spacer()
+
+    // Verify Homebrew installation
+    stage_step("Checking for Homebrew installation")
+    if not is_command("brew") {
+        step_update("Installing Homebrew")
+        $ /bin/bash -c "\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"$ failed(code) {
+            let message = "Failed to install Homebrew"
+            log_message(message, code)
+            step_failed(message)
+        }
+        let message = "Homebrew installed successfully"
+        step_success(message)
+        log_message(message)
+
+        step_update("Configuring Homebrew environment")
+        if file_exists("/opt/homebrew/bin/brew") {
+            silent trust $ eval "\$(/opt/homebrew/bin/brew shellenv)" $
+        } else {
+            if file_exists("/usr/local/bin/brew") {
+                silent trust $ eval "\$(/usr/local/bin/brew shellenv)" $
+            }
+        }
+    } else {
+        step_update("Homebrew detected, performing update")
+        silent $ brew update $ failed(code) {
+            let message = "Failed to update Homebrew"
+            log_message(message, code)
+            step_failed(message)
+        }
+        step_update("Upgrading existing Homebrew packages")
+        silent $ brew upgrade $ failed(code) {
+            let message = "Failed to upgrade Homebrew packages"
+            log_message(message, code)
+            step_failed(message)
+        }
+        let message = "Homebrew is up to date"
+        step_success(message)
+        log_message(message)
+    }
+}
+stage_footer(STAGE, "macOS Environment Setup")
+
+// Stage 2: Homebrew Package Installation
+// Install necessary packages via Homebrew using a Brewfile
+stage_header("Installing Homebrew packages", STAGE)
+{
+    stage_step("Downloading latest Brewfile from repository")
+    let brewfile_path = "{TEMP_DIR}/Brewfile"
+    file_download("https://raw.githubusercontent.com/jpdck/capsuleOS/main/Brewfile", brewfile_path) failed(code) {
+        let message = "Failed to download Brewfile"
+        log_message(message, code)
+        step_failed(message)
+    }
+    step_success("Brewfile downloaded successfully")
+    log_message("Brewfile downloaded to {brewfile_path}")
+
+    stage_spacer()
+
+    step_update("Installing Homebrew packages from Brewfile")
+    $ brew bundle install --file="{brewfile_path}" $ failed(code) {
+        log_message("Failed to install Homebrew packages via Brewfile", code)
+        step_failed("Failed to install Homebrew packages via Brewfile")
+    }
+    let message = "Homebrew packages installed successfully from Brewfile"
+    step_success(message)
+    log_message(message)
+}
+stage_footer(STAGE, "Installing Homebrew packages")
+
+// Stage 3: 1Password Integration Setup
+// Configure 1Password CLI and import necessary credentials
+stage_header("Setting up 1Password integration", STAGE)
+{
+    stage_step("Checking for 1Password CLI")
+    if not is_command("op") {
+        let message = "1Password CLI not found - required for credential management"
+        log_message(message)
+        step_failed(message)
+    }
+    step_success("1Password CLI detected")
+    log_message("1Password CLI detected")
+    
+    stage_spacer()
+    
+    // Prompt for service token
+    stage_step("Configuring 1Password service token")
+    echo_colored("Please enter your 1Password Service Token:", 33)
+    echo_colored("(You can create one at https://my.1password.com/developer-tools/infrastructure-secrets)", 33)
+    
+    let token = input_hidden("")
+    
+    if len(trim(token)) == 0 {
+        let message = "No service token provided - required for 1Password integration"
+        log_message(message)
+        step_failed(message)
+    }
+    
+    // Store token in macOS Keychain for persistence across sessions
+    // This allows future runs to retrieve the token without re-prompting
+    step_update("Storing service token in macOS Keychain")
+    $ security delete-generic-password -a "{USER}" -s "op-service-token" $ failed {
+        // Ignore failure - likely means no existing token
+        log_message("No existing service token to remove (expected on first run)")
+    }
+    
+    $ security add-generic-password -a "{USER}" -s "op-service-token" -w "{token}" -U $ failed(code) {
+        let message = "Failed to store token in Keychain for future use"
+        log_message(message, code)
+        step_warning(message)
+    }
+    step_success("Service token stored in Keychain")
+    log_message("Service token stored securely")
+    
+    // Set token for current session
+    env_var_set("OP_SERVICE_ACCOUNT_TOKEN", token) failed {
+        let message = "Failed to set OP_SERVICE_ACCOUNT_TOKEN environment variable"
+        log_message(message)
+        step_failed(message)
+    }
+    
+    stage_spacer()
+    
+    // Verify ZettoSenshi vault exists
+    stage_step("Verifying ZettoSenshi vault access")
+    let vault_check = $ op vault list --format=json $ failed(code) {
+        let message = "Failed to list 1Password vaults"
+        log_message(message, code)
+        step_failed(message)
+    }
+    
+    if not text_contains(vault_check, "ZettoSenshi") {
+        let message = "ZettoSenshi vault not found or inaccessible"
+        log_message(message)
+        step_failed(message)
+    }
+    step_success("ZettoSenshi vault accessible")
+    log_message("ZettoSenshi vault verified")
+    
+    stage_spacer()
+    
+    // List and import all SSH keys
+    stage_step("Fetching SSH keys from ZettoSenshi vault")
+    let ssh_keys_json = $ op item list --vault="ZettoSenshi" --categories="SSH Key" --format=json $ failed(code) {
+        let message = "Failed to list SSH keys from vault"
+        log_message(message, code)
+        step_failed(message)
+    }
+    
+    // Parse SSH key list
+    let ssh_keys_raw = trust $ echo '{ssh_keys_json}' | jq -r '.[] | .title + "|" + .id' $
+    
+    if len(trim(ssh_keys_raw)) == 0 {
+        let message = "No SSH keys found in ZettoSenshi vault"
+        log_message(message)
+        step_failed(message)
+    }
+    
+    let key_lines = split_lines(trim(ssh_keys_raw))
+    let key_lines_count = 0
+    for line in key_lines {
+        key_lines_count += 1
+    }
+    step_success("Found {key_lines_count} SSH key(s) in vault")
+    log_message("Found {key_lines_count} SSH key(s) to import")
+    
+    // Create .ssh directory
+    let ssh_dir = "{HOME}/.ssh"
+    if not dir_exists(ssh_dir) {
+        dir_create(ssh_dir) failed(code) {
+            let message = "Failed to create .ssh directory"
+            log_message(message, code)
+            step_failed(message)
+        }
+    }
+    file_chmod(ssh_dir, "700") failed(code) {
+        let message = "Failed to set permissions on .ssh directory"
+        log_message(message, code)
+        step_failed(message)
+    }
+    
+    stage_spacer()
+    stage_step("Importing all SSH keys")
+    
+    // Process each key
+    for i, key_line in key_lines {
+        let parts = split(key_line, "|")
+        if len(parts) < 2 {
+            log_message("Skipping invalid key line format: {key_line}")
+            continue
+        }
+        let key_title = parts[0]
+        let key_id = parts[1]
+        
+        step_update("Processing SSH key {i + 1}/{key_lines_count}: {key_title}")
+        
+        // Get key details from 1Password
+        let key_json = $ op item get "{key_id}" --format=json $ failed(code) {
+            let message = "Failed to fetch key details for {key_title}"
+            log_message(message, code)
+            step_warning(message)
+            continue
+        }
+        
+        // Extract private key
+        let private_key = trust $ echo '{key_json}' | jq -r '.fields[] | select(.label=="private key") | .value' $
+        
+        if len(trim(private_key)) == 0 or private_key == "null" {
+            step_warning("Could not extract private key for {key_title}")
+            log_message("Private key extraction failed for {key_title}")
+            continue
+        }
+        
+        // Determine filename - ZettoSenshi gets default name
+        let key_filename = ""
+        if key_title == "ZettoSenshi" {
+            key_filename = "id_ed25519"
+        } else {
+            // Sanitize key title for filesystem
+            let sanitized = trust $ echo "id_{key_title}" | tr ' ' '_' | tr -cd '[:alnum:]_.-' $
+            key_filename = trim(sanitized)
+        }
+        
+        // Write private key
+        let key_path = "{ssh_dir}/{key_filename}"
+        file_write(key_path, private_key) failed(code) {
+            let message = "Failed to write private key: {key_filename}"
+            log_message(message, code)
+            step_warning(message)
+            continue
+        }
+        file_chmod(key_path, "600") failed(code) {
+            let message = "Failed to set permissions on private key: {key_filename}"
+            log_message(message, code)
+            step_warning(message)
+        }
+        
+        // Extract and write public key
+        let public_key = trust $ echo '{key_json}' | jq -r '.fields[] | select(.label=="public key") | .value' $
+        
+        if len(trim(public_key)) > 0 and public_key != "null" {
+            let pub_path = "{key_path}.pub"
+            file_write(pub_path, public_key) failed(code) {
+                log_message("Failed to write public key for {key_filename}", code)
+                step_warning("Could not write public key for {key_filename}")
+            }
+            file_chmod(pub_path, "644") failed(code) {
+                log_message("Failed to set permissions on public key for {key_filename}", code)
+            }
+        }
+        
+        // Start SSH agent if not running
+        silent $ pgrep -x ssh-agent > /dev/null $ failed {
+            silent trust $ eval "\$(ssh-agent -s)" $
+        }
+        
+        // Add to SSH agent
+        silent $ ssh-add "{key_path}" $ failed {
+            step_warning("Imported {key_filename} but could not add to SSH agent")
+            log_message("Failed to add {key_filename} to SSH agent")
+        }
+
+        step_success("Imported and added {key_filename} to SSH agent")
+        log_message("SSH key {key_filename} imported successfully")
+    }
+    
+    step_success("All SSH keys imported ({key_lines_count} total)")
+    log_message("SSH key import completed: {key_lines_count} keys processed")
+}
+stage_footer(STAGE, "Setting up 1Password integration")
+
+// Stage 4: macOS Defaults Configuration
+// Apply recommended macOS system settings for optimal performance
+stage_header("Configuring macOS settings", STAGE)
+{
+    if input_confirm("Apply recommended macOS system settings?", true) {
+        stage_step("Applying macOS system settings...")
+
+        step_update("Configuring interface, dock, finder, and trackpad settings")
+        apply_macos_defaults() failed(code) {
+            log_message("Failed to apply macOS defaults", code)
+            step_failed("Failed to apply macOS defaults")
+        }
+        
+        // Restarting services
+        step_update("Restarting affected services")
+        silent trust $ killall Dock Finder SystemUIServer $
+
+        step_success("macOS system settings applied")
+        log_message("macOS system settings applied")
+    } else {
+        step_warning("Skipping macOS system settings")
+        log_message("Skipped macOS system settings")
+    }
+}
+stage_footer(STAGE, "Configuring macOS settings")
+
+// Stage 5: capsuleOS Repository Setup
+// Clone or update the capsuleOS repository for further development
+stage_header("Setting up capsuleOS repository", STAGE)
+{
+    if not dir_exists(REPO_DIR) {
+        stage_step("Cloning capsuleOS repository")
+        silent $ git clone git@github.com:jpdck/capsuleOS.git "{REPO_DIR}" $ failed(code) {
+            let message = "Failed to clone capsuleOS repository"
+            log_message(message, code)
+            step_failed(message)
+        }
+        step_success("capsuleOS repository cloned successfully")
+        log_message("Repository cloned to {REPO_DIR}")
+    } else {
+        stage_step("Updating capsuleOS repository")
+        silent $ git -C "{REPO_DIR}" pull origin main $ failed(code) {
+            let message = "Failed to update capsuleOS repository"
+            log_message(message, code)
+            step_failed(message)
+        }
+        step_success("capsuleOS repository updated successfully")
+        log_message("Repository updated at {REPO_DIR}")
+    }
+}
+stage_footer(STAGE, "Setting up capsuleOS repository")
+
+// Stage 6: Dotfiles Configuration
+// Set up user dotfiles for personalized shell environment
+stage_header("Configuring user dotfiles", STAGE)
+{
+    stage_step("Verifying GNU Stow installation")
+    if not is_command("stow") {
+        log_message("GNU Stow not found for dotfiles configuration")
+        step_failed("GNU Stow is not installed; cannot configure dotfiles")
+    }
+    step_success("GNU Stow is installed")
+    log_message("GNU Stow found")
+
+    stage_spacer()
+
+    stage_step("Applying dotfiles with GNU Stow")
+    const DOTFILES_DIR = "{REPO_DIR}/dotfiles"
+
+    // Verify dotfiles directory exists (should exist since we cloned capsuleOS repo in Stage 5)
+    if not dir_exists(DOTFILES_DIR) {
+        let message = "Dotfiles directory not found in capsuleOS repository"
+        log_message(message)
+        step_failed(message)
+    }
+
+    // Get list of packages (directories) to stow using absolute path
+    let packages_raw = trust $ ls -1d "{DOTFILES_DIR}"/*/ | xargs -n1 basename $
+    let packages = split_lines(trim(packages_raw))
+
+    step_update("Found {len(packages)} package(s) to stow")
+    log_message("Packages to stow: {join(packages, ", ")}")
+
+    // Stow each package using explicit directory flag
+    for pkg in packages {
+        step_update("Stowing {pkg}...")
+
+        // First attempt to stow with explicit directory
+        $ stow -d "{DOTFILES_DIR}" -t "{HOME}" "{pkg}" $ failed(code) {
+            // If it failed, remove conflicts and try again
+            step_update("Removing conflicts for {pkg}...")
+
+            // Get list of files that would be stowed using absolute path
+            let files_to_stow = trust $ find "{DOTFILES_DIR}/{pkg}" -type f -o -type l $
+            let file_list = split_lines(trim(files_to_stow))
+
+            // Remove each conflicting file from HOME
+            for file_path in file_list {
+                // Strip the dotfiles directory prefix
+                let relative_path = trust $ echo "{file_path}" | sed "s|{DOTFILES_DIR}/{pkg}/||" $
+                let target_file = "{HOME}/{trim(relative_path)}"
+
+                if file_exists(target_file) {
+                    silent trust $ rm -f "{target_file}" $
+                    log_message("Removed conflicting file: {target_file}")
+                }
+            }
+
+            // Try stowing again with explicit directory
+            $ stow -d "{DOTFILES_DIR}" -t "{HOME}" "{pkg}" $ failed(retry_code) {
+                let message = "Failed to stow {pkg} after removing conflicts"
+                log_message(message, retry_code)
+                step_failed(message)
+            }
+        }
+
+        step_success("Successfully stowed {pkg}")
+        log_message("Successfully stowed {pkg}")
+    }
+    
+    step_success("Dotfiles configuration complete")
+    log_message("All dotfiles packages processed")
+}
+stage_footer(STAGE, "Configuring user dotfiles")
+
+// Stage 7: Additional Language-Specific Tools
+// Cargofile (cargo), Amber, Conda
+stage_header("Installing additional language-specific tools", STAGE)
+{
+    stage_step("Downloading latest Cargofile from repository")
+    let cargofile_path = "{TEMP_DIR}/Cargofile"
+    file_download("https://raw.githubusercontent.com/jpdck/capsuleOS/main/Cargofile", cargofile_path) failed(code) {
+        let message = "Failed to download Cargofile"
+        log_message(message, code)
+        step_failed(message)
+    }
+    step_success("Cargofile downloaded successfully")
+    log_message("Cargofile downloaded to {cargofile_path}")
+
+    stage_spacer()
+
+    stage_step("Installing Rust tools via Cargo")
+    if not is_command("cargo") {
+        step_failed("Cargo not found; skipping Rust tools installation")
+        log_message("Cargo not found; skipped Rust tools installation")
+    }
+
+    // Read tools from Cargofile and install
+    let tools_raw = file_read(cargofile_path) failed(code) {
+        let message = "Failed to read Cargofile"
+        log_message(message, code)
+        step_failed(message)
+    }
+    let tools = split_lines(trim(tools_raw))
+    for tool_raw in tools {
+        let tool = trim(tool_raw)
+        if len(tool) > 0 and not starts_with(tool, "#") {
+            step_update("Installing {tool} via Cargo")
+            silent $ cargo install {tool} $ failed(code) {
+                let message = "Failed to install {tool} via Cargo"
+                log_message(message, code)
+                step_failed(message)
+            }
+            step_success("{tool} installed successfully")
+            log_message("{tool} installed via Cargo")
+        }
+    }
+
+    stage_spacer()
+
+    stage_step("Installing Amber framework")
+    // Download install.sh to temp directory
+    const amber_installer = "{TEMP_DIR}/amber-install.sh"
+    const amber_url = "https://github.com/amber-lang/amber/releases/download/0.5.1-alpha/install.sh"
+    const amber_sha256 = "6c5455349fe9454aa2913438ee036275f3b0a2ed744b82a22e3496335bc9ac57"
+    
+    file_download(amber_url, amber_installer) failed(code) {
+        let message = "Failed to download Amber installer"
+        log_message(message, code)
+        step_failed(message)
+    }
+    
+    // Verify SHA256 checksum
+    let computed_sha256 = $ shasum -a 256 {amber_installer} | cut -d ' ' -f1 $ failed(code) {
+        let message = "Failed to compute SHA256 checksum of Amber installer"
+        log_message(message, code)
+        step_failed(message)
+    }
+    
+    if trim(computed_sha256) != amber_sha256 {
+        let message = "SHA256 verification failed for Amber installer (expected: {amber_sha256}, got: {trim(computed_sha256)})"
+        log_message(message, 1)
+        step_failed(message)
+    }
+    
+    // Execute installer after verification
+    $ bash {amber_installer} $ failed(code) {
+        let message = "Failed to install Amber framework"
+        log_message(message, code)
+        step_failed(message)
+    }
+    step_success("Amber framework installed successfully")
+    log_message("Amber framework installed")
+
+    stage_spacer()
+
+    stage_step("Installing Python packages via conda")
+    if not is_command("conda") {
+        log_message("conda not found; skipped Python packages installation")
+        step_failed("conda not found; skipping Python packages installation")
+    }
+    let python_packages = ["pytest", "ipython", "python-lsp-server"]
+    
+    for pkg in python_packages {
+        $ conda install -y "{pkg}" $ failed(code) {
+            let message = "Failed to install {pkg}"
+            log_message(message, code)
+            step_warning(message)
+            continue
+        }
+        log_message("{pkg} installed via conda")
+    }
+    
+    step_success("Python packages installation completed")
+    log_message("All conda packages processed")
+}
+stage_footer(STAGE, "Installing additional language-specific tools")
+
+// Stage 8: Finalize and Verify Installation
+// Ensure all components are correctly installed and configured
+stage_header("Finalizing and verifying installation", STAGE)
+{
+    stage_step("Verifying installation components")
+    let essential_commands = ["git", "brew", "op", "stow", "cargo", "conda"]
+    for cmd in essential_commands {
+        if not is_command(cmd) {
+            let message = "Essential command not found: {cmd}"
+            log_message(message)
+            step_warning(message)
+        } else {
+            log_message("Verified command: {cmd}")
+        }
+    }
+    step_success("Installation verification completed")
+    log_message("Installation process finalized and verified")
+}
+stage_footer(STAGE, "Finalizing and verifying installation")
+
+// Cleanup: Remove temporary directory
+stage_header("Cleaning up temporary files", STAGE)
+{
+    stage_step("Removing temporary directory")
+    silent trust $ rm -rf "{TEMP_DIR}" $
+    step_success("Temporary files removed")
+    log_message("Cleaned up temporary directory: {TEMP_DIR}")
+}
+stage_footer(STAGE, "Cleaning up temporary files")
+
+title_footer()

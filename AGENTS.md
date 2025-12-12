@@ -1,6 +1,41 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to AI agents when working with code in this repository.
+
+## Critical Instructions
+
+### Amber Language Files
+
+Amber file extensions: *.amber, *.ab
+
+When working with ANY Amber language files in this repository, you must follow these requirements:
+
+- **Documentation Reference**: Always reference the [Amber Language Documentation](https://github.com/amber-lang/amber-docs) when editing `.amber` or `.ab` files
+- **Validation**: The amber script must pass `amber check` without errors before committing
+- **Compilation**: Use `amber build` to compile Amber scripts to Bash when needed
+
+#### Available Amber Commands
+
+```text
+Usage: amber [OPTIONS] [INPUT] [ARGS]... [COMMAND]
+
+Commands:
+  eval        Execute Amber code fragment
+  run         Execute Amber script
+  check       Check Amber script for errors
+  build       Compile Amber script to Bash
+  docs        Generate Amber script documentation
+  completion  Generate Bash completion script
+  help        Print this message or the help of the given subcommand(s)
+```
+
+#### Development Workflow for Amber Files
+
+1. **Edit**: Modify the `.amber` or `.ab` source files in `Scripts/`
+2. **Check**: Run `amber check <file.amber>` or `amber check <file.ab>` to validate syntax and logic
+3. **Test**: Use `amber test <file.amber>` or `amber test <file.ab>` to test functionality
+4. **Build**: Compile with `amber build <file.amber>` or `amber build <file.ab>` to generate Bash scripts
+5. **Deploy**: The compiled Bash scripts are used in the installation process
 
 ## Repository Overview
 
@@ -11,12 +46,17 @@ This is a macOS development environment bootstrap repository that automates the 
 ### Core Files
 
 - `Brewfile` - Comprehensive package definitions for CLI tools, development languages, GUI apps, and fonts
-- `install.sh` - Automated bootstrap script that handles the complete setup process
-- `dotfiles/` - Configuration files managed with GNU Stow, organized by package (zsh, git, helix, etc.)
+- `Cargofile` - Rust crate definitions for development tools and utilities (installed via `cargo install`)
+- `install.sh` - Legacy automated bootstrap script
+- `installer.amber` - New installer source code written in Amber language
+- `installer.sh` - Compiled Bash script generated from `installer.amber`
+- `dotfiles/` - Configuration files managed with GNU Stow, organized by package
 
 ### Installation Process
 
-The `install.sh` script runs through 8 phases:
+The repository is transitioning to an Amber-based installer (`installer.amber` -> `installer.sh`).
+
+The legacy `install.sh` script runs through 8 phases:
 
 1. System Prerequisites (Xcode tools, Homebrew)
 2. Package Installation (from Brewfile)
@@ -26,6 +66,11 @@ The `install.sh` script runs through 8 phases:
 6. macOS Configuration (system preferences)
 7. App Store Installation (using `mas`)
 8. Language-Specific Tools (Rust, Python packages)
+
+The new `installer.sh` (compiled from `installer.amber`) provides a more structured approach with better logging and error handling. It currently covers:
+1. macOS Environment Setup
+2. Homebrew Package Installation
+3. 1Password Integration
 
 ## Common Development Commands
 
@@ -78,11 +123,10 @@ brew bundle install
 
 Each package in `dotfiles/` contains configuration files that are symlinked using GNU Stow:
 
-- `zsh/` - Shell configuration with autosuggestions and syntax highlighting
-- `git/` - Git configuration and aliases
-- `helix/` - Modern editor configuration
-- `starship/` - Cross-shell prompt configuration
-- `bash/`, `gitkraken/` - Additional tool configurations
+- **Shell & Terminal**: `zsh`, `bash`, `starship`, `conda`
+- **Development Tools**: `git`, `gh` (GitHub CLI), `gitkraken`, `docker`
+- **Editors**: `helix`
+- **System & Security**: `ssh`, `claude`
 
 ### 1Password Integration
 
@@ -96,7 +140,7 @@ The setup script integrates with 1Password for SSH key management:
 
 ### Installed Languages & Tools
 
-- **Rust** - Full toolchain with cargo, rust-analyzer, additional cargo tools
+- **Rust** - Full toolchain with cargo, rust-analyzer. Additional tools defined in `Cargofile` (e.g., `cargo-edit`, `bacon`, `clippy`).
 - **Go** - Compiler, language server (gopls), debugger (delve), linter, live reload
 - **Python** - Python 3.14, ruff (linter/formatter), mypy (type checking)
 - **Java** - OpenJDK 17, Gradle, Maven
