@@ -523,7 +523,11 @@ stage_header("Installing additional language-specific tools", STAGE)
     }
     
     // Verify SHA256 checksum
-    let computed_sha256 = trust $ shasum -a 256 {amber_installer} | awk '\{print $1\}' $
+    let computed_sha256 = trust $ shasum -a 256 {amber_installer} | cut -d' ' -f1 $ failed(code) {
+        let message = "Failed to compute SHA256 checksum of Amber installer"
+        log_message(message, code)
+        step_failed(message)
+    }
     let computed_sha256_trimmed = trim(computed_sha256)
     
     if computed_sha256_trimmed != amber_sha256 {
