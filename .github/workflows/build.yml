@@ -1,0 +1,38 @@
+name: Build Installer
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'Scripts/installer.ab'
+      - 'Scripts/installer_utils.ab'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Install Amber
+        run: |
+          curl -fsSL https://github.com/amber-lang/amber/releases/latest/download/install.sh | bash
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+      
+      - name: Build installer from Amber source
+        run: |
+          cd Scripts
+          amber build installer.ab ../install.sh --minify
+          cd ..
+          chmod +x install.sh
+      
+      - name: Upload built installer as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: install-sh
+          path: install.sh
+      
+      - name: Verify installer syntax
+        run: bash -n install.sh

@@ -1,0 +1,67 @@
+
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*.*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Install Amber
+        run: |
+          curl -fsSL https://github.com/amber-lang/amber/releases/latest/download/install.sh | bash
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+        
+      - name: Build installer from Amber source
+        run: |
+          cd Scripts
+          amber build installer.ab ../install.sh --minify
+          cd ..
+          chmod +x install.sh
+      
+      - name: Generate checksums
+        run: |
+          shasum -a 256 install.sh > install.sh.sha256
+          cat install.sh.sha256
+      
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            install.sh
+            install.sh.sha256
+            Brewfile
+            Cargofile
+          body: |
+            ## CapsuleOS Installer
+            
+            ### Quick Install
+            ```bash
+            curl -fsSL https://github.com/jpdck/capsuleOS/releases/download/${{ github.ref_name }}/install.sh | bash
+            ```
+            
+            ### Verify Checksum
+            ```bash
+            curl -fsSL https://github.com/jpdck/capsuleOS/releases/download/${{ github.ref_name }}/install.sh.sha256 | shasum -a 256 -c -
+            ```
+            
+            ### What's Included
+            - Homebrew packages from Brewfile
+            - Rust tools from Cargofile  
+            - Dotfiles configuration
+            - macOS system settings
+          draft: true
+          prerelease: true
+          make_latest: true
+          fail_on_unmatched_files: true
