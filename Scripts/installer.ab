@@ -3,20 +3,12 @@
 // https://github.com/jpdck/capsuleOS             //
 // -----------------------------------------------//
 
-import * from "std/text"
-import * from "std/env"
-import * from "std/date"
-import * from "std/fs"
+import { split, text_contains, split_lines, trim, join } from "std/text"
+import { is_command, env_var_get, env_var_set, input_confirm, input_hidden, echo_colored } from "std/env"
+import { file_exists, file_chmod, file_write, dir_exists, file_read, dir_create } from "std/fs"
 import { file_download } from "std/http"
 import * from "installer_utils.ab"
 
-const RED = 31
-const GREEN = 32
-const YELLOW=33
-const BLUE=34
-const NC=0
-
-const LOG_FILE = "installer.log"
 const USER = trust env_var_get("USER")
 const HOME = trust env_var_get("HOME")
 const REPO_DIR = "{HOME}/Projects/capsuleOS"
@@ -66,6 +58,8 @@ fun apply_macos_defaults(): Null? {
     }
 }
 
+title_header()
+
 // Stage 1: macOS Environment Setup
 // Ensure the macOS environment is prepared for installation
 stage_header("macOS Environment Setup", STAGE)
@@ -75,7 +69,7 @@ stage_header("macOS Environment Setup", STAGE)
     if not is_command("xcode-select") {
         step_update("Installing Xcode CLI tools")
         $ xcode-select --install $ failed(code) {
-            log_message("Xcode CLI tools installation failed with code {code}")
+            log_message("Xcode CLI tools installation failed with code", code)
             step_failed("Failed to install Xcode CLI tools")
         }
         
@@ -95,8 +89,8 @@ stage_header("macOS Environment Setup", STAGE)
     if not is_command("brew") {
         step_update("Installing Homebrew")
         $ /bin/bash -c "\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"$ failed(code) {
-            let message = "Failed to install Homebrew \{{code}\}"
-            log_message(message)
+            let message = "Failed to install Homebrew"
+            log_message(message, code)
             step_failed(message)
         }
         let message = "Homebrew installed successfully"
@@ -105,14 +99,14 @@ stage_header("macOS Environment Setup", STAGE)
     } else {
         step_update("Homebrew detected, performing update")
         silent $ brew update $ failed(code) {
-            let message = "Failed to update Homebrew \{{code}\}"
-            log_message(message)
+            let message = "Failed to update Homebrew"
+            log_message(message, code)
             step_failed(message)
         }
         step_update("Upgrading existing Homebrew packages")
         silent $ brew upgrade $ failed(code) {
-            let message = "Failed to upgrade Homebrew packages \{{code}\}"
-            log_message(message)
+            let message = "Failed to upgrade Homebrew packages"
+            log_message(message, code)
             step_failed(message)
         }
         let message = "Homebrew is up to date"
@@ -133,15 +127,15 @@ stage_header("Installing Homebrew packages", STAGE)
         step_update(message)
 
         file_download("https://raw.githubusercontent.com/jpdck/capsuleOS/main/Brewfile", "./Brewfile") failed(code) {
-            let message = "Failed to download Brewfile \{{code}\}"
-            log_message(message)
+            let message = "Failed to download Brewfile"
+            log_message(message, code)
             step_failed(message)
         }
     }
 
     step_update("Installing Homebrew packages from Brewfile")
     $ brew bundle install $ failed(code) {
-        log_message("Failed to install Homebrew packages via Brewfile \{{code}\}")
+        log_message("Failed to install Homebrew packages via Brewfile", code)
         step_failed("Failed to install Homebrew packages via Brewfile")
     }
     let message = "Homebrew packages installed successfully from Brewfile"
@@ -154,71 +148,198 @@ stage_footer(STAGE, "Installing Homebrew packages")
 // Configure 1Password CLI and import necessary credentials
 stage_header("Setting up 1Password integration", STAGE)
 {
-//     stage_step("Retrieving 1Password Service Token")
-//     {
-//         let op_token = env_var_get("OP_SERVICE_ACCOUNT_TOKEN") failed {
-//             log_message("1Password Service Token not found in environment variables")
-//             step_update("Token not in environment variables")
-//             input_prompt("│  Please enter your 1Password Service Token: ")
-//         }
-
-//         //sanitize input
-
-//         silent $ printf '%s' "{op_token}" | security add-generic-password -a "{USER}" -s "op-service-token" -w -U $ failed(code) {
-//             let message = "Failed to store token in Keychain, you may need to add it manually"
-//             step_warning(message)
-//             log_message(message + ": {code}")
-//         }
-//     }
-
-//     stage_step("Initializing 1Password Vault")
-//     {
-//         let vault_list = silent $ op vault list --format=json | jq -r '.[].name' $ failed(code) {
-//             log_message("Failed to list 1Password vaults: {code}")
-//             step_failed("Failed to list 1Password vaults")
-//         }
-
-//         if not text_contains(vault_list, "ZettoSenshi") {
-//             step_failed("Vault not found in 1Password account")
-//         } else {
-//             step_success("ZettoSenshi vault found")
-//         }
-//     }
-
-//     stage_step("Importing SSH keys from ZettoSenshi vault")
-//     {
-//         let ssh_keys = $ op item list --vault="ZettoSenshi" --format=json | jq -r '.[] | select(.category=="SSH_KEY") | .title' $ failed(code) {
-//             log_message("Warning: Failed to list SSH keys: {code}")
-//             step_failed("Failed to list SSH keys")
-//         }
+    stage_step("Checking for 1Password CLI")
+    if not is_command("op") {
+        let message = "1Password CLI not found - required for credential management"
+        log_message(message)
+        step_failed(message)
+    }
+    step_success("1Password CLI detected")
+    log_message("1Password CLI detected")
+    
+    stage_spacer()
+    
+    // Prompt for service token
+    stage_step("Configuring 1Password service token")
+    echo_colored("Please enter your 1Password Service Token:", 33)
+    echo_colored("(You can create one at https://my.1password.com/developer-tools/infrastructure-secrets)", 33)
+    
+    let token = input_hidden("")
+    
+    if len(trim(token)) == 0 {
+        let message = "No service token provided - required for 1Password integration"
+        log_message(message)
+        step_failed(message)
+    }
+    
+    // Store token in macOS Keychain for persistence across sessions
+    // This allows future runs to retrieve the token without re-prompting
+    step_update("Storing service token in macOS Keychain")
+    $ security delete-generic-password -a "{USER}" -s "op-service-token" $ failed {
+        // Ignore failure - likely means no existing token
+        log_message("No existing service token to remove (expected on first run)")
+    }
+    
+    $ security add-generic-password -a "{USER}" -s "op-service-token" -w "{token}" -U $ failed(code) {
+        let message = "Failed to store token in Keychain for future use"
+        log_message(message, code)
+        step_warning(message)
+    }
+    step_success("Service token stored in Keychain")
+    log_message("Service token stored securely")
+    
+    // Set token for current session
+    env_var_set("OP_SERVICE_ACCOUNT_TOKEN", token) failed {
+        let message = "Failed to set OP_SERVICE_ACCOUNT_TOKEN environment variable"
+        log_message(message)
+        step_failed(message)
+    }
+    
+    stage_spacer()
+    
+    // Verify ZettoSenshi vault exists
+    stage_step("Verifying ZettoSenshi vault access")
+    let vault_check = $ op vault list --format=json $ failed(code) {
+        let message = "Failed to list 1Password vaults"
+        log_message(message, code)
+        step_failed(message)
+    }
+    
+    if not text_contains(vault_check, "ZettoSenshi") {
+        let message = "ZettoSenshi vault not found or inaccessible"
+        log_message(message)
+        step_failed(message)
+    }
+    step_success("ZettoSenshi vault accessible")
+    log_message("ZettoSenshi vault verified")
+    
+    stage_spacer()
+    
+    // List and import all SSH keys
+    stage_step("Fetching SSH keys from ZettoSenshi vault")
+    let ssh_keys_json = $ op item list --vault="ZettoSenshi" --categories="SSH Key" --format=json $ failed(code) {
+        let message = "Failed to list SSH keys from vault"
+        log_message(message, code)
+        step_failed(message)
+    }
+    
+    // Parse SSH key list
+    let ssh_keys_raw = trust $ echo '{ssh_keys_json}' | jq -r '.[] | .title + "|" + .id' $
+    
+    if len(trim(ssh_keys_raw)) == 0 {
+        let message = "No SSH keys found in ZettoSenshi vault"
+        log_message(message)
+        step_failed(message)
+    }
+    
+    let key_lines = split_lines(trim(ssh_keys_raw))
+    let key_lines_count = 0
+    for line in key_lines {
+        key_lines_count += 1
+    }
+    step_success("Found {key_lines_count} SSH key(s) in vault")
+    log_message("Found {key_lines_count} SSH key(s) to import")
+    
+    // Create .ssh directory
+    let ssh_dir = "{HOME}/.ssh"
+    if not dir_exists(ssh_dir) {
+        dir_create(ssh_dir) failed(code) {
+            let message = "Failed to create .ssh directory"
+            log_message(message, code)
+            step_failed(message)
+        }
+    }
+    file_chmod(ssh_dir, "700") failed(code) {
+        let message = "Failed to set permissions on .ssh directory"
+        log_message(message, code)
+        step_failed(message)
+    }
+    
+    stage_spacer()
+    stage_step("Importing all SSH keys")
+    
+    // Process each key
+    for i, key_line in key_lines {
+        let parts = split(key_line, "|")
+        let key_title = parts[0]
+        let key_id = parts[1]
         
-//         let ssh_keys_array = split_lines(ssh_keys)
+        step_update("Processing SSH key {i + 1}/{key_lines_count}: {key_title}")
+        
+        // Get key details from 1Password
+        let key_json = $ op item get "{key_id}" --format=json $ failed(code) {
+            let message = "Failed to fetch key details for {key_title}"
+            log_message(message, code)
+            step_warning(message)
+            continue
+        }
+        
+        // Extract private key
+        let private_key = trust $ echo '{key_json}' | jq -r '.fields[] | select(.label=="private key") | .value' $
+        
+        if len(trim(private_key)) == 0 or private_key == "null" {
+            step_warning("Could not extract private key for {key_title}")
+            log_message("Private key extraction failed for {key_title}")
+            continue
+        }
+        
+        // Determine filename - ZettoSenshi gets default name
+        let key_filename = ""
+        if key_title == "ZettoSenshi" {
+            key_filename = "id_ed25519"
+        } else {
+            // Sanitize key title for filesystem
+            let sanitized = trust $ echo "id_{key_title}" | tr ' ' '_' | tr -cd '[:alnum:]_.-' $
+            key_filename = trim(sanitized)
+        }
+        
+        // Write private key
+        let key_path = "{ssh_dir}/{key_filename}"
+        file_write(key_path, private_key) failed(code) {
+            let message = "Failed to write private key: {key_filename}"
+            log_message(message, code)
+            step_warning(message)
+            continue
+        }
+        file_chmod(key_path, "600") failed(code) {
+            let message = "Failed to set permissions on private key: {key_filename}"
+            log_message(message, code)
+            step_warning(message)
+        }
+        
+        // Extract and write public key
+        let public_key = trust $ echo '{key_json}' | jq -r '.fields[] | select(.label=="public key") | .value' $
+        
+        if len(trim(public_key)) > 0 and public_key != "null" {
+            let pub_path = "{key_path}.pub"
+            file_write(pub_path, public_key) failed(code) {
+                log_message("Failed to write public key for {key_filename}", code)
+                step_warning("Could not write public key for {key_filename}")
+            }
+            file_chmod(pub_path, "644") failed(code) {
+                log_message("Failed to set permissions on public key for {key_filename}", code)
+            }
+        }
+        
+        // Start SSH agent if not running
+        silent trust $ pgrep -x ssh-agent > /dev/null $
+        if status != 0 {
+            silent trust $ eval "\$(ssh-agent -s)" $
+        }
+        
+        // Add to SSH agent
+        silent $ ssh-add "{key_path}" $ failed {
+            step_warning("Imported {key_filename} but could not add to SSH agent")
+            log_message("Failed to add {key_filename} to SSH agent")
+        }
 
-//         if len(ssh_keys_array) == 0 {
-//             step_warning("No SSH keys found in ZettoSenshi vault")
-//             log_message("No SSH keys found in vault")
-//         } else {
-//             echo "│      Found {len(ssh_keys_array)} SSH key(s):"
-//             for index, key in ssh_keys_array {
-//                 echo "│        [{index + 1}] {key}"
-//             }
-//             log_message("Found {len(ssh_keys_array)} SSH keys in vault")
-//         }
-
-//         let ssh_selection = ""
-
-//         if len(trim(ssh_keys)) > 0 {
-//             trust $ echo "{ssh_keys}" | nl -w2 -s'. ' $
-//         } else {
-//             echo "Warning: No SSH keys found in ZettoSenshi vault"
-//             ssh_selection = "none"
-//         }
-
-//     }
-
-
+        step_success("Imported and added {key_filename} to SSH agent")
+        log_message("SSH key {key_filename} imported successfully")
+    }
+    
+    step_success("All SSH keys imported ({key_lines_count} total)")
+    log_message("SSH key import completed: {key_lines_count} keys processed")
 }
-
 stage_footer(STAGE, "Setting up 1Password integration")
 
 // Stage 4: macOS Defaults Configuration
@@ -236,9 +357,7 @@ stage_header("Configuring macOS settings", STAGE)
         
         // Restarting services
         step_update("Restarting affected services")
-        silent $ killall Dock Finder $ failed {
-             // Ignore if they aren't running or fail to kill
-        }
+        silent trust $ killall Dock Finder SystemUIServer $
 
         step_success("macOS system settings applied")
         log_message("macOS system settings applied")
@@ -347,3 +466,96 @@ stage_header("Configuring user dotfiles", STAGE)
     log_message("All dotfiles packages processed")
 }
 stage_footer(STAGE, "Configuring user dotfiles")
+
+// Stage 7: Additional Language-Specific Tools
+// Cargofile (cargo), Amber, Conda
+stage_header("Installing additional language-specific tools", STAGE)
+{
+    stage_step("Installing Rust tools via Cargo")
+    if not is_command("cargo") {
+        step_failed("Cargo not found; skipping Rust tools installation")
+        log_message("Cargo not found; skipped Rust tools installation")
+    }
+
+    // Install tools by reading from Cargofile
+    let cargofile_path = "{REPO_DIR}/Cargofile"
+    if not file_exists(cargofile_path) {
+        let message = "Cargofile not found in capsuleOS repository"
+        log_message(message)
+        step_failed(message)
+    }
+    
+    // Read tools from Cargofile and install
+    let tools_raw = file_read(cargofile_path) failed(code) {
+        let message = "Failed to read Cargofile"
+        log_message(message, code)
+        step_failed(message)
+    }
+    let tools = split_lines(trim(tools_raw))
+    for tool in tools {
+        step_update("Installing {tool} via Cargo")
+        silent $ cargo install {tool} $ failed(code) {
+            let message = "Failed to install {tool} via Cargo"
+            log_message(message, code)
+            step_failed(message)
+        }
+        step_success("{tool} installed successfully")
+        log_message("{tool} installed via Cargo")
+    }
+
+    stage_spacer()
+
+    stage_step("Installing Amber framework")
+    $ bash <(curl -sL "https://github.com/amber-lang/amber/releases/download/0.5.1-alpha/install.sh") $ failed(code) {
+        let message = "Failed to install Amber framework"
+        log_message(message, code)
+        step_failed(message)
+    }
+    step_success("Amber framework installed successfully")
+    log_message("Amber framework installed")
+
+    stage_spacer()
+
+    stage_step("Installing Python packages via conda")
+    if not is_command("conda") {
+        step_warning("conda not found; skipping Python packages installation")
+        log_message("conda not found; skipped Python packages installation")
+    }
+    let python_packages = ["pytest", "ipython", "python-lsp-server"]
+    
+    for pkg in python_packages {
+        $ conda install -y "{pkg}" $ failed(code) {
+            let message = "Failed to install {pkg}"
+            log_message(message, code)
+            step_warning(message)
+            continue
+        }
+        log_message("{pkg} installed via conda")
+    }
+    
+    step_success("Python packages installation completed")
+    log_message("All conda packages processed")
+}
+stage_footer(STAGE, "Installing additional language-specific tools")
+
+// Stage 8: Finalize and Verify Installation
+// Ensure all components are correctly installed and configured
+stage_header("Finalizing and verifying installation", STAGE)
+{
+    stage_step("Verifying installation components")
+    let essential_commands = ["git", "brew", "op", "stow", "cargo", "conda"]
+    for cmd in essential_commands {
+        if not is_command(cmd) {
+            let message = "Essential command not found: {cmd}"
+            log_message(message)
+            step_warning(message)
+        } else {
+            log_message("Verified command: {cmd}")
+        }
+    }
+    step_success("Installation verification completed")
+    log_message("Installation process finalized and verified")
+}
+stage_footer(STAGE, "Finalizing and verifying installation")
+
+title_footer()
