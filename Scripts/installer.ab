@@ -148,7 +148,7 @@ stage_header("Installing Homebrew packages", STAGE)
     stage_spacer()
 
     step_update("Installing Homebrew packages from Brewfile")
-    $ brew bundle install --file="{brewfile_path}" $ failed(code) {
+    $ brew bundle install --file="{brewfile_path}" --quiet $ failed(code) {
         log_message("Failed to install Homebrew packages via Brewfile", code)
         step_failed("Failed to install Homebrew packages via Brewfile")
     }

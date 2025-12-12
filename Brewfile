@@ -65,7 +65,7 @@ brew "gping"                  # Ping with graphs
 #########################################
 
 # JavaScript/TypeScript Development
-brew "bun"                    # Fast JavaScript runtime & package manager
+brew "oven-sh/bun/bun"                    # Fast JavaScript runtime & package manager
 
 # Rust Development
 brew "rust"                   # Rust compiler and cargo
@@ -145,10 +145,10 @@ cask "1password"              # Password manager
 cask "visual-studio-code"     # Code editor
 cask "jetbrains-toolbox"      # JetBrains Toolbox
 cask "firefox"                # Web browser
-cask "tailscale"              # VPN
+cask "tailscale-app"              # VPN
 
 # Media & Productivity
-cask "handbrake"              # Video transcoding
+cask "handbrake-app"              # Video transcoding
 cask "iina"                   # Video player
 cask "kobo"                   # Kobo eBook reader
 cask "hiddenbar"              # Menu bar organization
@@ -160,7 +160,7 @@ cask "usenapp"                # Usenet client
 # Development Tools
 cask "warp"                   # Terminal
 cask "fork"                   # Git GUI
-cask "ghidra"                 # Reverse engineering
+brew "ghidra"                 # Reverse engineering
 cask "balenaetcher"           # USB/SD card OS image flasher
 cask "kicad"                  # PCB design software
 
@@ -200,3 +200,25 @@ cask "miniconda"                        # Python environment management
 cask "font-jetbrains-mono-nerd-font"
 cask "font-fira-code-nerd-font"
 cask "font-meslo-lg-nerd-font"
+
+#########################################
+# Mac App Store Applications            #
+#########################################
+mas 1569813296  # 1Password for Safari        (8.11.22)
+mas 1168254295  # AmorphousDiskMark           (4.0.1)
+mas 6502451661  # Balatro                     (1.0.20)
+mas 425264550   # Blackmagic Disk Speed Test  (3.4.2)
+mas 488920185   # Disk Space Analyzer Pro     (6.0)
+mas 1136220934  # Infuse                      (8.3.4)
+mas 409183694   # Keynote                     (14.4)
+mas 441258766   # Magnet                      (3.0.7)
+mas 1592917505  # Noir                        (2025.2.7)
+mas 409203825   # Numbers                     (14.4)
+mas 409201541   # Pages                       (14.4)
+mas 375589283   # Parcel                      (8.2.4)
+mas 6702028686  # RCT Classic+                (1.0.435)
+mas 1465346522  # Sasquatch                   (2.1.4)
+mas 1475387142  # Tailscale                   (1.90.9)
+mas 1295203466  # Windows App                 (11.3.0)
+mas 1662217862  # Wipr                        (2.15)
+mas 497799835   # Xcode                       (26.1.1)
