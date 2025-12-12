@@ -510,7 +510,30 @@ stage_header("Installing additional language-specific tools", STAGE)
     stage_spacer()
 
     stage_step("Installing Amber framework")
-    $ bash <(curl -sL "https://github.com/amber-lang/amber/releases/download/0.5.1-alpha/install.sh") $ failed(code) {
+    
+    // Download install.sh to temp directory
+    let amber_installer = "{TEMP_DIR}/amber-install.sh"
+    let amber_url = "https://github.com/amber-lang/amber/releases/download/0.5.1-alpha/install.sh"
+    let amber_sha256 = "6c5455349fe9454aa2913438ee036275f3b0a2ed744b82a22e3496335bc9ac57"
+    
+    file_download(amber_url, amber_installer) failed(code) {
+        let message = "Failed to download Amber installer"
+        log_message(message, code)
+        step_failed(message)
+    }
+    
+    // Verify SHA256 checksum
+    let computed_sha256 = trust $ shasum -a 256 {amber_installer} | awk '\{print $1\}' $
+    let computed_sha256_trimmed = trim(computed_sha256)
+    
+    if computed_sha256_trimmed != amber_sha256 {
+        let message = "SHA256 verification failed for Amber installer (expected: {amber_sha256}, got: {computed_sha256_trimmed})"
+        log_message(message, 1)
+        step_failed(message)
+    }
+    
+    // Execute installer after verification
+    $ bash {amber_installer} $ failed(code) {
         let message = "Failed to install Amber framework"
         log_message(message, code)
         step_failed(message)
