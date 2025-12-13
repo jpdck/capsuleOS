@@ -33,6 +33,8 @@
       "Bash(conda info:*)",
       "Bash(cargo search:*)",
       "Bash(amber check:*)",
+      "Bash(amber build:*)",
+      "Bash(amber test:*)",
       "Bash(systemctl status:*)",
       "Bash(journalctl:*)",
       "Read(~/.ssh/config)",

@@ -195,6 +195,7 @@ cask "steam"                  # Gaming platform
 cask "pcsx2"                  # PlayStation 2 emulator
 cask "parallels"              # Virtualization
 cask "openrct2"               # RollerCoaster Tycoon 2 open source
+cask "openra"
 cask "crossover"              # Run Windows apps on macOS
 
 # Hardware & System Utilities
