@@ -94,7 +94,7 @@ stage_header("macOS Environment Setup", STAGE)
     stage_step("Checking for Homebrew installation")
     if not is_command("brew") {
         step_update("Installing Homebrew")
-        silent $ NONINTERACTIVE=1 CI=1 /bin/bash -c "\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" $ failed(code) {
+        $ NONINTERACTIVE=1 CI=1 /bin/bash -c "\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" $ failed(code) {
             let message = "Failed to install Homebrew"
             log_message(message, code)
             step_failed(message)
