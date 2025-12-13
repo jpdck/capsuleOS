@@ -6,7 +6,7 @@ This file provides guidance to AI agents when working with code in this reposito
 
 ### Amber Language Files
 
-Amber file extensions: *.amber, *.ab
+Amber file extensions: *.amber,*.ab
 
 When working with ANY Amber language files in this repository, you must follow these requirements:
 
@@ -68,6 +68,7 @@ The legacy `install.sh` script runs through 8 phases:
 8. Language-Specific Tools (Rust, Python packages)
 
 The new `installer.sh` (compiled from `installer.amber`) provides a more structured approach with better logging and error handling. It currently covers:
+
 1. macOS Environment Setup
 2. Homebrew Package Installation
 3. 1Password Integration
