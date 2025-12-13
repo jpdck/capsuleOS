@@ -132,7 +132,8 @@ Each package in `dotfiles/` contains configuration files that are symlinked usin
 
 The setup script integrates with 1Password for SSH key management:
 
-- Fetches SSH keys from "ZettoSenshi" vault
+- Prompts for your 1Password vault name
+- Fetches SSH keys from the configured vault
 - Adds keys to local system and SSH agent
 - Stores service token in shell configuration
 

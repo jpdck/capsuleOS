@@ -4,7 +4,7 @@
 // -----------------------------------------------//
 
 import { split, text_contains, split_lines, trim, join, starts_with } from "std/text"
-import { is_command, env_var_get, env_var_set, input_confirm, input_hidden, echo_colored } from "std/env"
+import { is_command, env_var_get, env_var_set, input_prompt, input_confirm, input_hidden, echo_colored } from "std/env"
 import { file_exists, file_chmod, file_write, dir_exists, file_read, dir_create } from "std/fs"
 import { file_download } from "std/http"
 import * from "installer_utils.ab"
@@ -66,9 +66,9 @@ fun apply_macos_defaults(): Null? {
 
 title_header()
 
-// Stage 1: macOS Environment Setup
-// Ensure the macOS environment is prepared for installation
-stage_header("macOS Environment Setup", STAGE)
+// Stage 1: macOS Dependency Setup
+// Ensure the macOS environment is prepared for installation with Xcode CLI tools and Homebrew
+stage_header("macOS Dependency Setup", STAGE)
 {
     // Verify Xcode Command Line Tools installation
     stage_step("Checking for Xcode CLI tools installation")
@@ -92,7 +92,23 @@ stage_header("macOS Environment Setup", STAGE)
 
     // Verify Homebrew installation
     stage_step("Checking for Homebrew installation")
-    if not is_command("brew") {
+
+    // First, check if Homebrew binary exists and configure PATH if needed
+    let brew_installed = file_exists("/opt/homebrew/bin/brew") or file_exists("/usr/local/bin/brew")
+
+    if brew_installed and not is_command("brew") {
+        step_update("Configuring Homebrew environment")
+        if {
+            file_exists("/opt/homebrew/bin/brew"): {
+                silent trust $ eval "\$(/opt/homebrew/bin/brew shellenv)" $
+            }
+            file_exists("/usr/local/bin/brew"): {
+                silent trust $ eval "\$(/usr/local/bin/brew shellenv)" $
+            }
+        }
+    }
+
+    if not is_command("brew") and not brew_installed {
         step_update("Installing Homebrew")
         $ NONINTERACTIVE=1 CI=1 /bin/bash -c "\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" $ failed(code) {
             let message = "Failed to install Homebrew"
@@ -112,7 +128,9 @@ stage_header("macOS Environment Setup", STAGE)
                 silent trust $ eval "\$(/usr/local/bin/brew shellenv)" $
             }
         }
-    } else {
+    }
+
+    if is_command("brew") {
         step_update("Homebrew detected, performing update")
         silent $ brew update $ failed(code) {
             let message = "Failed to update Homebrew"
@@ -149,7 +167,7 @@ stage_header("Installing Homebrew packages", STAGE)
     stage_spacer()
 
     step_update("Installing Homebrew packages from Brewfile")
-    silent $ brew bundle install --file="{brewfile_path}" --quiet $ failed(code) {
+    let result = $ brew bundle install --file="{brewfile_path}" --quiet $ failed(code) {
         log_message("Failed to install Homebrew packages via Brewfile", code)
         step_failed("Failed to install Homebrew packages via Brewfile")
     }
@@ -209,30 +227,57 @@ stage_header("Setting up 1Password integration", STAGE)
         log_message(message)
         step_failed(message)
     }
-    
+
     stage_spacer()
-    
-    // Verify ZettoSenshi vault exists
-    stage_step("Verifying ZettoSenshi vault access")
+
+    // Prompt for vault name
+    stage_step("Configuring 1Password vault name")
+
+    let vault_name = input_prompt("Enter your 1Password vault name for SSH keys: ")
+
+    if len(trim(vault_name)) == 0 {
+        let message = "No vault name provided - required for SSH key import"
+        log_message(message)
+        step_failed(message)
+    }
+
+    // Store in Keychain for future reference
+    $ security delete-generic-password -a "{USER}" -s "op-vault-name" $ failed {
+        log_message("No existing vault name to remove (expected on first run)")
+    }
+
+    $ security add-generic-password -a "{USER}" -s "op-vault-name" -w "{vault_name}" -U $ failed(code) {
+        let message = "Failed to store vault name in Keychain for future reference"
+        log_message(message, code)
+        step_warning(message)
+    }
+
+    step_success("Vault name configured: {vault_name}")
+    log_message("Vault name set to: {vault_name}")
+
+    stage_spacer()
+
+    // Verify vault exists
+    stage_step("Verifying {vault_name} vault access")
     let vault_check = $ op vault list --format=json $ failed(code) {
         let message = "Failed to list 1Password vaults"
         log_message(message, code)
         step_failed(message)
     }
     
-    if not text_contains(vault_check, "ZettoSenshi") {
-        let message = "ZettoSenshi vault not found or inaccessible"
+    if not text_contains(vault_check, vault_name) {
+        let message = "{vault_name} vault not found or inaccessible"
         log_message(message)
         step_failed(message)
     }
-    step_success("ZettoSenshi vault accessible")
-    log_message("ZettoSenshi vault verified")
+    step_success("{vault_name} vault accessible")
+    log_message("{vault_name} vault verified")
     
     stage_spacer()
     
     // List and import all SSH keys
-    stage_step("Fetching SSH keys from ZettoSenshi vault")
-    let ssh_keys_json = $ op item list --vault="ZettoSenshi" --categories="SSH Key" --format=json $ failed(code) {
+    stage_step("Fetching SSH keys from {vault_name} vault")
+    let ssh_keys_json = $ op item list --vault="{vault_name}" --categories="SSH Key" --format=json $ failed(code) {
         let message = "Failed to list SSH keys from vault"
         log_message(message, code)
         step_failed(message)
@@ -242,7 +287,7 @@ stage_header("Setting up 1Password integration", STAGE)
     let ssh_keys_raw = trust $ echo '{ssh_keys_json}' | jq -r '.[] | .title + "|" + .id' $
     
     if len(trim(ssh_keys_raw)) == 0 {
-        let message = "No SSH keys found in ZettoSenshi vault"
+        let message = "No SSH keys found in {vault_name} vault"
         log_message(message)
         step_failed(message)
     }
@@ -276,7 +321,11 @@ stage_header("Setting up 1Password integration", STAGE)
     // Process each key
     for i, key_line in key_lines {
         let parts = split(key_line, "|")
-        if len(parts) < 2 {
+        let parts_length = 0
+        for p in parts {
+            parts_length += 1
+        }
+        if parts_length < 2 {
             log_message("Skipping invalid key line format: {key_line}")
             continue
         }
@@ -286,7 +335,7 @@ stage_header("Setting up 1Password integration", STAGE)
         step_update("Processing SSH key {i + 1}/{key_lines_count}: {key_title}")
         
         // Get key details from 1Password
-        let key_json = $ op item get "{key_id}" --format=json $ failed(code) {
+        let key_json = $ op item get "{key_id}" --vault="{vault_name}" --format=json $ failed(code) {
             let message = "Failed to fetch key details for {key_title}"
             log_message(message, code)
             step_warning(message)
@@ -302,9 +351,9 @@ stage_header("Setting up 1Password integration", STAGE)
             continue
         }
         
-        // Determine filename - ZettoSenshi gets default name
+        // Determine filename - vault's primary key gets default name
         let key_filename = ""
-        if key_title == "ZettoSenshi" {
+        if key_title == vault_name {
             key_filename = "id_ed25519"
         } else {
             // Sanitize key title for filesystem
