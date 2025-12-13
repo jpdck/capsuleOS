@@ -68,8 +68,34 @@ pub fun log_message(message: Text, failure_code: Int = 0): Null {
     let formatted_message = failure_code != 0
         then "{message} (Error Code: {failure_code})"
         else message
-    
+
     file_append(LOG_FILE, "[{timestamp}] {formatted_message}\n") failed {
         echo_error("Failed to write to log file: {LOG_FILE}")
+    }
+}
+
+pub fun fatal_error(message: Text, code: Int = 1): Null {
+    log_message(message, code)
+    error(message)
+    exit code
+}
+
+pub fun log_info(message: Text): Null {
+    info(message)
+    log_message(message)
+}
+
+pub fun is_empty(text: Text): Bool {
+    return len(trim(text)) == 0
+}
+
+pub fun configure_brew_path(): Null {
+    if {
+        file_exists("/opt/homebrew/bin/brew"): {
+            silent trust $ eval "\$(/opt/homebrew/bin/brew shellenv)" $
+        }
+        file_exists("/usr/local/bin/brew"): {
+            silent trust $ eval "\$(/usr/local/bin/brew shellenv)" $
+        }
     }
 }

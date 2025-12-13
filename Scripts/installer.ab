@@ -75,18 +75,12 @@ stage_header("macOS Dependency Setup", STAGE)
     if not is_command("xcode-select") {
         info("Installing Xcode CLI tools")
         $ xcode-select --install $ failed(code) {
-            log_message("Xcode CLI tools installation failed with code", code)
-            error("Failed to install Xcode CLI tools")
-            exit 1
+            fatal_error("Failed to install Xcode CLI tools", code)
         }
-        
-        let message = "Xcode CLI tools installed successfully"
-        info(message)
-        log_message(message)
+
+        log_info("Xcode CLI tools installed successfully")
     } else {
-        let message = "Xcode CLI tools are already installed"
-        info(message)
-        log_message(message)
+        log_info("Xcode CLI tools are already installed")
     }
 
     // Verify Homebrew installation
@@ -97,57 +91,26 @@ stage_header("macOS Dependency Setup", STAGE)
 
     if brew_installed and not is_command("brew") {
         info("Configuring Homebrew environment")
-        if {
-            file_exists("/opt/homebrew/bin/brew"): {
-                silent trust $ eval "\$(/opt/homebrew/bin/brew shellenv)" $
-            }
-            file_exists("/usr/local/bin/brew"): {
-                silent trust $ eval "\$(/usr/local/bin/brew shellenv)" $
-            }
-        }
+        configure_brew_path()
     }
 
     if not is_command("brew") and not brew_installed {
         info("Installing Homebrew")
         $ NONINTERACTIVE=1 CI=1 /bin/bash -c "\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" $ failed(code) {
-            let message = "Failed to install Homebrew"
-            log_message(message, code)
-            error(message)
-            exit 1
+            fatal_error("Failed to install Homebrew", code)
         }
-        let message = "Homebrew installed successfully"
-        info(message)
-        log_message(message)
+        log_info("Homebrew installed successfully")
 
         info("Configuring Homebrew environment")
-        if {
-            file_exists("/opt/homebrew/bin/brew"): {
-                silent trust $ eval "\$(/opt/homebrew/bin/brew shellenv)" $
-            }
-            file_exists("/usr/local/bin/brew"): {
-                silent trust $ eval "\$(/usr/local/bin/brew shellenv)" $
-            }
-        }
+        configure_brew_path()
     }
 
     if is_command("brew") {
-        info("Homebrew detected, performing update")
-        $ brew update $ failed(code) {
-            let message = "Failed to update Homebrew"
-            log_message(message, code)
-            error(message)
-            exit 1
+        info("Homebrew detected, performing update/upgrade")
+        $ brew update && brew upgrade $ failed(code) {
+            fatal_error("Failed to update/upgrade Homebrew", code)
         }
-        info("Upgrading existing Homebrew packages")
-        $ brew upgrade $ failed(code) {
-            let message = "Failed to upgrade Homebrew packages"
-            log_message(message, code)
-            error(message)
-            exit 1
-        }
-        let message = "Homebrew is up to date"
-        info(message)
-        log_message(message)
+        log_info("Homebrew is up to date")
     }
 }
 
@@ -158,23 +121,16 @@ stage_header("Installing Homebrew packages", STAGE)
     info("Downloading latest Brewfile from repository")
     let brewfile_path = "{TEMP_DIR}/Brewfile"
     file_download("https://github.com/jpdck/capsuleOS/releases/download/latest/Brewfile", brewfile_path) failed(code) {
-        let message = "Failed to download Brewfile"
-        log_message(message, code)
-        error(message)
-        exit 1
+        fatal_error("Failed to download Brewfile", code)
     }
     info("Brewfile downloaded successfully")
     log_message("Brewfile downloaded to {brewfile_path}")
 
     info("Installing Homebrew packages from Brewfile")
     let result = $ brew bundle install --file="{brewfile_path}" $ failed(code) {
-        log_message("Failed to install Homebrew packages via Brewfile", code)
-        error("Failed to install Homebrew packages via Brewfile")
-        exit 1
+        fatal_error("Failed to install Homebrew packages via Brewfile", code)
     }
-    let message = "Homebrew packages installed successfully from Brewfile"
-    info(message)
-    log_message(message)
+    log_info("Homebrew packages installed successfully from Brewfile")
 }
 
 // Stage 3: 1Password Integration Setup
@@ -196,8 +152,8 @@ stage_header("Setting up 1Password integration", STAGE)
     echo_colored("(You can create one at https://my.1password.com/developer-tools/infrastructure-secrets)", 33)
     
     let token = input_hidden("")
-    
-    if len(trim(token)) == 0 {
+
+    if is_empty(token) {
         let message = "No service token provided - required for 1Password integration"
         log_message(message)
         error(message)
@@ -217,8 +173,7 @@ stage_header("Setting up 1Password integration", STAGE)
         log_message(message, code)
         warning(message)
     }
-    info("Service token stored in Keychain")
-    log_message("Service token stored securely")
+    log_info("Service token stored in Keychain")
     
     // Set token for current session
     env_var_set("OP_SERVICE_ACCOUNT_TOKEN", token) failed {
@@ -234,7 +189,7 @@ stage_header("Setting up 1Password integration", STAGE)
 
     let vault_name = input_prompt("Enter your 1Password vault name for SSH keys: ")
 
-    if len(trim(vault_name)) == 0 {
+    if is_empty(vault_name) {
         let message = "No vault name provided - required for SSH key import"
         log_message(message)
         error(message)
@@ -259,10 +214,7 @@ stage_header("Setting up 1Password integration", STAGE)
     // Verify vault exists
     info("Verifying {vault_name} vault access")
     let vault_check = $ op vault list --format=json $ failed(code) {
-        let message = "Failed to list 1Password vaults"
-        log_message(message, code)
-        error(message)
-        exit 1
+        fatal_error("Failed to list 1Password vaults", code)
     }
     
     if not text_contains(vault_check, vault_name) {
@@ -276,16 +228,13 @@ stage_header("Setting up 1Password integration", STAGE)
     // List and import all SSH keys
     info("Fetching SSH keys from {vault_name} vault")
     let ssh_keys_json = $ op item list --vault="{vault_name}" --categories="SSH Key" --format=json $ failed(code) {
-        let message = "Failed to list SSH keys from vault"
-        log_message(message, code)
-        error(message)
-        exit 1
+        fatal_error("Failed to list SSH keys from vault", code)
     }
     
     // Parse SSH key list
     let ssh_keys_raw = trust $ echo '{ssh_keys_json}' | jq -r '.[] | .title + "|" + .id' $
-    
-    if len(trim(ssh_keys_raw)) == 0 {
+
+    if is_empty(ssh_keys_raw) {
         let message = "No SSH keys found in {vault_name} vault"
         log_message(message)
         error(message)
@@ -293,10 +242,7 @@ stage_header("Setting up 1Password integration", STAGE)
     }
     
     let key_lines = split_lines(trim(ssh_keys_raw))
-    let key_lines_count = 0
-    for line in key_lines {
-        key_lines_count += 1
-    }
+    let key_lines_count = len(key_lines)
     info("Found {key_lines_count} SSH key(s) in vault")
     log_message("Found {key_lines_count} SSH key(s) to import")
     
@@ -304,17 +250,11 @@ stage_header("Setting up 1Password integration", STAGE)
     let ssh_dir = "{HOME}/.ssh"
     if not dir_exists(ssh_dir) {
         dir_create(ssh_dir) failed(code) {
-            let message = "Failed to create .ssh directory"
-            log_message(message, code)
-            error(message)
-            exit 1
+            fatal_error("Failed to create .ssh directory", code)
         }
     }
     silent $ chmod 700 "{ssh_dir}" $ failed(code) {
-        let message = "Failed to set permissions on .ssh directory"
-        log_message(message, code)
-        error(message)
-        exit 1
+        fatal_error("Failed to set permissions on .ssh directory", code)
     }
     
     info("Importing all SSH keys")
@@ -322,10 +262,7 @@ stage_header("Setting up 1Password integration", STAGE)
     // Process each key
     for i, key_line in key_lines {
         let parts = split(key_line, "|")
-        let parts_length = 0
-        for p in parts {
-            parts_length += 1
-        }
+        let parts_length = len(parts)
         if parts_length < 2 {
             log_message("Skipping invalid key line format: {key_line}")
             continue
@@ -345,8 +282,8 @@ stage_header("Setting up 1Password integration", STAGE)
         
         // Extract private key
         let private_key = trust $ echo '{key_json}' | jq -r '.fields[] | select(.label=="private key") | .value' $
-        
-        if len(trim(private_key)) == 0 or private_key == "null" {
+
+        if is_empty(private_key) or private_key == "null" {
             warning("Could not extract private key for {key_title}")
             log_message("Private key extraction failed for {key_title}")
             continue
@@ -378,8 +315,8 @@ stage_header("Setting up 1Password integration", STAGE)
         
         // Extract and write public key
         let public_key = trust $ echo '{key_json}' | jq -r '.fields[] | select(.label=="public key") | .value' $
-        
-        if len(trim(public_key)) > 0 and public_key != "null" {
+
+        if not is_empty(public_key) and public_key != "null" {
             let pub_path = "{key_path}.pub"
             file_write(pub_path, public_key) failed(code) {
                 log_message("Failed to write public key for {key_filename}", code)
@@ -418,20 +355,17 @@ stage_header("Configuring macOS settings", STAGE)
 
         info("Configuring interface, dock, finder, and trackpad settings")
         apply_macos_defaults() failed(code) {
-            log_message("Failed to apply macOS defaults", code)
-            error("Failed to apply macOS defaults")
-            exit 1
+            fatal_error("Failed to apply macOS defaults", code)
         }
         
         // Restarting services
         info("Restarting affected services")
         silent trust $ killall Dock Finder SystemUIServer $
 
-        info("macOS system settings applied")
-        log_message("macOS system settings applied")
+        log_info("macOS system settings applied")
     } else {
-        warning("Skipping macOS system settings")
         log_message("Skipped macOS system settings")
+        warning("Skipping macOS system settings")
     }
 }
 
@@ -442,20 +376,14 @@ stage_header("Setting up capsuleOS repository", STAGE)
     if not dir_exists(REPO_DIR) {
         info("Cloning capsuleOS repository")
         $ git clone git@github.com:jpdck/capsuleOS.git "{REPO_DIR}" $ failed(code) {
-            let message = "Failed to clone capsuleOS repository"
-            log_message(message, code)
-            error(message)
-            exit 1
+            fatal_error("Failed to clone capsuleOS repository", code)
         }
         info("capsuleOS repository cloned successfully")
         log_message("Repository cloned to {REPO_DIR}")
     } else {
         info("Updating capsuleOS repository")
         $ git -C "{REPO_DIR}" pull origin main $ failed(code) {
-            let message = "Failed to update capsuleOS repository"
-            log_message(message, code)
-            error(message)
-            exit 1
+            fatal_error("Failed to update capsuleOS repository", code)
         }
         info("capsuleOS repository updated successfully")
         log_message("Repository updated at {REPO_DIR}")
@@ -502,29 +430,12 @@ stage_header("Configuring user dotfiles", STAGE)
         $ stow -d "{DOTFILES_DIR}" -t "{HOME}" "{pkg}" $ failed(code) {
             // If it failed, remove conflicts and try again
             info("Removing conflicts for {pkg}...")
-
-            // Get list of files that would be stowed using absolute path
-            let files_to_stow = trust $ find "{DOTFILES_DIR}/{pkg}" -type f -o -type l $
-            let file_list = split_lines(trim(files_to_stow))
-
-            // Remove each conflicting file from HOME
-            for file_path in file_list {
-                // Strip the dotfiles directory prefix
-                let relative_path = trust $ echo "{file_path}" | sed "s|{DOTFILES_DIR}/{pkg}/||" $
-                let target_file = "{HOME}/{trim(relative_path)}"
-
-                if file_exists(target_file) {
-                    silent trust $ rm -f "{target_file}" $
-                    log_message("Removed conflicting file: {target_file}")
-                }
-            }
+            silent trust $ find "{DOTFILES_DIR}/{pkg}" \( -type f -o -type l \) -exec sh -c 'rm -f "{HOME}/\$(echo "\$1" | sed "s|{DOTFILES_DIR}/{pkg}/||")"' _ {} \; $
+            log_message("Removed conflicting files for {pkg}")
 
             // Try stowing again with explicit directory
             $ stow -d "{DOTFILES_DIR}" -t "{HOME}" "{pkg}" $ failed(retry_code) {
-                let message = "Failed to stow {pkg} after removing conflicts"
-                log_message(message, retry_code)
-                error(message)
-                exit 1
+                fatal_error("Failed to stow {pkg} after removing conflicts", retry_code)
             }
         }
 
@@ -542,11 +453,8 @@ stage_header("Installing additional language-specific tools", STAGE)
 {
     info("Downloading latest Cargofile from repository")
     let cargofile_path = "{TEMP_DIR}/Cargofile"
-        file_download("https://github.com/jpdck/capsuleOS/releases/download/latest/Cargofile", cargofile_path) failed(code) {
-        let message = "Failed to download Cargofile"
-        log_message(message, code)
-        error(message)
-        exit 1
+    file_download("https://github.com/jpdck/capsuleOS/releases/download/latest/Cargofile", cargofile_path) failed(code) {
+        fatal_error("Failed to download Cargofile", code)
     }
     info("Cargofile downloaded successfully")
     log_message("Cargofile downloaded to {cargofile_path}")
@@ -560,10 +468,7 @@ stage_header("Installing additional language-specific tools", STAGE)
 
     // Read tools from Cargofile and install
     let tools_raw = file_read(cargofile_path) failed(code) {
-        let message = "Failed to read Cargofile"
-        log_message(message, code)
-        error(message)
-        exit 1
+        fatal_error("Failed to read Cargofile", code)
     }
     let tools = split_lines(trim(tools_raw))
     for tool_raw in tools {
@@ -571,10 +476,7 @@ stage_header("Installing additional language-specific tools", STAGE)
         if len(tool) > 0 and not starts_with(tool, "#") {
             info("Installing {tool} via Cargo")
             $ cargo install {tool} $ failed(code) {
-                let message = "Failed to install {tool} via Cargo"
-                log_message(message, code)
-                error(message)
-                exit 1
+                fatal_error("Failed to install {tool} via Cargo", code)
             }
             info("{tool} installed successfully")
             log_message("{tool} installed via Cargo")
@@ -589,33 +491,21 @@ stage_header("Installing additional language-specific tools", STAGE)
     const amber_sha256 = "6c5455349fe9454aa2913438ee036275f3b0a2ed744b82a22e3496335bc9ac57"
     
     file_download(amber_url, amber_installer) failed(code) {
-        let message = "Failed to download Amber installer"
-        log_message(message, code)
-        error(message)
-        exit 1
+        fatal_error("Failed to download Amber installer", code)
     }
-    
+
     // Verify SHA256 checksum
     let computed_sha256 = $ shasum -a 256 {amber_installer} | cut -d ' ' -f1 $ failed(code) {
-        let message = "Failed to compute SHA256 checksum of Amber installer"
-        log_message(message, code)
-        error(message)
-        exit 1
+        fatal_error("Failed to compute SHA256 checksum of Amber installer", code)
     }
     
     if trim(computed_sha256) != amber_sha256 {
-        let message = "SHA256 verification failed for Amber installer (expected: {amber_sha256}, got: {trim(computed_sha256)})"
-        log_message(message, 1)
-        error(message)
-        exit 1
+        fatal_error("SHA256 verification failed for Amber installer (expected: {amber_sha256}, got: {trim(computed_sha256)})", 1)
     }
-    
+
     // Execute installer after verification
     $ bash {amber_installer} $ failed(code) {
-        let message = "Failed to install Amber framework"
-        log_message(message, code)
-        error(message)
-        exit 1
+        fatal_error("Failed to install Amber framework", code)
     }
     info("Amber framework installed successfully")
     log_message("Amber framework installed")
@@ -658,8 +548,7 @@ stage_header("Finalizing and verifying installation", STAGE)
             log_message("Verified command: {cmd}")
         }
     }
-    info("Installation verification completed")
-    log_message("Installation process finalized and verified")
+    log_info("Installation verification completed")
 }
 
 // Cleanup: Remove temporary directory
