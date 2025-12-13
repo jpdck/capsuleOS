@@ -1,41 +1,16 @@
 # Cargofile - Rust crates to install via `cargo install`
-# Similar to Brewfile but for Cargo crates
-# Usage: while read -r crate; do [[ $crate =~ ^#.*$ ]] || [[ -z $crate ]] || cargo install "$crate"; done < Cargofile
+# Raw Usage: while read -r crate; do [[ $crate =~ ^#.*$ ]] || [[ -z $crate ]] || cargo install "$crate"; done < Cargofile
 
-# Development Tools
-cargo-edit          # Add, remove, and upgrade dependencies
-cargo-watch         # Watch for changes and run cargo commands
-cargo-nextest       # Next-generation test runner
-bacon               # Background rust code checker
-cargo-audit         # Security vulnerability scanner
-cargo-outdated      # Check for outdated dependencies
+# Development Tools (Cargo-only)
 cargo-update        # Update installed executables
-cargo-tree          # Display dependency tree
 cargo-expand        # Show macro expansions
 cargo-bloat         # Find what takes most space in executable
 
-# Code Quality & Formatting
-clippy              # Linting tool
-rustfmt             # Code formatter (usually comes with Rust)
-cargo-fmt           # Cargo subcommand for rustfmt
-
-# Analysis & Metrics
-tokei               # Count lines of code
+# Analysis & Metrics (Cargo-only)
 cargo-deps          # Visualize dependency graphs
 cargo-geiger        # Detect unsafe code usage
 
-# Build & Release Tools
+# Build & Release Tools (Cargo-only)
 cargo-release       # Release automation
 cargo-dist          # Build and distribute binaries
 cross               # Cross compilation made easy
-cargo-deny          # Lint dependencies
-
-# Development Utilities
-bottom              # Process/system monitor
-dust                # Disk usage analyzer
-procs               # Modern ps replacement
-tealdeer            # Fast tldr implementation
-
-# Git Tools
-gitui               # Terminal git UI
-onefetch            # Git repository summary

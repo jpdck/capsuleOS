@@ -54,37 +54,51 @@ brew "ffmpeg"
 brew "imagemagick"
 
 # System Info & Monitoring
-brew "nerdfetch"              # System info
-brew "btop"                   # Process monitor
-brew "hyperfine"              # Benchmarking
-brew "bandwhich"              # Network monitoring
-brew "gping"                  # Ping with graphs
+brew "nerdfetch"                        # System info
+brew "btop"                             # Process monitor
+brew "hyperfine"                        # Benchmarking
+brew "bandwhich"                        # Network monitoring
+brew "gping"                            # Ping with graphs
 
 #########################################
-# Language Toolchains                  #
+# Language Toolchains                   #
 #########################################
 
 # JavaScript/TypeScript Development
-brew "oven-sh/bun/bun"                    # Fast JavaScript runtime & package manager
+brew "oven-sh/bun/bun"                  # Fast JavaScript runtime & package manager
 
 # Rust Development
-brew "rust"                   # Rust compiler and cargo
-brew "bacon"                  # Rust build tool
+brew "rust"                             # Rust compiler and cargo
+brew "bacon"                            # Rust build tool
+brew "tokei"                            # Count lines of code
+brew "bottom"                           # Process/system monitor (alias btm)
+brew "dust"                             # Disk usage analyzer
+brew "procs"                            # Modern ps replacement
+brew "tealdeer"                         # Fast tldr implementation (alias tldr)
+brew "gitui"                            # Terminal git UI
+brew "onefetch"                         # Git repository summary
+brew "sccache"                          # Shared compilation cache for Rust
+brew "cargo-binstall"                   # Install rust binaries without compilation
 
 # Go Development
-brew "go"                     # Go compiler
-brew "delve"                  # Go debugger
-brew "golangci-lint"          # Go linter
-brew "air"                    # Go live reload
+brew "go"                               # Go compiler
+brew "delve"                            # Go debugger
+brew "golangci-lint"                    # Go linter
+brew "air"                              # Go live reload
 
-# Python Development
+#########################################
+# Python Development                    #
+#########################################
+
 brew "python@3.14"            # Python 3
 brew "ruff"                   # Fast Python linter/formatter
 brew "mypy"                   # Python type checking
+brew "pipx"                   # Install Python applications in isolated envs
+cask "miniconda"              # Python environment management (moved from bottom)
 
 # Java Development
-brew "gradle"                 # Build tool
-brew "maven"                  # Build tool
+brew "gradle"                            # Build tool
+brew "maven"                             # Build tool
 
 # Build Tools
 brew "cmake"
@@ -190,9 +204,6 @@ cask "betterdisplay"          # Monitor management & resolution control
 cask "bettermouse"            # Mouse acceleration & scrolling fixes
 cask "battery-toolkit"        # Battery management
 
-# Python Environment Management
-cask "miniconda"                        # Python environment management
-
 #########################################
 # Fonts and Terminal Customization      #
 #########################################
@@ -204,21 +215,20 @@ cask "font-meslo-lg-nerd-font"
 #########################################
 # Mac App Store Applications            #
 #########################################
-mas 1569813296  # 1Password for Safari        (8.11.22)
-mas 1168254295  # AmorphousDiskMark           (4.0.1)
-mas 6502451661  # Balatro                     (1.0.20)
-mas 425264550   # Blackmagic Disk Speed Test  (3.4.2)
-mas 488920185   # Disk Space Analyzer Pro     (6.0)
-mas 1136220934  # Infuse                      (8.3.4)
-mas 409183694   # Keynote                     (14.4)
-mas 441258766   # Magnet                      (3.0.7)
-mas 1592917505  # Noir                        (2025.2.7)
-mas 409203825   # Numbers                     (14.4)
-mas 409201541   # Pages                       (14.4)
-mas 375589283   # Parcel                      (8.2.4)
-mas 6702028686  # RCT Classic+                (1.0.435)
-mas 1465346522  # Sasquatch                   (2.1.4)
-mas 1475387142  # Tailscale                   (1.90.9)
-mas 1295203466  # Windows App                 (11.3.0)
-mas 1662217862  # Wipr                        (2.15)
-mas 497799835   # Xcode                       (26.1.1)
+mas "1Password for Safari", id: 1569813296
+mas "AmorphousDiskMark", id: 1168254295
+mas "Balatro", id: 6502451661
+mas "Blackmagic Disk Speed Test", id: 425264550
+mas "Disk Space Analyzer Pro", id: 488920185
+mas "Infuse", id: 1136220934
+mas "Keynote", id: 409183694
+mas "Magnet", id: 441258766
+mas "Noir", id: 1592917505
+mas "Numbers", id: 409203825
+mas "Pages", id: 409201541
+mas "Parcel", id: 375589283
+mas "RCT Classic+", id: 6702028686
+mas "Sasquatch", id: 1465346522
+mas "Windows App", id: 1295203466
+mas "Wipr", id: 1662217862
+mas "Xcode", id: 497799835
