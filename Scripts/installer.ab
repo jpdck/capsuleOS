@@ -157,7 +157,7 @@ stage_header("Installing Homebrew packages", STAGE)
 {
     info("Downloading latest Brewfile from repository")
     let brewfile_path = "{TEMP_DIR}/Brewfile"
-    file_download("https://raw.githubusercontent.com/jpdck/capsuleOS/main/Brewfile", brewfile_path) failed(code) {
+    file_download("https://github.com/jpdck/capsuleOS/releases/download/latest/Brewfile", brewfile_path) failed(code) {
         let message = "Failed to download Brewfile"
         log_message(message, code)
         error(message)
@@ -542,7 +542,7 @@ stage_header("Installing additional language-specific tools", STAGE)
 {
     info("Downloading latest Cargofile from repository")
     let cargofile_path = "{TEMP_DIR}/Cargofile"
-    file_download("https://raw.githubusercontent.com/jpdck/capsuleOS/main/Cargofile", cargofile_path) failed(code) {
+        file_download("https://github.com/jpdck/capsuleOS/releases/download/latest/Cargofile", cargofile_path) failed(code) {
         let message = "Failed to download Cargofile"
         log_message(message, code)
         error(message)
