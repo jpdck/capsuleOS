@@ -18,7 +18,7 @@ Bootstraps a complete macOS development environment with 100+ curated packages, 
 ## Install
 
 ```bash
-curl -fsSL https://github.com/jpdck/capsuleOS/releases/download/latest/install.sh | bash
+bash <(curl -fsSL https://github.com/jpdck/capsuleOS/releases/download/latest/install.sh)>
 ```
 
 That's it. Go make coffee.
@@ -46,7 +46,7 @@ Check `~/capsuleOS/logs/installer.log` for details.
 
 ## Why Amber?
 
-This installer is written in [Amber](https://amber-lang.com/) - a modern language that transpiles to bash. You get readable source code ([Scripts/installer.ab](Scripts/installer.ab)) that compiles to portable bash ([Scripts/installer.sh](Scripts/installer.sh)).
+This installer is written in [Amber](https://amber-lang.com/) - a modern, typesafe language that transpiles to bash. You get readable source code ([Scripts/installer.ab](Scripts/installer.ab)) that compiles to portable bash ([Scripts/installer.sh](Scripts/installer.sh)).
 
 Run either version. They're identical.
 
