@@ -1,12 +1,9 @@
-import { echo_error } from "std/env"
+import { echo_error, echo_colored, env_var_get, env_var_set } from "std/env"
 import { lpad, rpad, trim } from "std/text"
 import { date_now, date_format_posix } from "std/date"
-import { file_append, file_read } from "std/fs"
+import { file_append, file_read, file_exists } from "std/fs"
 
 const LOG_FILE = "installer.log"
-const VERSION = trim(file_read("VERSION") failed {
-    "v0.0"
-})
 
 pub fun title_header(): Null {
     let border = "═══════════════════════════════════════════"
@@ -14,7 +11,7 @@ pub fun title_header(): Null {
     
     echo ""
     echo "╔{border}╗"
-    let header = "capsuleOS AMBER INSTALL SYSTEM v{VERSION}"
+    let header = "capsuleOS AMBER INSTALL SYSTEM"
     let header_padding = (width - len(header)) / 2
     let header_line = rpad(lpad(header, " ", header_padding + len(header)), " ", width-2)
     echo "║{header_line}║"
@@ -28,7 +25,7 @@ pub fun title_footer(): Null {
     
     echo ""
     echo "╔{border}╗"
-    let header = "capsuleOS AMBER INSTALL SYSTEM v{VERSION}"
+    let header = "capsuleOS AMBER INSTALL SYSTEM"
     let header_padding = (width - len(header)) / 2
     let header_line = rpad(lpad(header, " ", header_padding + len(header)), " ", width-2)
     echo "║{header_line}║"
@@ -43,42 +40,22 @@ pub fun title_footer(): Null {
 
 pub fun stage_header(stage_name: Text, ref stage: Int): Null {
     stage = stage + 1
+    silent trust $sleep 1$
     echo ""
-    echo "┌─ STAGE {stage}: {stage_name}"
-}
-
-pub fun stage_step(step_description: Text): Null {
-    echo "│" + lpad("→ {step_description}", " ", len(step_description) + 5)
-}
-
-pub fun step_success(step_description: Text): Null {
-    echo "│" + lpad("✓ {step_description}", " ", len(step_description) + 5)
-}
-
-pub fun step_warning(step_description: Text): Null {
-    echo "│" + lpad("⚠ {step_description}", " ", len(step_description) + 5)
-}
-
-pub fun step_update(step_description: Text): Null {
-    echo "│" + lpad("⟲ {step_description}", " ", len(step_description) + 5)
-}
-
-pub fun step_failed(step_description: Text): Null {
-    echo "│" + lpad("‼ {step_description}", " ", len(step_description) + 5)
-    echo "└─ ERROR ENCOUNTERED"
-    exit 1
-}
-
-pub fun stage_spacer(): Null {
-    echo "│"
-    $ sleep 1 $ failed {
-        // Ignore sleep failures
-    }
-}
-
-pub fun stage_footer(stage: Int, stage_name: Text): Null {
-    echo "└─ STAGE {stage} COMPLETE: {stage_name}"
+    echo_colored("═══ STAGE {stage}: {stage_name} ═══", 36)
     echo ""
+}
+
+pub fun info(message: Text): Null {
+    echo_colored("  {message}", 37)
+}
+
+pub fun warning(message: Text): Null {
+    echo_colored("  [WARNING] {message}", 33)
+}
+
+pub fun error(message: Text): Null {
+    echo_colored("  [ERROR] {message}", 31)
 }
 
 pub fun log_message(message: Text, failure_code: Int = 0): Null {
@@ -89,8 +66,45 @@ pub fun log_message(message: Text, failure_code: Int = 0): Null {
     let formatted_message = failure_code != 0
         then "{message} (Error Code: {failure_code})"
         else message
-    
+
     file_append(LOG_FILE, "[{timestamp}] {formatted_message}\n") failed {
         echo_error("Failed to write to log file: {LOG_FILE}")
+    }
+}
+
+pub fun fatal_error(message: Text, code: Int = 1): Null {
+    log_message(message, code)
+    error(message)
+    exit code
+}
+
+pub fun log_info(message: Text): Null {
+    info(message)
+    log_message(message)
+}
+
+pub fun is_empty(text: Text): Bool {
+    return len(trim(text)) == 0
+}
+
+pub fun configure_brew_path(): Null {
+    if {
+        file_exists("/opt/homebrew/bin/brew"): {
+            silent trust $ eval "\$(/opt/homebrew/bin/brew shellenv)" $
+        }
+        file_exists("/usr/local/bin/brew"): {
+            silent trust $ eval "\$(/usr/local/bin/brew shellenv)" $
+        }
+    }
+}
+
+pub fun configure_cargo_path(): Null {
+    const USER = trust env_var_get("USER")
+    const HOME = trust env_var_get("HOME")
+    if file_exists("{HOME}/.cargo/bin/cargo") {
+        let current_path = env_var_get("PATH")
+        env_var_set("PATH", "{HOME}/.cargo/bin:{current_path}") failed {
+            warning("Failed to add cargo to PATH")
+        }
     }
 }

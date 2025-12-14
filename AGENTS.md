@@ -6,13 +6,14 @@ This file provides guidance to AI agents when working with code in this reposito
 
 ### Amber Language Files
 
-Amber file extensions: *.amber, *.ab
+Amber file extensions: .amber, .ab
 
 When working with ANY Amber language files in this repository, you must follow these requirements:
 
 - **Documentation Reference**: Always reference the [Amber Language Documentation](https://github.com/amber-lang/amber-docs) when editing `.amber` or `.ab` files
 - **Validation**: The amber script must pass `amber check` without errors before committing
-- **Compilation**: Use `amber build` to compile Amber scripts to Bash when needed
+- **Compilation**: `install.sh` is auto-built by CI/CD; local builds are for testing only (output is gitignored)
+- **Warning**: Running Amber files or compiled scripts directly affects your system. This installer is designed for fresh macOS setups.
 
 #### Available Amber Commands
 
@@ -31,11 +32,17 @@ Commands:
 
 #### Development Workflow for Amber Files
 
-1. **Edit**: Modify the `.amber` or `.ab` source files in `Scripts/`
-2. **Check**: Run `amber check <file.amber>` or `amber check <file.ab>` to validate syntax and logic
-3. **Test**: Use `amber test <file.amber>` or `amber test <file.ab>` to test functionality
-4. **Build**: Compile with `amber build <file.amber>` or `amber build <file.ab>` to generate Bash scripts
-5. **Deploy**: The compiled Bash scripts are used in the installation process
+1. **Edit**: Modify the `.ab` source files in `Scripts/` directory
+   - `Scripts/installer.ab` - Main installer logic
+   - `Scripts/installer_utils.ab` - Shared utility functions
+2. **Check**: Run `amber check Scripts/installer.ab` to validate syntax and logic
+3. **Commit**: Commit only the `.ab` source files (installer.sh is gitignored)
+4. **CI/CD**: GitHub Actions automatically builds `install.sh` on:
+   - Pull requests to `main` - validates and creates artifact
+   - Release tags (`v*.*`) - builds and attaches to GitHub release
+5. **Distribution**: Users download `install.sh` from GitHub releases, not from the repository
+
+**Local Development**: You can build locally with `cd Scripts && amber build installer.ab` for testing, but the output is gitignored and not committed.
 
 ## Repository Overview
 
@@ -47,67 +54,34 @@ This is a macOS development environment bootstrap repository that automates the 
 
 - `Brewfile` - Comprehensive package definitions for CLI tools, development languages, GUI apps, and fonts
 - `Cargofile` - Rust crate definitions for development tools and utilities (installed via `cargo install`)
-- `install.sh` - Legacy automated bootstrap script
-- `installer.amber` - New installer source code written in Amber language
-- `installer.sh` - Compiled Bash script generated from `installer.amber`
+- `Scripts/installer.ab` - Main installer source code written in Amber language
+- `Scripts/installer_utils.ab` - Shared utility functions for the installer (imported by installer.ab)
+- `install.sh` - **Gitignored**; built by CI/CD and distributed via GitHub releases only
 - `dotfiles/` - Configuration files managed with GNU Stow, organized by package
 
 ### Installation Process
 
-The repository is transitioning to an Amber-based installer (`installer.amber` -> `installer.sh`).
+The installer is written in Amber (`Scripts/installer.ab` + `Scripts/installer_utils.ab`) and compiled to Bash (`install.sh` at repo root).
 
-The legacy `install.sh` script runs through 8 phases:
+**Installation Phases:**
 
-1. System Prerequisites (Xcode tools, Homebrew)
-2. Package Installation (from Brewfile)
-3. 1Password Integration (SSH key management)
-4. Repository Setup (clones capsuleOS repo)
-5. Dotfiles Setup (GNU Stow deployment)
-6. macOS Configuration (system preferences)
-7. App Store Installation (using `mas`)
-8. Language-Specific Tools (Rust, Python packages)
+1. **macOS Environment Setup** - Installs/updates Xcode Command Line Tools and Homebrew
+2. **Homebrew Package Installation** - Bundles packages from Brewfile
+3. **1Password Integration** - Connects to 1Password and imports SSH keys from vault
+4. **Repository Cloning** - Clones capsuleOS to `~/Projects/capsuleOS`
+5. **macOS Defaults Configuration** - Applies system preferences (optional)
+6. **Dotfiles Deployment** - Symlinks dotfiles using GNU Stow
+7. **Programming Language Tools Installation** - Installs Rust crates from Cargofile
+8. **Verification & Cleanup** - Confirms installation and removes temporary files
 
-The new `installer.sh` (compiled from `installer.amber`) provides a more structured approach with better logging and error handling. It currently covers:
-1. macOS Environment Setup
-2. Homebrew Package Installation
-3. 1Password Integration
-
-## Common Development Commands
-
-### Package Management
+**Build Process (CI/CD):**
 
 ```bash
-# Install all packages from Brewfile
-brew bundle install
-
-# Update packages
-brew update && brew upgrade
-
-# Check for issues
-brew doctor
-
-# Clean up old versions
-brew cleanup
+cd Scripts
+amber build installer.ab ../install.sh --minify
 ```
 
-### Dotfiles Management
-
-```bash
-# From dotfiles/ directory
-stow package-name    # Install/update dotfiles for a specific package
-stow -D package-name # Remove dotfiles for a package
-stow -R package-name # Restow (remove and install)
-```
-
-### Initial Setup
-
-```bash
-# Run complete bootstrap (from repository root)
-./install.sh
-
-# Manual package installation only
-brew bundle install
-```
+This compiles `installer.ab` to `install.sh` at the repository root with minification. The compiled script is portable and can run on any macOS system without Amber installed. GitHub Actions automatically builds and attaches `install.sh` to releases.
 
 ## Architecture Notes
 
@@ -132,7 +106,8 @@ Each package in `dotfiles/` contains configuration files that are symlinked usin
 
 The setup script integrates with 1Password for SSH key management:
 
-- Fetches SSH keys from "ZettoSenshi" vault
+- Prompts for your 1Password vault name
+- Fetches SSH keys from the configured vault
 - Adds keys to local system and SSH agent
 - Stores service token in shell configuration
 
@@ -140,7 +115,7 @@ The setup script integrates with 1Password for SSH key management:
 
 ### Installed Languages & Tools
 
-- **Rust** - Full toolchain with cargo, rust-analyzer. Additional tools defined in `Cargofile` (e.g., `cargo-edit`, `bacon`, `clippy`).
+- **Rust** - Full toolchain with cargo, rust-analyzer. Additional tools defined in `Cargofile` (e.g., `cargo-update`, `cargo-expand`, `cargo-deps`, `cross`).
 - **Go** - Compiler, language server (gopls), debugger (delve), linter, live reload
 - **Python** - Python 3.14, ruff (linter/formatter), mypy (type checking)
 - **Java** - OpenJDK 17, Gradle, Maven
@@ -155,7 +130,7 @@ The setup script integrates with 1Password for SSH key management:
 
 ## Maintenance Notes
 
-- The repository logs installation progress to `install.log`
+- The installer logs progress to `installer.log` in the current directory
 - System preferences are applied automatically but can be skipped
 - Failed package installations don't stop the overall process
 - SSH keys are managed through 1Password vault integration

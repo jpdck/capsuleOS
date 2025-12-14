@@ -1,10 +1,6 @@
 # Brewfile for macOS Homebrew Migration
 
 # Taps for additional package sources
-tap "oven-sh/bun"
-tap "italomandara/cxpatcher"
-tap "mhaeuser/mhaeuser"
-tap "probe-rs/probe-rs"
 
 #########################################
 # CLI Tools & Development Environment   #
@@ -47,156 +43,187 @@ brew "git-flow"                         # Git branching model
 brew "git"                              # Version control
 
 # Archive Utilities
-brew "gnu-tar"
+brew "gnu-tar"                          # GNU tar   
 
 # Media Utilities
-brew "ffmpeg"
-brew "imagemagick"
+brew "ffmpeg"                           # Audio/video processing
+brew "imagemagick"                      # Image processing
 
 # System Info & Monitoring
-brew "nerdfetch"              # System info
-brew "btop"                   # Process monitor
-brew "hyperfine"              # Benchmarking
-brew "bandwhich"              # Network monitoring
-brew "gping"                  # Ping with graphs
+brew "nerdfetch"                        # System info
+brew "btop"                             # Process monitor
+brew "hyperfine"                        # Benchmarking
+brew "bandwhich"                        # Network monitoring
+brew "gping"                            # Ping with graphs
 
 #########################################
-# Language Toolchains                  #
+# Language Toolchains                   #
 #########################################
 
 # JavaScript/TypeScript Development
-brew "bun"                    # Fast JavaScript runtime & package manager
+brew "oven-sh/bun/bun"                  # Fast JavaScript runtime & package manager
 
 # Rust Development
-brew "rust"                   # Rust compiler and cargo
-brew "bacon"                  # Rust build tool
+brew "rust"                             # Rust compiler and cargo
+brew "bacon"                            # Rust build tool
+brew "tokei"                            # Count lines of code
+brew "bottom"                           # Process/system monitor (alias btm)
+brew "dust"                             # Disk usage analyzer
+brew "procs"                            # Modern ps replacement
+brew "tealdeer"                         # Fast tldr implementation (alias tldr)
+brew "gitui"                            # Terminal git UI
+brew "onefetch"                         # Git repository summary
+brew "sccache"                          # Shared compilation cache for Rust
+brew "cargo-binstall"                   # Install rust binaries without compilation
 
 # Go Development
-brew "go"                     # Go compiler
-brew "delve"                  # Go debugger
-brew "golangci-lint"          # Go linter
-brew "air"                    # Go live reload
-
-# Python Development
-brew "python@3.14"            # Python 3
-brew "ruff"                   # Fast Python linter/formatter
-brew "mypy"                   # Python type checking
-
-# Java Development
-brew "gradle"                 # Build tool
-brew "maven"                  # Build tool
-
-# Build Tools
-brew "cmake"
-brew "ninja"
-brew "pkg-config"
-brew "make"
-brew "gcc"
+brew "go"                               # Go compiler
+brew "delve"                            # Go debugger
+brew "golangci-lint"                    # Go linter
+brew "air"                              # Go live reload
 
 #########################################
-# Container & DevOps Tools             #
+# Python Development                    #
+#########################################
+
+brew "python@3.14"                      # Python 3
+brew "ruff"                             # Fast Python linter/formatter
+brew "mypy"                             # Python type checking
+brew "pipx"                             # Install Python applications in isolated envs
+cask "miniconda"                        # Python environment management (moved from bottom)
+
+# Java Development
+brew "gradle"                           # Build tool
+brew "maven"                            # Build tool
+
+# Build Tools
+brew "cmake"                            # Build system
+brew "ninja"                            # Small build system
+brew "pkg-config"                       # Manage compile and link flags for libraries
+brew "make"                             # Build automation tool  
+brew "gcc"                              # GNU Compiler Collection
+
+#########################################
+# Container & DevOps Tools              #
 #########################################
 
 # Container Management
-brew "docker"                       # Docker CLI
-brew "docker-compose"               # Container orchestration (plugin + standalone)
-brew "docker-credential-helper"     # macOS keychain integration
-brew "colima"                       # Docker runtime for macOS
+brew "docker"                           # Docker CLI
+brew "docker-compose"                   # Container orchestration (plugin + standalone)
+brew "docker-credential-helper"         # macOS keychain integration
+brew "colima"                           # Docker runtime for macOS
 
 #########################################
-# Security & Password Management       #
+# Security & Password Management        #
 #########################################
 
-cask "1password-cli"          # 1Password CLI
-brew "pinentry-mac"           # Pinentry for GPG
-brew "gnupg"                  # GPG for encryption/signing
+cask "1password-cli"                    # 1Password CLI
+brew "pinentry-mac"                     # Pinentry for GPG
+brew "gnupg"                            # GPG for encryption/signing
 
 
 #########################################
-# Network & Debugging Tools            #
+# Network & Debugging Tools             #
 #########################################
 
-brew "doggo"                  # DNS lookup tool
-brew "xh"                     # HTTP client (alternative to httpie)
+brew "doggo"                            # DNS lookup tool
+brew "xh"                               # HTTP client (alternative to httpie)
 
 #########################################
-# Documentation Tools                  #
+# Documentation Tools                   #
 #########################################
 
-brew "mdbook"                 # Markdown book generator
-brew "pandoc"                 # Document converter
+brew "mdbook"                           # Markdown book generator
+brew "pandoc"                           # Document converter
 
 #########################################
-# macOS-Specific Tools                 #
+# macOS-Specific Tools                  #
 #########################################
 
-brew "mas"                    # Mac App Store CLI
-brew "pngpaste"               # Clipboard to PNG
-brew "coreutils"              # GNU coreutils
-cask "raycast"                # Spotlight replacement & productivity
-cask "connectmenow"           # Mount network shares quick and easy
+brew "mas"                              # Mac App Store CLI
+brew "pngpaste"                         # Clipboard to PNG
+brew "coreutils"                        # GNU coreutils
+cask "raycast"                          # Spotlight replacement & productivity
+cask "connectmenow"                     # Mount network shares quick and easy
 
 #########################################
-# GUI Applications (Casks)             #
+# GUI Applications (Casks)              #
 #########################################
 
 # Essential Applications
-cask "1password"              # Password manager
-cask "visual-studio-code"     # Code editor
-cask "jetbrains-toolbox"      # JetBrains Toolbox
-cask "firefox"                # Web browser
-cask "tailscale-app"              # VPN
+cask "1password"                        # Password manager
+cask "visual-studio-code"               # Code editor
+cask "jetbrains-toolbox"                # JetBrains Toolbox
+cask "firefox"                          # Web browser
+cask "tailscale-app"                    # VPN
 
 # Media & Productivity
-cask "handbrake-app"              # Video transcoding
-cask "iina"                   # Video player
-cask "kobo"                   # Kobo eBook reader
-cask "hiddenbar"              # Menu bar organization
-cask "keka"                   # Archive manager
-cask "transmission"           # BitTorrent client
-cask "jdownloader"            # Download manager
-cask "usenapp"                # Usenet client
+cask "handbrake-app"                    # Video transcoding
+cask "iina"                             # Video player
+cask "kobo"                             # Kobo eBook reader
+cask "hiddenbar"                        # Menu bar organization
+cask "keka"                             # Archive manager
+cask "transmission"                     # BitTorrent client
+cask "jdownloader"                      # Download manager
+cask "usenapp"                          # Usenet client
 
 # Development Tools
-cask "warp"                   # Terminal
-cask "fork"                   # Git GUI
-brew "ghidra"                 # Reverse engineering
-cask "balenaetcher"           # USB/SD card OS image flasher
-cask "kicad"                  # PCB design software
+cask "warp"                             # Terminal
+cask "fork"                             # Git GUI
+brew "ghidra"                           # Reverse engineering
+cask "balenaetcher"                     # USB/SD card OS image flasher
 
 # Specialized Tools
-cask "buzz"                   # Transcription
-cask "rustdesk"               # Remote desktop
-cask "secretive"              # SSH key management
-cask "temurin"                # Java JDK
-cask "setapp"                 # Subscription app platform
+cask "buzz"                             # Transcription
+cask "rustdesk"                         # Remote desktop
+cask "secretive"                        # SSH key management
+cask "temurin"                          # Java JDK
+cask "setapp"                           # Subscription app platform
 
 # Communication & Productivity
-cask "proton-drive"           # Cloud storage
-cask "proton-mail"            # Email client
-cask "protonvpn"              # VPN client
+cask "proton-drive"                     # Cloud storage
+cask "proton-mail"                      # Email client
+cask "protonvpn"                        # VPN client
 
 # Gaming & Entertainment
-cask "steam"                  # Gaming platform
-cask "pcsx2"                  # PlayStation 2 emulator
-cask "parallels"              # Virtualization
-cask "openrct2"               # RollerCoaster Tycoon 2 open source
-cask "crossover"              # Run Windows apps on macOS
+cask "steam"                            # Gaming platform
+cask "pcsx2"                            # PlayStation 2 emulator
+cask "parallels"                        # Virtualization
+cask "openrct2"                         # RollerCoaster Tycoon 2 open source
+cask "crossover"                        # Run Windows apps on macOS
 
 # Hardware & System Utilities
-cask "displaylink"            # Monitor management
-cask "logi-options-plus"      # Logitech peripherals
-cask "betterdisplay"          # Monitor management & resolution control
-cask "bettermouse"            # Mouse acceleration & scrolling fixes
-cask "battery-toolkit"        # Battery management
-
-# Python Environment Management
-cask "miniconda"                        # Python environment management
+cask "displaylink"                      # Monitor management
+cask "logi-options+"                    # Logitech peripherals
+cask "betterdisplay"                    # Monitor management & resolution control
+cask "bettermouse"                      # Mouse acceleration & scrolling fixes
+cask "battery-toolkit"                  # Battery management
 
 #########################################
 # Fonts and Terminal Customization      #
 #########################################
 
-cask "font-jetbrains-mono-nerd-font"
-cask "font-fira-code-nerd-font"
-cask "font-meslo-lg-nerd-font"
+cask "font-jetbrains-mono-nerd-font"    # Nerd Font version of JetBrains Mono
+cask "font-fira-code-nerd-font"         # Nerd Font version of Fira Code
+cask "font-meslo-lg-nerd-font"          # Nerd Font version of Meslo LG
+
+#########################################
+# Mac App Store Applications            #
+#########################################
+mas "1Password for Safari", id: 1569813296
+mas "AmorphousDiskMark", id: 1168254295
+mas "Balatro", id: 6502451661
+mas "Blackmagic Disk Speed Test", id: 425264550
+mas "Disk Space Analyzer Pro", id: 488920185
+mas "Infuse", id: 1136220934
+mas "Keynote", id: 409183694
+mas "Magnet", id: 441258766
+mas "Noir", id: 1592917505
+mas "Numbers", id: 409203825
+mas "Pages", id: 409201541
+mas "Parcel", id: 375589283
+mas "RCT Classic+", id: 6702028686
+mas "Sasquatch", id: 1465346522
+mas "Windows App", id: 1295203466
+mas "Wipr", id: 1662217862
+mas "Xcode", id: 497799835
