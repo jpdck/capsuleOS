@@ -43,6 +43,7 @@ pub fun title_footer(): Null {
 
 pub fun stage_header(stage_name: Text, ref stage: Int): Null {
     stage = stage + 1
+    silent trust $sleep 1$
     echo ""
     echo_colored("═══ STAGE {stage}: {stage_name} ═══", 36)
     echo ""
