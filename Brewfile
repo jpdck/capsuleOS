@@ -1,6 +1,10 @@
 # Brewfile for macOS Homebrew Migration
 
 # Taps for additional package sources
+tap "oven-sh/bun"                       # Bun JavaScript runtime
+tap "italomandara/cxpatcher"            # CX Patcher for game mods
+tap "mhaeuser/mhaeuser"                 # Mhaeuser tap
+tap "probe-rs/probe-rs"                 # Probe-rs tap
 
 #########################################
 # CLI Tools & Development Environment   #
