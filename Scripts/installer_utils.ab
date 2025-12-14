@@ -108,3 +108,11 @@ pub fun configure_cargo_path(): Null {
         }
     }
 }
+
+pub fun is_interactive(): Bool {
+    // Check if stdin is a terminal (file descriptor 0)
+    silent $ test -t 0 $ failed {
+        return false
+    }
+    return true
+}
