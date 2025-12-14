@@ -1,12 +1,9 @@
-import { echo_error, echo_colored } from "std/env"
+import { echo_error, echo_colored, env_var_get, env_var_set } from "std/env"
 import { lpad, rpad, trim } from "std/text"
 import { date_now, date_format_posix } from "std/date"
 import { file_append, file_read, file_exists } from "std/fs"
 
 const LOG_FILE = "installer.log"
-
-// Get script directory to read VERSION file from correct location
-const SCRIPT_DIR = trust $ cd "\$(dirname "\$0")" && pwd $
 
 pub fun title_header(): Null {
     let border = "═══════════════════════════════════════════"
@@ -97,6 +94,17 @@ pub fun configure_brew_path(): Null {
         }
         file_exists("/usr/local/bin/brew"): {
             silent trust $ eval "\$(/usr/local/bin/brew shellenv)" $
+        }
+    }
+}
+
+pub fun configure_cargo_path(): Null {
+    const USER = trust env_var_get("USER")
+    const HOME = trust env_var_get("HOME")
+    if file_exists("{HOME}/.cargo/bin/cargo") {
+        let current_path = env_var_get("PATH")
+        env_var_set("PATH", "{HOME}/.cargo/bin:{current_path}") failed {
+            warning("Failed to add cargo to PATH")
         }
     }
 }

@@ -472,8 +472,16 @@ stage_header("Installing additional language-specific tools", STAGE)
     }
     let tools = split_lines(trim(tools_raw))
     for tool_raw in tools {
-        let tool = trim(tool_raw)
-        if len(tool) > 0 and not starts_with(tool, "#") {
+        let tool_trimmed = trim(tool_raw)
+        // Skip empty lines and comment-only lines
+        if len(tool_trimmed) == 0 or starts_with(tool_trimmed, "#") {
+            continue
+        }
+        // Strip inline comments (everything after #)
+        let tool_parts = split(tool_trimmed, "#")
+        let tool = trim(tool_parts[0])
+
+        if len(tool) > 0 {
             info("Installing {tool} via Cargo")
             $ cargo install {tool} $ failed(code) {
                 fatal_error("Failed to install {tool} via Cargo", code)
@@ -517,8 +525,19 @@ stage_header("Installing additional language-specific tools", STAGE)
         error("conda not found; skipping Python packages installation")
         exit 1
     }
+
+    // Accept conda Terms of Service before installing packages
+    info("Accepting conda Terms of Service")
+    silent $ conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main $ failed {
+        log_message("Failed to accept conda TOS for pkgs/main channel (may already be accepted)")
+    }
+    silent $ conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r $ failed {
+        log_message("Failed to accept conda TOS for pkgs/r channel (may already be accepted)")
+    }
+    log_message("Conda Terms of Service accepted")
+
     let python_packages = ["pytest", "ipython", "python-lsp-server"]
-    
+
     for pkg in python_packages {
         $ conda install -y "{pkg}" $ failed(code) {
             let message = "Failed to install {pkg}"
