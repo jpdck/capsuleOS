@@ -32,9 +32,9 @@ Commands:
 #### Development Workflow for Amber Files
 
 1. **Edit**: Modify the `.amber` or `.ab` source files in `Scripts/`
-2. **Check**: Run `amber check <file.amber>` or `amber check <file.ab>` to validate syntax and logic
-3. **Test**: Use `amber test <file.amber>` or `amber test <file.ab>` to test functionality
-4. **Build**: Compile with `amber build <file.amber>` or `amber build <file.ab>` to generate Bash scripts
+2. **Check**: Run `amber check <file>` to validate syntax and logic
+3. **Test**: Use `amber test <file>` to test functionality
+4. **Build**: Compile with `amber build <file>` to generate Bash scripts
 5. **Deploy**: The compiled Bash scripts are used in the installation process
 
 ## Repository Overview
