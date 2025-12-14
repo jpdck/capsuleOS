@@ -66,6 +66,19 @@ fun apply_macos_defaults(): Null? {
 
 title_header()
 
+// Detect if we're running interactively and cache sudo credentials if needed
+let INTERACTIVE = is_interactive()
+if INTERACTIVE {
+    info("Interactive mode detected - caching sudo credentials")
+    echo_colored("  This installer requires administrative privileges.", 33)
+    $ sudo -v $ failed(code) {
+        fatal_error("Failed to obtain sudo privileges", code)
+    }
+    log_message("Sudo credentials cached for interactive session")
+} else {
+    log_message("Non-interactive mode detected")
+}
+
 // Stage 1: macOS Dependency Setup
 // Ensure the macOS environment is prepared for installation with Xcode CLI tools and Homebrew
 stage_header("macOS Dependency Setup", STAGE)
@@ -95,11 +108,23 @@ stage_header("macOS Dependency Setup", STAGE)
     }
 
     if not is_command("brew") and not brew_installed {
-        info("Installing Homebrew")
-        $ NONINTERACTIVE=1 CI=1 /bin/bash -c "\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" $ failed(code) {
-            fatal_error("Failed to install Homebrew", code)
+        if INTERACTIVE {
+            info("Installing Homebrew (this may take a few minutes)")
+            $ /bin/bash -c "\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" $ failed(code) {
+                fatal_error("Failed to install Homebrew", code)
+            }
+            log_info("Homebrew installed successfully")
+        } else {
+            let message = "Homebrew is not installed and cannot be installed in non-interactive mode"
+            log_message(message)
+            error(message)
+            echo_colored("  Please install Homebrew manually:", 33)
+            echo_colored("    /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"", 33)
+            echo_colored("  Or run this script interactively:", 33)
+            echo_colored("    curl -fsSL https://github.com/jpdck/capsuleOS/releases/download/latest/install.sh -o install.sh", 33)
+            echo_colored("    bash install.sh", 33)
+            exit 1
         }
-        log_info("Homebrew installed successfully")
 
         info("Configuring Homebrew environment")
         configure_brew_path()
