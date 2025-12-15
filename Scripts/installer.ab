@@ -156,6 +156,11 @@ stage_header("Installing Homebrew packages", STAGE)
         fatal_error("Failed to install Homebrew packages via Brewfile", code)
     }
     log_info("Homebrew packages installed successfully from Brewfile")
+
+    info("Initializing GPG directory structure")
+    silent $ gpg --list-keys $ failed {
+        log_message("GPG directory initialization completed")
+     }
 }
 
 // Stage 3: 1Password Integration Setup
