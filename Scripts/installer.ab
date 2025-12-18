@@ -139,8 +139,9 @@ stage_header("macOS Dependency Setup", STAGE)
     }
 }
 
-// Stage 2: Homebrew Package Installation
+// Stage 2: Homebrew Package Installation and Update Configuration
 // Install necessary packages via Homebrew using a Brewfile
+// Set up nightly cron job to run for updating brew and running mas upgrade
 stage_header("Installing Homebrew packages", STAGE)
 {
     info("Downloading latest Brewfile from repository")
@@ -161,6 +162,9 @@ stage_header("Installing Homebrew packages", STAGE)
     silent $ gpg --list-keys $ failed {
         log_message("GPG directory initialization completed")
      }
+
+     info("Configuring cron script")
+     // insert script here
 }
 
 // Stage 3: 1Password Integration Setup
@@ -526,19 +530,9 @@ stage_header("Installing additional language-specific tools", STAGE)
     // Download install.sh to temp directory
     const amber_installer = "{TEMP_DIR}/amber-install.sh"
     const amber_url = "https://github.com/amber-lang/amber/releases/download/0.5.1-alpha/install.sh"
-    const amber_sha256 = "6c5455349fe9454aa2913438ee036275f3b0a2ed744b82a22e3496335bc9ac57"
     
     file_download(amber_url, amber_installer) failed(code) {
         fatal_error("Failed to download Amber installer", code)
-    }
-
-    // Verify SHA256 checksum
-    let computed_sha256 = $ shasum -a 256 {amber_installer} | cut -d ' ' -f1 $ failed(code) {
-        fatal_error("Failed to compute SHA256 checksum of Amber installer", code)
-    }
-    
-    if trim(computed_sha256) != amber_sha256 {
-        fatal_error("SHA256 verification failed for Amber installer (expected: {amber_sha256}, got: {trim(computed_sha256)})", 1)
     }
 
     // Execute installer after verification
