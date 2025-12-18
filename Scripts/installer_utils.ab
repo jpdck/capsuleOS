@@ -1,9 +1,10 @@
 import { echo_error, echo_colored, env_var_get, env_var_set } from "std/env"
-import { lpad, rpad, trim } from "std/text"
+import { lpad, rpad, trim, text_contains } from "std/text"
 import { date_now, date_format_posix } from "std/date"
 import { file_append, file_read, file_exists } from "std/fs"
 
 const LOG_FILE = "installer.log"
+const USER = trust env_var_get("USER")
 
 pub fun title_header(): Null {
     let border = "═══════════════════════════════════════════"
@@ -99,7 +100,6 @@ pub fun configure_brew_path(): Null {
 }
 
 pub fun configure_cargo_path(): Null {
-    const USER = trust env_var_get("USER")
     const HOME = trust env_var_get("HOME")
     if file_exists("{HOME}/.cargo/bin/cargo") {
         let current_path = env_var_get("PATH")
@@ -115,4 +115,48 @@ pub fun is_interactive(): Bool {
         return false
     }
     return true
+}
+
+pub fun configure_mas_sudo(): Null {
+    // Dynamically determine mas path
+    let mas_path = trust $ command -v mas $
+
+    if not is_empty(mas_path) {
+        const SUDOERS_FILE = "/etc/sudoers.d/mas-upgrade"
+        let sudoers_content = "{USER} ALL=(root) NOPASSWD: {mas_path} upgrade\n"
+
+        info("Configuring passwordless sudo for mas upgrade")
+
+        // Write sudoers file with proper permissions
+        $ echo '{sudoers_content}' | sudo tee {SUDOERS_FILE} > /dev/null $ failed(code) {
+            fatal_error("Failed to create sudoers file", code)
+        }
+
+        // Set correct permissions (440)
+        $ sudo chmod 440 {SUDOERS_FILE} $ failed(code) {
+            fatal_error("Failed to set sudoers file permissions", code)
+        }
+
+        // Validate sudoers configuration
+        $ sudo visudo -c $ failed(code) {
+            fatal_error("Sudoers configuration is invalid", code)
+        }
+
+        // Verify the rule is in effect
+        let verify = $ sudo -l -U {USER} $ failed {
+            warning("Could not verify sudo configuration")
+        }
+
+        if not is_empty(verify) {
+            if not text_contains(verify, "NOPASSWD") or not text_contains(verify, "mas upgrade") {
+                warning("Sudo rule may not be active - check with: sudo -l")
+            }
+        }
+
+        info("Passwordless sudo configured for mas upgrade")
+        log_message("Sudoers configured: {SUDOERS_FILE} for {mas_path}")
+    } else {
+        warning("mas command not found - cannot configure passwordless sudo")
+        log_message("mas not found, sudo configuration skipped")
+    }
 }

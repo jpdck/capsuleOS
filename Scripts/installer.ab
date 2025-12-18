@@ -163,8 +163,12 @@ stage_header("Installing Homebrew packages", STAGE)
         log_message("GPG directory initialization completed")
      }
 
-     info("Configuring cron script")
-     // insert script here
+    info("Configuring passwordless sudo for automated updates")
+
+    // Configure passwordless sudo for mas upgrade
+    configure_mas_sudo()
+
+    log_message("Passwordless sudo configured - LaunchAgent will be set up after dotfiles deployment")
 }
 
 // Stage 3: 1Password Integration Setup
@@ -479,6 +483,59 @@ stage_header("Configuring user dotfiles", STAGE)
     
     info("Dotfiles configuration complete")
     log_message("All dotfiles packages processed")
+
+    // Generate and load LaunchAgent for automated updates
+    info("Setting up automated update schedule")
+
+    let launchagent_dir = "{HOME}/Library/LaunchAgents"
+    let plist_filename = "com.{USER}.update-tools.plist"
+    let plist_path = "{launchagent_dir}/{plist_filename}"
+    let template_path = "{REPO_DIR}/Scripts/update-tools-launchagent.plist.template"
+
+    // Ensure LaunchAgents directory exists
+    if not dir_exists(launchagent_dir) {
+        dir_create(launchagent_dir) failed(code) {
+            warning("Could not create LaunchAgents directory")
+            log_message("LaunchAgent directory creation failed", code)
+            // Continue anyway - might fail later but worth trying
+        }
+    }
+
+    // Read plist template from repo (already cloned in Stage 5)
+    if not file_exists(template_path) {
+        error("LaunchAgent template not found in repository")
+        log_message("LaunchAgent template missing: {template_path}")
+        warning("Automated updates will NOT be configured - manual setup required")
+    } else {
+        let template_content = file_read(template_path) failed(code) {
+            error("Could not read LaunchAgent template")
+            log_message("LaunchAgent template read failed", code)
+            warning("Automated updates will NOT be configured - manual setup required")
+        }
+
+        // Replace \{\{USER\}\} placeholder with actual username
+        // Note: Using \{\{ and \}\} to escape Amber's single brace interpolation
+        let plist_content = trust $ echo '{template_content}' | sed 's/\{\{USER\}\}/{USER}/g' $
+
+        // Write final plist
+        file_write(plist_path, plist_content) failed(code) {
+            error("Could not write LaunchAgent plist")
+            log_message("LaunchAgent plist write failed", code)
+            warning("Automated updates will NOT be configured - manual setup required")
+        }
+
+        // Load the LaunchAgent
+        $ launchctl load -w "{plist_path}" $ exited(code) {
+            if code == 0 {
+                info("Automated updates scheduled (daily at 4:00 AM)")
+                log_message("Update automation LaunchAgent loaded successfully: {plist_filename}")
+            } else {
+                error("Failed to load update LaunchAgent")
+                log_message("LaunchAgent load failed", code)
+                warning("Automated updates configured but NOT active - load manually: launchctl load -w {plist_path}")
+            }
+        }
+    }
 }
 
 // Stage 7: Additional Language-Specific Tools

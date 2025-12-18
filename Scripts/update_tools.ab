@@ -48,8 +48,11 @@ main {
     //     echo "ERROR: mas binary hash mismatch, aborting"
     //     exit 1
     // }
-    
-    trust sudo $ {mas_bin} upgrade $
+
+    $ sudo -n {mas_bin} upgrade $ failed {
+        echo "ERROR: sudo failed for mas upgrade"
+        exit 1
+    }
     
     log_timestamp("finished updates")
 }
