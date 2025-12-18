@@ -9,50 +9,15 @@ import { env_var_get } from "std/env"
 trust $ export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin" $
 const HOME = trust env_var_get("HOME")
 
-fun log_timestamp(message: Text) {
-    let current_date = date_now()
-    let timestamp = trust date_format_posix(current_date)
-    echo "===== {timestamp} {message} ====="
-}
-
 main {
-    let log_path = "{HOME}/Library/Logs/update-tools.log"
-    let log_dir = trust $ dirname "{log_path}" $
-    
-    if not dir_exists(log_dir) {
-        dir_create(log_dir)?
-    }
-    
-    // Redirect output to log
-    trust $ exec >> "{log_path}" 2>&1 $
-    
-    log_timestamp("starting updates")
-    
-    // Homebrew (never sudo)
     $ brew update $?
     $ brew upgrade $?
     $ brew cleanup $?
     
     // mas (with hash verification)
     let mas_bin = "/opt/homebrew/bin/mas"
-    // let expected_hash = "REPLACE_WITH_REAL_SHA256"
     
-    if not file_exists(mas_bin) {
-        echo "ERROR: mas binary not found"
-        exit 1
+    if file_exists(mas_bin) {
+        $ mas upgrade $?
     }
-    
-    // let hash_output = $ shasum -a 256 "{mas_bin}" $?
-    
-    // if not text_contains(hash_output, expected_hash) {
-    //     echo "ERROR: mas binary hash mismatch, aborting"
-    //     exit 1
-    // }
-
-    $ sudo -n {mas_bin} upgrade $ failed {
-        echo "ERROR: sudo failed for mas upgrade"
-        exit 1
-    }
-    
-    log_timestamp("finished updates")
 }

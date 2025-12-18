@@ -549,7 +549,7 @@ stage_header("Installing additional language-specific tools", STAGE)
     }
     info("Cargofile downloaded successfully")
     log_message("Cargofile downloaded to {cargofile_path}")
-
+    configure_cargo_path()
 
     info("Installing Rust tools via Cargo")
     if not is_command("cargo") {
