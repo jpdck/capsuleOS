@@ -57,4 +57,7 @@ cache/
 dotfiles/*/.*rc.local
 dotfiles/*/.local*
 Gaming/
-./Scripts/*.sh
+*.sh
+
+# Specifically allowed shell scripts
+!dotfiles/**/*.sh
