@@ -36,7 +36,21 @@ That's it. Go make coffee.
 9. Installs Rust tools from [Cargofile](Cargofile)
 10. Installs Amber framework
 
-Check `~/capsuleOS/logs/installer.log` for details.
+## Debugging
+
+The installer outputs all progress to the terminal. To save a log for debugging:
+
+```bash
+bash install.sh 2>&1 | tee install.log
+```
+
+Or with the one-liner:
+
+```bash
+curl -fsSL https://github.com/jpdck/capsuleOS/releases/download/latest/install.sh | bash 2>&1 | tee install.log
+```
+
+This captures both stdout and stderr to `install.log` while showing output in real-time.
 
 ## Requirements
 

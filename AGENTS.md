@@ -44,6 +44,14 @@ Commands:
 
 **Local Development**: You can build locally with `cd Scripts && amber build installer.ab` for testing, but the output is gitignored and not committed.
 
+### Development Notes
+
+- **Logging Philosophy**: Terminal output is the source of truth for installation progress. No separate log file is created. Users who need logs can use `bash install.sh 2>&1 | tee install.log`.
+- **Error Handling**: Uses inline `failed(code) { error(msg); exit code }` pattern for clarity in an alpha language.
+- **UX Elements**: Sleep delays in stage headers are intentional - they give users time to read warnings before terminal scrolls.
+- **Directory Operations**: Uses `dir_exists` + `dir_create` (Amber idiom) rather than `mkdir -p` for explicit intent and better debugging.
+- **Silent vs Trust**: Commands with `silent` still have `failed` blocks with meaningful warnings. Commands with `trust` truly don't care about failure (e.g., deleting non-existent keychain entries).
+
 ## Repository Overview
 
 This is a macOS development environment bootstrap repository that automates the setup from a bare macOS system to a fully configured development environment using Homebrew.

@@ -72,11 +72,9 @@ if INTERACTIVE {
     info("Interactive mode detected - caching sudo credentials")
     echo_colored("  This installer requires administrative privileges.", 33)
     $ sudo -v $ failed(code) {
-        fatal_error("Failed to obtain sudo privileges", code)
+        error("Failed to obtain sudo privileges")
+        exit code
     }
-    log_message("Sudo credentials cached for interactive session")
-} else {
-    log_message("Non-interactive mode detected")
 }
 
 // Stage 1: macOS Dependency Setup
@@ -88,12 +86,12 @@ stage_header("macOS Dependency Setup", STAGE)
     if not is_command("xcode-select") {
         info("Installing Xcode CLI tools")
         $ xcode-select --install $ failed(code) {
-            fatal_error("Failed to install Xcode CLI tools", code)
+            error("Failed to install Xcode CLI tools")
+            exit code
         }
-
-        log_info("Xcode CLI tools installed successfully")
+        info("Xcode CLI tools installed successfully")
     } else {
-        log_info("Xcode CLI tools are already installed")
+        info("Xcode CLI tools are already installed")
     }
 
     // Verify Homebrew installation
@@ -111,18 +109,13 @@ stage_header("macOS Dependency Setup", STAGE)
         if INTERACTIVE {
             info("Installing Homebrew (this may take a few minutes)")
             $ /bin/bash -c "\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" $ failed(code) {
-                fatal_error("Failed to install Homebrew", code)
+                error("Failed to install Homebrew")
+                exit code
             }
-            log_info("Homebrew installed successfully")
+            info("Homebrew installed successfully")
         } else {
-            let message = "Homebrew is not installed and cannot be installed in non-interactive mode"
-            log_message(message)
-            error(message)
-            echo_colored("  Please install Homebrew manually:", 33)
-            echo_colored("    /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"", 33)
-            echo_colored("  Or run this script interactively:", 33)
-            echo_colored("    curl -fsSL https://github.com/jpdck/capsuleOS/releases/download/latest/install.sh -o install.sh", 33)
-            echo_colored("    bash install.sh", 33)
+            error("Homebrew is not installed and cannot be installed in non-interactive mode")
+            echo_colored("  Install manually or run this script interactively", 33)
             exit 1
         }
 
@@ -133,9 +126,10 @@ stage_header("macOS Dependency Setup", STAGE)
     if is_command("brew") {
         info("Homebrew detected, performing update/upgrade")
         $ brew update && brew upgrade $ failed(code) {
-            fatal_error("Failed to update/upgrade Homebrew", code)
+            error("Failed to update/upgrade Homebrew")
+            exit code
         }
-        log_info("Homebrew is up to date")
+        info("Homebrew is up to date")
     }
 }
 
@@ -147,28 +141,25 @@ stage_header("Installing Homebrew packages", STAGE)
     info("Downloading latest Brewfile from repository")
     let brewfile_path = "{TEMP_DIR}/Brewfile"
     file_download("https://github.com/jpdck/capsuleOS/releases/download/latest/Brewfile", brewfile_path) failed(code) {
-        fatal_error("Failed to download Brewfile", code)
+        error("Failed to download Brewfile")
+        exit code
     }
     info("Brewfile downloaded successfully")
-    log_message("Brewfile downloaded to {brewfile_path}")
 
     info("Installing Homebrew packages from Brewfile")
-    let result = $ brew bundle install --file="{brewfile_path}" $ failed(code) {
-        fatal_error("Failed to install Homebrew packages via Brewfile", code)
+    $ brew bundle install --file="{brewfile_path}" $ failed(code) {
+        error("Failed to install Homebrew packages via Brewfile")
+        exit code
     }
-    log_info("Homebrew packages installed successfully from Brewfile")
+    info("Homebrew packages installed successfully from Brewfile")
 
     info("Initializing GPG directory structure")
-    silent $ gpg --list-keys $ failed {
-        log_message("GPG directory initialization completed")
-     }
+    silent $ gpg --list-keys $ failed(code) {
+        warning("Failed to initialize GPG directory")
+    }
 
     info("Configuring passwordless sudo for automated updates")
-
-    // Configure passwordless sudo for mas upgrade
     configure_mas_sudo()
-
-    log_message("Passwordless sudo configured - LaunchAgent will be set up after dotfiles deployment")
 }
 
 // Stage 3: 1Password Integration Setup
@@ -177,13 +168,10 @@ stage_header("Setting up 1Password integration", STAGE)
 {
     info("Checking for 1Password CLI")
     if not is_command("op") {
-        let message = "1Password CLI not found - required for credential management"
-        log_message(message)
-        error(message)
+        error("1Password CLI not found - required for credential management")
         exit 1
     }
     info("1Password CLI detected")
-    log_message("1Password CLI detected")
     // Prompt for service token
     info("Configuring 1Password service token")
     echo_colored("Please enter your 1Password Service Token:", 33)
@@ -192,107 +180,66 @@ stage_header("Setting up 1Password integration", STAGE)
     let token = input_hidden("")
 
     if is_empty(token) {
-        let message = "No service token provided - required for 1Password integration"
-        log_message(message)
-        error(message)
+        error("No service token provided - required for 1Password integration")
         exit 1
     }
-    
+
     // Store token in macOS Keychain for persistence across sessions
-    // This allows future runs to retrieve the token without re-prompting
     info("Storing service token in macOS Keychain")
-    $ security delete-generic-password -a "{USER}" -s "op-service-token" $ failed {
-        // Ignore failure - likely means no existing token
-        log_message("No existing service token to remove (expected on first run)")
-    }
-    
-    $ security add-generic-password -a "{USER}" -s "op-service-token" -w "{token}" -U $ failed(code) {
-        let message = "Failed to store token in Keychain for future use"
-        log_message(message, code)
-        warning(message)
-    }
-    log_info("Service token stored in Keychain")
-    
+    store_keychain("op-service-token", token)
+    info("Service token stored in Keychain")
+
     // Set token for current session
     env_var_set("OP_SERVICE_ACCOUNT_TOKEN", token) failed {
-        let message = "Failed to set OP_SERVICE_ACCOUNT_TOKEN environment variable"
-        log_message(message)
-        error(message)
+        error("Failed to set OP_SERVICE_ACCOUNT_TOKEN environment variable")
         exit 1
     }
 
 
     // Prompt for vault name
     info("Configuring 1Password vault name")
-
     let vault_name = input_prompt("Enter your 1Password vault name for SSH keys: ")
 
     if is_empty(vault_name) {
-        let message = "No vault name provided - required for SSH key import"
-        log_message(message)
-        error(message)
+        error("No vault name provided - required for SSH key import")
         exit 1
     }
 
     // Store in Keychain for future reference
-    $ security delete-generic-password -a "{USER}" -s "op-vault-name" $ failed {
-        log_message("No existing vault name to remove (expected on first run)")
-    }
-
-    $ security add-generic-password -a "{USER}" -s "op-vault-name" -w "{vault_name}" -U $ failed(code) {
-        let message = "Failed to store vault name in Keychain for future reference"
-        log_message(message, code)
-        warning(message)
-    }
-
+    store_keychain("op-vault-name", vault_name)
     info("Vault name configured: {vault_name}")
-    log_message("Vault name set to: {vault_name}")
 
 
-    // Verify vault exists
-    info("Verifying {vault_name} vault access")
-    let vault_check = $ op vault list --format=json $ failed(code) {
-        fatal_error("Failed to list 1Password vaults", code)
-    }
-    
-    if not text_contains(vault_check, vault_name) {
-        let message = "{vault_name} vault not found or inaccessible"
-        log_message(message)
-        error(message)
-        exit 1
-    }
-    info("{vault_name} vault accessible")
-    log_message("{vault_name} vault verified")
-    // List and import all SSH keys
+    // List and import all SSH keys from vault
     info("Fetching SSH keys from {vault_name} vault")
     let ssh_keys_json = $ op item list --vault="{vault_name}" --categories="SSH Key" --format=json $ failed(code) {
-        fatal_error("Failed to list SSH keys from vault", code)
+        error("Failed to list SSH keys from vault")
+        exit code
     }
-    
+
     // Parse SSH key list
     let ssh_keys_raw = trust $ echo '{ssh_keys_json}' | jq -r '.[] | .title + "|" + .id' $
 
     if is_empty(ssh_keys_raw) {
-        let message = "No SSH keys found in {vault_name} vault"
-        log_message(message)
-        error(message)
+        error("No SSH keys found in {vault_name} vault")
         exit 1
     }
-    
+
     let key_lines = split_lines(trim(ssh_keys_raw))
     let key_lines_count = len(key_lines)
     info("Found {key_lines_count} SSH key(s) in vault")
-    log_message("Found {key_lines_count} SSH key(s) to import")
     
     // Create .ssh directory
     let ssh_dir = "{HOME}/.ssh"
     if not dir_exists(ssh_dir) {
         dir_create(ssh_dir) failed(code) {
-            fatal_error("Failed to create .ssh directory", code)
+            error("Failed to create .ssh directory")
+            exit code
         }
     }
     silent $ chmod 700 "{ssh_dir}" $ failed(code) {
-        fatal_error("Failed to set permissions on .ssh directory", code)
+        error("Failed to set permissions on .ssh directory")
+        exit code
     }
     
     info("Importing all SSH keys")
@@ -302,53 +249,40 @@ stage_header("Setting up 1Password integration", STAGE)
         let parts = split(key_line, "|")
         let parts_length = len(parts)
         if parts_length < 2 {
-            log_message("Skipping invalid key line format: {key_line}")
             continue
         }
         let key_title = parts[0]
         let key_id = parts[1]
-        
+
         info("Processing SSH key {i + 1}/{key_lines_count}: {key_title}")
-        
+
         // Get key details from 1Password
         let key_json = $ op item get "{key_id}" --vault="{vault_name}" --format=json $ failed(code) {
-            let message = "Failed to fetch key details for {key_title}"
-            log_message(message, code)
-            warning(message)
+            warning("Failed to fetch key details for {key_title}")
             continue
         }
-        
+
         // Extract private key
         let private_key = trust $ echo '{key_json}' | jq -r '.fields[] | select(.label=="private key") | .value' $
 
         if is_empty(private_key) or private_key == "null" {
             warning("Could not extract private key for {key_title}")
-            log_message("Private key extraction failed for {key_title}")
             continue
         }
         
         // Determine filename - vault's primary key gets default name
-        let key_filename = ""
-        if key_title == vault_name {
-            key_filename = "id_ed25519"
-        } else {
-            // Sanitize key title for filesystem
-            let sanitized = trust $ echo "id_{key_title}" | tr ' ' '_' | tr -cd '[:alnum:]_.-' $
-            key_filename = trim(sanitized)
-        }
-        
+        let key_filename = key_title == vault_name
+            then "id_ed25519"
+            else trim(trust $ echo "id_{key_title}" | tr ' ' '_' | tr -cd '[:alnum:]_.-' $)
+
         // Write private key
         let key_path = "{ssh_dir}/{key_filename}"
         file_write(key_path, private_key) failed(code) {
-            let message = "Failed to write private key: {key_filename}"
-            log_message(message, code)
-            warning(message)
+            warning("Failed to write private key: {key_filename}")
             continue
         }
         file_chmod(key_path, "600") failed(code) {
-            let message = "Failed to set permissions on private key: {key_filename}"
-            log_message(message, code)
-            warning(message)
+            warning("Failed to set permissions on private key: {key_filename}")
         }
         
         // Extract and write public key
@@ -357,31 +291,27 @@ stage_header("Setting up 1Password integration", STAGE)
         if not is_empty(public_key) and public_key != "null" {
             let pub_path = "{key_path}.pub"
             file_write(pub_path, public_key) failed(code) {
-                log_message("Failed to write public key for {key_filename}", code)
                 warning("Could not write public key for {key_filename}")
             }
             file_chmod(pub_path, "644") failed(code) {
-                log_message("Failed to set permissions on public key for {key_filename}", code)
+                warning("Failed to set permissions on public key for {key_filename}")
             }
         }
-        
+
         // Start SSH agent if not running
         silent $ pgrep -x ssh-agent > /dev/null $ failed {
             silent trust $ eval "\$(ssh-agent -s)" $
         }
-        
+
         // Add to SSH agent
         silent $ ssh-add "{key_path}" $ failed {
             warning("Imported {key_filename} but could not add to SSH agent")
-            log_message("Failed to add {key_filename} to SSH agent")
         }
 
         info("Imported and added {key_filename} to SSH agent")
-        log_message("SSH key {key_filename} imported successfully")
     }
-    
+
     info("All SSH keys imported ({key_lines_count} total)")
-    log_message("SSH key import completed: {key_lines_count} keys processed")
 }
 
 // Stage 4: macOS Defaults Configuration
@@ -390,19 +320,16 @@ stage_header("Configuring macOS settings", STAGE)
 {
     if input_confirm("Apply recommended macOS system settings?", true) {
         info("Applying macOS system settings...")
-
         info("Configuring interface, dock, finder, and trackpad settings")
         apply_macos_defaults() failed(code) {
-            fatal_error("Failed to apply macOS defaults", code)
+            error("Failed to apply macOS defaults")
+            exit code
         }
-        
-        // Restarting services
+
         info("Restarting affected services")
         silent trust $ killall Dock Finder SystemUIServer $
-
-        log_info("macOS system settings applied")
+        info("macOS system settings applied")
     } else {
-        log_message("Skipped macOS system settings")
         warning("Skipping macOS system settings")
     }
 }
@@ -414,17 +341,17 @@ stage_header("Setting up capsuleOS repository", STAGE)
     if not dir_exists(REPO_DIR) {
         info("Cloning capsuleOS repository")
         $ git clone git@github.com:jpdck/capsuleOS.git "{REPO_DIR}" $ failed(code) {
-            fatal_error("Failed to clone capsuleOS repository", code)
+            error("Failed to clone capsuleOS repository")
+            exit code
         }
         info("capsuleOS repository cloned successfully")
-        log_message("Repository cloned to {REPO_DIR}")
     } else {
         info("Updating capsuleOS repository")
         $ git -C "{REPO_DIR}" pull origin main $ failed(code) {
-            fatal_error("Failed to update capsuleOS repository", code)
+            error("Failed to update capsuleOS repository")
+            exit code
         }
         info("capsuleOS repository updated successfully")
-        log_message("Repository updated at {REPO_DIR}")
     }
 }
 
@@ -434,12 +361,10 @@ stage_header("Configuring user dotfiles", STAGE)
 {
     info("Verifying GNU Stow installation")
     if not is_command("stow") {
-        log_message("GNU Stow not found for dotfiles configuration")
         error("GNU Stow is not installed; cannot configure dotfiles")
         exit 1
     }
     info("GNU Stow is installed")
-    log_message("GNU Stow found")
 
 
     info("Applying dotfiles with GNU Stow")
@@ -447,18 +372,14 @@ stage_header("Configuring user dotfiles", STAGE)
 
     // Verify dotfiles directory exists (should exist since we cloned capsuleOS repo in Stage 5)
     if not dir_exists(DOTFILES_DIR) {
-        let message = "Dotfiles directory not found in capsuleOS repository"
-        log_message(message)
-        error(message)
+        error("Dotfiles directory not found in capsuleOS repository")
         exit 1
     }
 
     // Get list of packages (directories) to stow using absolute path
     let packages_raw = trust $ ls -1d "{DOTFILES_DIR}"/*/ | xargs -n1 basename $
     let packages = split_lines(trim(packages_raw))
-
     info("Found {len(packages)} package(s) to stow")
-    log_message("Packages to stow: {join(packages, ", ")}")
 
     // Stow each package using explicit directory flag
     for pkg in packages {
@@ -469,20 +390,18 @@ stage_header("Configuring user dotfiles", STAGE)
             // If it failed, remove conflicts and try again
             info("Removing conflicts for {pkg}...")
             silent trust $ find "{DOTFILES_DIR}/{pkg}" \( -type f -o -type l \) -exec sh -c 'rm -f "{HOME}/\$(echo "\$1" | sed "s|{DOTFILES_DIR}/{pkg}/||")"' _ {} \; $
-            log_message("Removed conflicting files for {pkg}")
 
             // Try stowing again with explicit directory
             $ stow -d "{DOTFILES_DIR}" -t "{HOME}" "{pkg}" $ failed(retry_code) {
-                fatal_error("Failed to stow {pkg} after removing conflicts", retry_code)
+                error("Failed to stow {pkg} after removing conflicts")
+                exit retry_code
             }
         }
 
         info("Successfully stowed {pkg}")
-        log_message("Successfully stowed {pkg}")
     }
-    
+
     info("Dotfiles configuration complete")
-    log_message("All dotfiles packages processed")
 
     // Generate and load LaunchAgent for automated updates
     info("Setting up automated update schedule")
@@ -496,42 +415,30 @@ stage_header("Configuring user dotfiles", STAGE)
     if not dir_exists(launchagent_dir) {
         dir_create(launchagent_dir) failed(code) {
             warning("Could not create LaunchAgents directory")
-            log_message("LaunchAgent directory creation failed", code)
-            // Continue anyway - might fail later but worth trying
         }
     }
 
     // Read plist template from repo (already cloned in Stage 5)
     if not file_exists(template_path) {
-        error("LaunchAgent template not found in repository")
-        log_message("LaunchAgent template missing: {template_path}")
-        warning("Automated updates will NOT be configured - manual setup required")
+        warning("LaunchAgent template not found - automated updates will NOT be configured")
     } else {
         let template_content = file_read(template_path) failed(code) {
-            error("Could not read LaunchAgent template")
-            log_message("LaunchAgent template read failed", code)
-            warning("Automated updates will NOT be configured - manual setup required")
+            warning("Could not read LaunchAgent template - automated updates will NOT be configured")
         }
 
         // Replace \{\{USER\}\} placeholder with actual username
-        // Note: Using \{\{ and \}\} to escape Amber's single brace interpolation
         let plist_content = trust $ echo '{template_content}' | sed 's/\{\{USER\}\}/{USER}/g' $
 
         // Write final plist
         file_write(plist_path, plist_content) failed(code) {
-            error("Could not write LaunchAgent plist")
-            log_message("LaunchAgent plist write failed", code)
-            warning("Automated updates will NOT be configured - manual setup required")
+            warning("Could not write LaunchAgent plist - automated updates will NOT be configured")
         }
 
         // Load the LaunchAgent
         $ launchctl load -w "{plist_path}" $ exited(code) {
             if code == 0 {
                 info("Automated updates scheduled (daily at 4:00 AM)")
-                log_message("Update automation LaunchAgent loaded successfully: {plist_filename}")
             } else {
-                error("Failed to load update LaunchAgent")
-                log_message("LaunchAgent load failed", code)
                 warning("Automated updates configured but NOT active - load manually: launchctl load -w {plist_path}")
             }
         }
@@ -545,10 +452,10 @@ stage_header("Installing additional language-specific tools", STAGE)
     info("Downloading latest Cargofile from repository")
     let cargofile_path = "{TEMP_DIR}/Cargofile"
     file_download("https://github.com/jpdck/capsuleOS/releases/download/latest/Cargofile", cargofile_path) failed(code) {
-        fatal_error("Failed to download Cargofile", code)
+        error("Failed to download Cargofile")
+        exit code
     }
     info("Cargofile downloaded successfully")
-    log_message("Cargofile downloaded to {cargofile_path}")
     configure_cargo_path()
 
     info("Installing Rust tools via Cargo")
@@ -559,7 +466,8 @@ stage_header("Installing additional language-specific tools", STAGE)
 
     // Read tools from Cargofile and install
     let tools_raw = file_read(cargofile_path) failed(code) {
-        fatal_error("Failed to read Cargofile", code)
+        error("Failed to read Cargofile")
+        exit code
     }
     let tools = split_lines(trim(tools_raw))
     for tool_raw in tools {
@@ -575,62 +483,57 @@ stage_header("Installing additional language-specific tools", STAGE)
         if len(tool) > 0 {
             info("Installing {tool} via Cargo")
             $ cargo install {tool} $ failed(code) {
-                fatal_error("Failed to install {tool} via Cargo", code)
+                error("Failed to install {tool} via Cargo")
+                exit code
             }
             info("{tool} installed successfully")
-            log_message("{tool} installed via Cargo")
         }
     }
 
 
     info("Installing Amber framework")
-    // Download install.sh to temp directory
     const amber_installer = "{TEMP_DIR}/amber-install.sh"
     const amber_url = "https://github.com/amber-lang/amber/releases/download/0.5.1-alpha/install.sh"
-    
+
     file_download(amber_url, amber_installer) failed(code) {
-        fatal_error("Failed to download Amber installer", code)
+        error("Failed to download Amber installer")
+        exit code
     }
 
-    // Execute installer after verification
     $ bash {amber_installer} $ failed(code) {
-        fatal_error("Failed to install Amber framework", code)
+        error("Failed to install Amber framework")
+        exit code
     }
     info("Amber framework installed successfully")
-    log_message("Amber framework installed")
 
 
     info("Installing Python packages via conda")
     if not is_command("conda") {
-        log_message("conda not found; skipped Python packages installation")
         error("conda not found; skipping Python packages installation")
         exit 1
     }
 
     // Accept conda Terms of Service before installing packages
     info("Accepting conda Terms of Service")
-    silent $ conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main $ failed {
-        log_message("Failed to accept conda TOS for pkgs/main channel (may already be accepted)")
+    silent {
+        $ conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main $ failed {
+            warning("Failed to accept conda TOS for pkgs/main (may already be accepted)")
+        }
+        $ conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r $ failed {
+            warning("Failed to accept conda TOS for pkgs/r (may already be accepted)")
+        }
     }
-    silent $ conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r $ failed {
-        log_message("Failed to accept conda TOS for pkgs/r channel (may already be accepted)")
-    }
-    log_message("Conda Terms of Service accepted")
 
     let python_packages = ["pytest", "ipython", "python-lsp-server"]
 
     for pkg in python_packages {
         $ conda install -y "{pkg}" $ failed(code) {
-            let message = "Failed to install {pkg}"
-            log_message(message, code)
-            warning(message)
+            warning("Failed to install {pkg}")
             continue
         }
-        log_message("{pkg} installed via conda")
     }
-    
+
     info("Python packages installation completed")
-    log_message("All conda packages processed")
 }
 
 // Stage 8: Finalize and Verify Installation
@@ -641,14 +544,10 @@ stage_header("Finalizing and verifying installation", STAGE)
     let essential_commands = ["git", "brew", "op", "stow", "cargo", "conda"]
     for cmd in essential_commands {
         if not is_command(cmd) {
-            let message = "Essential command not found: {cmd}"
-            log_message(message)
-            warning(message)
-        } else {
-            log_message("Verified command: {cmd}")
+            warning("Essential command not found: {cmd}")
         }
     }
-    log_info("Installation verification completed")
+    info("Installation verification completed")
 }
 
 // Cleanup: Remove temporary directory
@@ -657,7 +556,6 @@ stage_header("Cleaning up temporary files", STAGE)
     info("Removing temporary directory")
     silent trust $ rm -rf "{TEMP_DIR}" $
     info("Temporary files removed")
-    log_message("Cleaned up temporary directory: {TEMP_DIR}")
 }
 
 title_footer()

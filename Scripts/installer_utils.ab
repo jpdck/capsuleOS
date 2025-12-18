@@ -1,9 +1,7 @@
-import { echo_error, echo_colored, env_var_get, env_var_set } from "std/env"
+import { echo_colored, env_var_get, env_var_set } from "std/env"
 import { lpad, rpad, trim, text_contains } from "std/text"
-import { date_now, date_format_posix } from "std/date"
-import { file_append, file_read, file_exists } from "std/fs"
+import { file_exists } from "std/fs"
 
-const LOG_FILE = "installer.log"
 const USER = trust env_var_get("USER")
 
 pub fun title_header(): Null {
@@ -59,29 +57,14 @@ pub fun error(message: Text): Null {
     echo_colored("  [ERROR] {message}", 31)
 }
 
-pub fun log_message(message: Text, failure_code: Int = 0): Null {
-    let timestamp = date_format_posix(date_now()) failed {
-        "UNKNOWN"
+pub fun store_keychain(service: Text, value: Text): Null {
+    // Remove existing entry (ignore failure - likely doesn't exist)
+    silent trust $ security delete-generic-password -a "{USER}" -s "{service}" $
+
+    // Add new entry
+    $ security add-generic-password -a "{USER}" -s "{service}" -w "{value}" -U $ failed(code) {
+        warning("Failed to store {service} in Keychain")
     }
-
-    let formatted_message = failure_code != 0
-        then "{message} (Error Code: {failure_code})"
-        else message
-
-    file_append(LOG_FILE, "[{timestamp}] {formatted_message}\n") failed {
-        echo_error("Failed to write to log file: {LOG_FILE}")
-    }
-}
-
-pub fun fatal_error(message: Text, code: Int = 1): Null {
-    log_message(message, code)
-    error(message)
-    exit code
-}
-
-pub fun log_info(message: Text): Null {
-    info(message)
-    log_message(message)
 }
 
 pub fun is_empty(text: Text): Bool {
@@ -102,7 +85,7 @@ pub fun configure_brew_path(): Null {
 pub fun configure_cargo_path(): Null {
     const HOME = trust env_var_get("HOME")
     if file_exists("{HOME}/.cargo/bin/cargo") {
-        let current_path = env_var_get("PATH")
+        let current_path = trust env_var_get("PATH")
         env_var_set("PATH", "{HOME}/.cargo/bin:{current_path}") failed {
             warning("Failed to add cargo to PATH")
         }
@@ -129,17 +112,20 @@ pub fun configure_mas_sudo(): Null {
 
         // Write sudoers file with proper permissions
         $ echo '{sudoers_content}' | sudo tee {SUDOERS_FILE} > /dev/null $ failed(code) {
-            fatal_error("Failed to create sudoers file", code)
+            error("Failed to create sudoers file")
+            exit code
         }
 
         // Set correct permissions (440)
         $ sudo chmod 440 {SUDOERS_FILE} $ failed(code) {
-            fatal_error("Failed to set sudoers file permissions", code)
+            error("Failed to set sudoers file permissions")
+            exit code
         }
 
         // Validate sudoers configuration
         $ sudo visudo -c $ failed(code) {
-            fatal_error("Sudoers configuration is invalid", code)
+            error("Sudoers configuration is invalid")
+            exit code
         }
 
         // Verify the rule is in effect
@@ -154,9 +140,7 @@ pub fun configure_mas_sudo(): Null {
         }
 
         info("Passwordless sudo configured for mas upgrade")
-        log_message("Sudoers configured: {SUDOERS_FILE} for {mas_path}")
     } else {
         warning("mas command not found - cannot configure passwordless sudo")
-        log_message("mas not found, sudo configuration skipped")
     }
 }
