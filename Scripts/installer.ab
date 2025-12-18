@@ -96,41 +96,39 @@ stage_header("macOS Dependency Setup", STAGE)
 
     // Verify Homebrew installation
     info("Checking for Homebrew installation")
-
-    // First, check if Homebrew binary exists and configure PATH if needed
     let brew_installed = file_exists("/opt/homebrew/bin/brew") or file_exists("/usr/local/bin/brew")
 
-    if brew_installed and not is_command("brew") {
-        info("Configuring Homebrew environment")
-        configure_brew_path()
-    }
+    if {
+        not brew_installed {
+            // Homebrew binary doesn't exist - need to install
+            if not INTERACTIVE {
+                error("Homebrew is not installed and cannot be installed in non-interactive mode")
+                echo_colored("  Install manually or run this script interactively", 33)
+                exit 1
+            }
 
-    if not is_command("brew") and not brew_installed {
-        if INTERACTIVE {
             info("Installing Homebrew (this may take a few minutes)")
             $ /bin/bash -c "\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" $ failed(code) {
                 error("Failed to install Homebrew")
                 exit code
             }
             info("Homebrew installed successfully")
-        } else {
-            error("Homebrew is not installed and cannot be installed in non-interactive mode")
-            echo_colored("  Install manually or run this script interactively", 33)
-            exit 1
-        }
 
-        info("Configuring Homebrew environment")
-        configure_brew_path()
+            configure_brew_path()
+        }
+        not is_command("brew") {
+            // Binary exists but not in PATH - just configure
+            info("Configuring Homebrew environment")
+            configure_brew_path()
+        }
     }
 
-    if is_command("brew") {
-        info("Homebrew detected, performing update/upgrade")
-        $ brew update && brew upgrade $ failed(code) {
-            error("Failed to update/upgrade Homebrew")
-            exit code
-        }
-        info("Homebrew is up to date")
+    // At this point, brew should be available - update it
+    $ brew update && brew upgrade $ failed(code) {
+        error("Failed to update/upgrade Homebrew")
+        exit code
     }
+    info("Homebrew is up to date")
 }
 
 // Stage 2: Homebrew Package Installation and Update Configuration
@@ -247,8 +245,7 @@ stage_header("Setting up 1Password integration", STAGE)
     // Process each key
     for i, key_line in key_lines {
         let parts = split(key_line, "|")
-        let parts_length = len(parts)
-        if parts_length < 2 {
+        if len(parts) < 2 {
             continue
         }
         let key_title = parts[0]
@@ -304,8 +301,8 @@ stage_header("Setting up 1Password integration", STAGE)
         }
 
         // Add to SSH agent
-        silent $ ssh-add "{key_path}" $ failed {
-            warning("Imported {key_filename} but could not add to SSH agent")
+        silent $ ssh-add "{key_path}" $ failed(code) {
+            warning("Imported {key_filename} but could not add to SSH agent [{code}]")
         }
 
         info("Imported and added {key_filename} to SSH agent")
@@ -348,10 +345,8 @@ stage_header("Setting up capsuleOS repository", STAGE)
     } else {
         info("Updating capsuleOS repository")
         $ git -C "{REPO_DIR}" pull origin main $ failed(code) {
-            error("Failed to update capsuleOS repository")
-            exit code
+            error("Failed to update capsuleOS repository [{code}]")
         }
-        info("capsuleOS repository updated successfully")
     }
 }
 
@@ -456,21 +451,24 @@ stage_header("Installing additional language-specific tools", STAGE)
         exit code
     }
     info("Cargofile downloaded successfully")
-    configure_cargo_path()
 
     info("Installing Rust tools via Cargo")
-    if not is_command("cargo") {
-        error("Cargo not found; skipping Rust tools installation")
-        exit 1
+    if {
+        not is_command("cargo") {
+            configure_cargo_path()
+        }
+        not is_command("cargo") {
+            error("Cargo not found; skipping Rust tools installation")
+            exit 1
+        }
     }
-
+    
     // Read tools from Cargofile and install
     let tools_raw = file_read(cargofile_path) failed(code) {
         error("Failed to read Cargofile")
         exit code
     }
-    let tools = split_lines(trim(tools_raw))
-    for tool_raw in tools {
+    for tool_raw in split_lines(trim(tools_raw)) {
         let tool_trimmed = trim(tool_raw)
         // Skip empty lines and comment-only lines
         if len(tool_trimmed) == 0 or starts_with(tool_trimmed, "#") {
@@ -492,48 +490,46 @@ stage_header("Installing additional language-specific tools", STAGE)
 
 
     info("Installing Amber framework")
-    const amber_installer = "{TEMP_DIR}/amber-install.sh"
-    const amber_url = "https://github.com/amber-lang/amber/releases/download/0.5.1-alpha/install.sh"
+    const AMBER_INSTALLER = "{TEMP_DIR}/amber-install.sh"
+    const AMBER_URL = "https://github.com/amber-lang/amber/releases/download/0.5.1-alpha/install.sh"
 
-    file_download(amber_url, amber_installer) failed(code) {
+    file_download(AMBER_URL, AMBER_INSTALLER) failed(code) {
         error("Failed to download Amber installer")
         exit code
     }
 
-    $ bash {amber_installer} $ failed(code) {
+    $ bash {AMBER_INSTALLER} $ failed(code) {
         error("Failed to install Amber framework")
         exit code
     }
     info("Amber framework installed successfully")
 
 
-    info("Installing Python packages via conda")
-    if not is_command("conda") {
-        error("conda not found; skipping Python packages installation")
-        exit 1
-    }
-
-    // Accept conda Terms of Service before installing packages
-    info("Accepting conda Terms of Service")
-    silent {
-        $ conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main $ failed {
-            warning("Failed to accept conda TOS for pkgs/main (may already be accepted)")
+    if  is_command("conda") {
+    
+        info("Installing Python packages via conda")
+        // Accept conda Terms of Service before installing packages
+        info("Accepting conda Terms of Service")
+        silent {
+            $ conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main $ failed {
+                warning("Failed to accept conda TOS for pkgs/main (may already be accepted)")
+            }
+            $ conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r $ failed {
+                warning("Failed to accept conda TOS for pkgs/r (may already be accepted)")
+            }
         }
-        $ conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r $ failed {
-            warning("Failed to accept conda TOS for pkgs/r (may already be accepted)")
+
+        let python_packages = ["pytest", "ipython", "python-lsp-server"]
+
+        for pkg in python_packages {
+            $ conda install -y "{pkg}" $ failed(code) {
+                warning("Failed to install {pkg}")
+                continue
+            }
         }
+
+        info("Python packages installation completed")
     }
-
-    let python_packages = ["pytest", "ipython", "python-lsp-server"]
-
-    for pkg in python_packages {
-        $ conda install -y "{pkg}" $ failed(code) {
-            warning("Failed to install {pkg}")
-            continue
-        }
-    }
-
-    info("Python packages installation completed")
 }
 
 // Stage 8: Finalize and Verify Installation
