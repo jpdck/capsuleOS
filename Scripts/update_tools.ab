@@ -1,13 +1,9 @@
 #!/usr/bin/env amber
 
-import { date_now, date_format_posix } from "std/date"
-import { dir_exists, dir_create, file_exists } from "std/fs"
-import { text_contains } from "std/text"
-import { env_var_get } from "std/env"
+import { is_command } from "std/env"
 
 // launchd has the PATH of a goldfish
 trust $ export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin" $
-const HOME = trust env_var_get("HOME")
 
 main {
     $ brew update $?
@@ -15,9 +11,7 @@ main {
     $ brew cleanup $?
     
     // mas (with hash verification)
-    let mas_bin = "/opt/homebrew/bin/mas"
-    
-    if file_exists(mas_bin) {
-        $ mas upgrade $?
+    if is_command("mas") {
+        trust $ mas upgrade $
     }
 }
