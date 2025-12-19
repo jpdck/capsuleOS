@@ -495,16 +495,20 @@ stage_header("Installing additional language-specific tools", STAGE)
     const AMBER_INSTALLER = "{TEMP_DIR}/amber-install.sh"
     const AMBER_URL = "https://github.com/amber-lang/amber/releases/download/0.5.1-alpha/install.sh"
 
-    file_download(AMBER_URL, AMBER_INSTALLER) failed(code) {
-        error("Failed to download Amber installer")
-        exit code
-    }
+    if not is_command("amber"){
+        file_download(AMBER_URL, AMBER_INSTALLER) failed(code) {
+            error("Failed to download Amber installer")
+            exit code
+        }
 
-    $ bash {AMBER_INSTALLER} $ failed(code) {
-        error("Failed to install Amber framework")
-        exit code
+        $ bash {AMBER_INSTALLER} $ failed(code) {
+            error("Failed to install Amber framework")
+            exit code
+        }
+        info("Amber framework installed successfully")
+    } else {
+        info("Amber already installed...")
     }
-    info("Amber framework installed successfully")
 
 
     if  is_command("conda") {
