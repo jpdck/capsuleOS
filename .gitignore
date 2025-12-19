@@ -42,6 +42,7 @@ Brewfile.lock.json
 # Local customizations
 local/
 *.local
+Themes/Dracula Pro*/
 
 # SSH keys (safety measure)
 id_*
