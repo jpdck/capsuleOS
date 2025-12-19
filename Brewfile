@@ -41,10 +41,10 @@ brew "yq"                               # YAML processor
 brew "helix"                            # Modern editor
 brew "direnv"                           # Environment management
 brew "tmux"                             # Terminal multiplexer
+brew "git"                              # Version control
 brew "gh"                               # GitHub CLI
 brew "git-delta"                        # Git diff viewer
 brew "git-flow"                         # Git branching model
-brew "git"                              # Version control
 
 # Archive Utilities
 brew "gnu-tar"                          # GNU tar   
