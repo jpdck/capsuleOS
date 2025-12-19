@@ -7,6 +7,7 @@ on:
     paths:
       - 'Scripts/installer.ab'
       - 'Scripts/installer_utils.ab'
+      - 'Scripts/update_tools.ab'
 
 jobs:
   build:
@@ -27,6 +28,13 @@ jobs:
           amber build installer.ab ../install.sh --minify
           cd ..
           chmod +x install.sh
+
+      - name: Build update tools script
+        run: |
+          cd Scripts
+          amber build update_tools.ab ../dotfiles/bin/.local/bin/update-tools.sh --minify
+          cd ..
+          chmod +x dotfiles/bin/.local/bin/update-tools.sh
       
       - name: Upload built installer as artifact
         uses: actions/upload-artifact@v4

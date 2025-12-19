@@ -29,7 +29,14 @@ jobs:
           amber build installer.ab ../install.sh --minify
           cd ..
           chmod +x install.sh
-      
+
+      - name: Build update tools script
+        run: |
+          cd Scripts
+          amber build update_tools.ab ../dotfiles/bin/.local/bin/update-tools.sh --minify
+          cd ..
+          chmod +x dotfiles/bin/.local/bin/update-tools.sh
+
       - name: Generate checksums
         run: |
           shasum -a 256 install.sh > install.sh.sha256
@@ -61,8 +68,8 @@ jobs:
             - Rust tools from Cargofile  
             - Dotfiles configuration
             - macOS system settings
-          draft: true
-          prerelease: true
+          draft: false
+          prerelease: false
           make_latest: true
           fail_on_unmatched_files: true
       

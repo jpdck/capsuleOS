@@ -59,6 +59,3 @@ dotfiles/*/.*rc.local
 dotfiles/*/.local*
 Gaming/
 *.sh
-
-# Specifically allowed shell scripts
-!dotfiles/**/*.sh

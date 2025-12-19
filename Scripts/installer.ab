@@ -548,7 +548,7 @@ stage_header("Installing additional language-specific tools", STAGE)
 stage_header("Finalizing and verifying installation", STAGE)
 {
     info("Verifying installation components")
-    let essential_commands = ["git", "brew", "op", "stow", "cargo", "conda"]
+    let essential_commands = ["git", "brew", "op", "stow", "cargo", "conda", "amber"]
     for cmd in essential_commands {
         if not is_command(cmd) {
             warning("Essential command not found: {cmd}")
