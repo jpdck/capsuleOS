@@ -516,7 +516,7 @@ stage_header("Installing additional language-specific tools", STAGE)
     }
 
 
-    if  is_command("conda") {
+        if  is_command("conda") {
     
         info("Installing Python packages via conda")
         // Accept conda Terms of Service before installing packages
@@ -530,13 +530,8 @@ stage_header("Installing additional language-specific tools", STAGE)
             }
         }
 
-        let python_packages = ["pytest", "ipython", "python-lsp-server"]
-
-        for pkg in python_packages {
-            $ conda install -y "{pkg}" $ failed(code) {
-                warning("Failed to install {pkg}")
-                continue
-            }
+        $ conda create -n dev -y python=3.14 pytest ipython python-lsp-server ruff mypy $ failed(code) {
+            warning("Failed to initialaize dev template for conda [{code}]")
         }
 
         info("Python packages installation completed")
