@@ -58,4 +58,7 @@ cache/
 dotfiles/*/.*rc.local
 dotfiles/*/.local*
 Gaming/
-installer.sh
+*.sh
+
+# Specifically allowed shell scripts
+!dotfiles/**/*.sh

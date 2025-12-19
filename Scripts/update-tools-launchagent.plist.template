@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.{{USER}}.update-tools</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>-lc</string>
+    <string>{{HOME}}/.local/bin/update-tools.sh</string>
+  </array>
+
+  <!-- Run daily at 4:00 AM -->
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key><integer>4</integer>
+    <key>Minute</key><integer>0</integer>
+  </dict>
+
+  <key>RunAtLoad</key>
+  <false/>
+
+  <!-- Process type and resource management -->
+  <key>ProcessType</key>
+  <string>Background</string>
+
+  <key>ExitTimeOut</key>
+  <integer>30</integer>
+
+  <key>ThrottleInterval</key>
+  <integer>300</integer>
+
+  <key>LowPriorityBackgroundIO</key>
+  <true/>
+
+  <!-- Explicit environment for reliable Homebrew access -->
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+  </dict>
+
+  <!-- System Settings UI integration -->
+  <key>AssociatedBundleIdentifiers</key>
+  <string>com.{{USER}}.capsuleOS</string>
+
+  <key>StandardOutPath</key>
+  <string>{{HOME}}/Library/Logs/update-tools.out</string>
+  <key>StandardErrorPath</key>
+  <string>{{HOME}}/Library/Logs/update-tools.err</string>
+</dict>
+</plist>

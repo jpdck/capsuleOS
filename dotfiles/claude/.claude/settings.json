@@ -1,12 +1,22 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
-  
-  "statusLine": {
-    "type": "command",
-    "command": "bunx -y ccstatusline@latest",
-    "padding": 0
+  "env": {
+    "DOCKER_BUILDKIT": "1",
+    "COMPOSE_DOCKER_CLI_BUILD": "1",
+    "DOCKER_DEFAULT_PLATFORM": "linux/arm64",
+    "COMPOSE_PARALLEL_LIMIT": "12",
+    "DOCKER_SCAN_SUGGEST": "false",
+    "PYTHONUNBUFFERED": "1",
+    "CONDA_AUTO_ACTIVATE_BASE": "false",
+    "HOMEBREW_NO_ANALYTICS": "1",
+    "EDITOR": "helix",
+    "PAGER": "less",
+    "DO_NOT_TRACK": "1"
   },
-  
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
   "permissions": {
     "allow": [
       "Bash(docker ps:*)",
@@ -41,6 +51,21 @@
       "Read(~/.gitconfig)",
       "Read(.env.example)",
       "Edit(.env.example)"
+    ],
+    "deny": [
+      "Bash(pip:*)",
+      "Read(.env)",
+      "Read(.env.*)",
+      "Read(*.key)",
+      "Read(*.pem)",
+      "Read(**/secrets/**)",
+      "Read(~/.ssh/id_*)",
+      "Read(~/.aws/credentials)",
+      "Read(~/.config/rclone/rclone.conf)",
+      "Edit(.env)",
+      "Edit(.env.*)",
+      "Edit(*.key)",
+      "Edit(*.pem)"
     ],
     "ask": [
       "Bash(docker run:*)",
@@ -96,43 +121,8 @@
       "Bash(curl:*)",
       "Bash(wget:*)",
       "WebFetch"
-    ],
-    "deny": [
-      "Bash(pip:*)",
-      "Read(.env)",
-      "Read(.env.*)",
-      "Read(*.key)",
-      "Read(*.pem)",
-      "Read(**/secrets/**)",
-      "Read(~/.ssh/id_*)",
-      "Read(~/.aws/credentials)",
-      "Read(~/.config/rclone/rclone.conf)",
-      "Edit(.env)",
-      "Edit(.env.*)",
-      "Edit(*.key)",
-      "Edit(*.pem)"
     ]
   },
-  
-  "env": {
-    "DOCKER_BUILDKIT": "1",
-    "COMPOSE_DOCKER_CLI_BUILD": "1",
-    "DOCKER_DEFAULT_PLATFORM": "linux/arm64",
-    "COMPOSE_PARALLEL_LIMIT": "12",
-    "DOCKER_SCAN_SUGGEST": "false",
-    "PYTHONUNBUFFERED": "1",
-    "CONDA_AUTO_ACTIVATE_BASE": "false",
-    "HOMEBREW_NO_ANALYTICS": "1",
-    "EDITOR": "helix",
-    "PAGER": "less",
-    "DO_NOT_TRACK": "1"
-  },
-  
-  "attribution": {
-    "commit": "",
-    "pr": ""
-  },
-  
   "hooks": {
     "PostToolUse": [
       {
@@ -172,9 +162,11 @@
       }
     ]
   },
-  
-  "alwaysThinkingEnabled": false,
-  
+  "statusLine": {
+    "type": "command",
+    "command": "bunx -y ccstatusline@latest",
+    "padding": 0
+  },
   "feedbackSurveyState": {
     "lastShownTime": 1754356350023
   }

@@ -1,0 +1,17 @@
+#!/usr/bin/env amber
+
+import { is_command } from "std/env"
+
+// launchd has the PATH of a goldfish
+trust $ export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin" $
+
+main {
+    $ brew update $?
+    $ brew upgrade $?
+    $ brew cleanup $?
+    
+    // mas (with hash verification)
+    if is_command("mas") {
+        trust $ mas upgrade $
+    }
+}

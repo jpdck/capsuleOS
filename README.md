@@ -19,12 +19,14 @@ Idempotent. Re-run anytime to update packages and refresh dotfiles.
 1. Xcode Command Line Tools + Homebrew setup
 2. Bundles packages from [Brewfile](Brewfile)
 3. Connects to 1Password and imports SSH keys
-4. Clones repo to `~/Projects/capsuleOS`
-5. Symlinks dotfiles via GNU Stow
-6. Installs Rust tools from [Cargofile](Cargofile)
-7. Applies macOS system settings (optional)
+4. Applies macOS system settings (optional)
+5. Clones repo to `~/Projects/capsuleOS`
+6. Symlinks dotfiles via GNU Stow
+7. Sets up automated update schedule
+8. Installs Rust tools from [Cargofile](Cargofile)
+9. Installs Amber framework
+10. Installs Python packages via conda
 
-Logs: `~/capsuleOS/logs/installer.log`
 
 ## Requirements
 
