@@ -137,12 +137,15 @@ stage_header("macOS Dependency Setup", STAGE)
 stage_header("Installing Homebrew packages", STAGE)
 {
     info("Downloading latest Brewfile from repository")
-    let brewfile_path = "{TEMP_DIR}/Brewfile"
-    file_download("https://github.com/jpdck/capsuleOS/releases/download/latest/Brewfile", brewfile_path) failed(code) {
-        error("Failed to download Brewfile")
-        exit code
+    let brewfile_path = "./Brewfile"
+    if not file_exists(brewfile_path) {
+        brewfile_path = "{TEMP_DIR}/Brewfile"
+        file_download("https://github.com/jpdck/capsuleOS/releases/download/latest/Brewfile", brewfile_path) failed(code) {
+            error("Failed to download Brewfile")
+            exit code
+        }
     }
-    info("Brewfile downloaded successfully")
+    info("Brewfile loaded successfully")
 
     info("Installing Homebrew packages from Brewfile")
     $ brew bundle install --file="{brewfile_path}" $ failed(code) {
@@ -421,10 +424,9 @@ stage_header("Configuring user dotfiles", STAGE)
             warning("Could not read LaunchAgent template - automated updates will NOT be configured")
         }
 
-        // Replace \{\{USER\}\} placeholder with actual username
-        let plist_content = trust $ echo '{template_content}' | sed 's/\{\{USER\}\}/{USER}/g' $
-        // Replace \{\{HOME\}\} placeholder with actual username
-        let plist_content = trust $ echo '{template_content}' | sed 's/\{\{HOME\}\}/{HOME}/g' $
+        // Replace {{USER}} and {{HOME}} placeholders with actual values
+        // Note: Using | as sed delimiter to avoid conflicts with paths containing /
+        let plist_content = trust $ echo '{template_content}' | sed -e 's|\{\{USER\}\}|{USER}|g' -e 's|\{\{HOME\}\}|{HOME}|g' $
 
         // Write final plist
         file_write(plist_path, plist_content) failed(code) {
@@ -447,12 +449,15 @@ stage_header("Configuring user dotfiles", STAGE)
 stage_header("Installing additional language-specific tools", STAGE)
 {
     info("Downloading latest Cargofile from repository")
-    let cargofile_path = "{TEMP_DIR}/Cargofile"
-    file_download("https://github.com/jpdck/capsuleOS/releases/download/latest/Cargofile", cargofile_path) failed(code) {
-        error("Failed to download Cargofile")
-        exit code
+    let cargofile_path = "./Cargofile"
+    if not file_exists(cargofile_path) {
+        cargofile_path = "{TEMP_DIR}/Cargofile"
+        file_download("https://github.com/jpdck/capsuleOS/releases/download/latest/Cargofile", cargofile_path) failed(code) {
+            error("Failed to download Cargofile")
+            exit code
+        }
     }
-    info("Cargofile downloaded successfully")
+    info("Cargofile loaded successfully")
 
     info("Installing Rust tools via Cargo")
     if {
