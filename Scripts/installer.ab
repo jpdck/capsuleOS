@@ -423,6 +423,8 @@ stage_header("Configuring user dotfiles", STAGE)
 
         // Replace \{\{USER\}\} placeholder with actual username
         let plist_content = trust $ echo '{template_content}' | sed 's/\{\{USER\}\}/{USER}/g' $
+        // Replace \{\{HOME\}\} placeholder with actual username
+        let plist_content = trust $ echo '{template_content}' | sed 's/\{\{HOME\}\}/{HOME}/g' $
 
         // Write final plist
         file_write(plist_path, plist_content) failed(code) {

@@ -9,7 +9,7 @@
   <array>
     <string>/bin/bash</string>
     <string>-lc</string>
-    <string>~/.local/bin/update-tools.sh</string>
+    <string>{{HOME}}/.local/bin/update-tools.sh</string>
   </array>
 
   <!-- Run daily at 4:00 AM -->
@@ -19,9 +19,15 @@
     <key>Minute</key><integer>0</integer>
   </dict>
 
+  <key>RunAtLoad</key>
+  <false/>
+
+  <key>TimeOut</key>
+  <integer>600</integer>
+
   <key>StandardOutPath</key>
-  <string>~/Library/Logs/update-tools.out</string>
+  <string>{{HOME}}/Library/Logs/update-tools.out</string>
   <key>StandardErrorPath</key>
-  <string>~/Library/Logs/update-tools.err</string>
+  <string>{{HOME}}/Library/Logs/update-tools.err</string>
 </dict>
 </plist>
