@@ -64,6 +64,8 @@ This is a macOS development environment bootstrap repository that automates the 
 - `Cargofile` - Rust crate definitions for development tools and utilities (installed via `cargo install`)
 - `Scripts/installer.ab` - Main installer source code written in Amber language
 - `Scripts/installer_utils.ab` - Shared utility functions for the installer (imported by installer.ab)
+- `Scripts/update-tools-launchagent.plist.template` - LaunchAgent template for periodic tool updates
+  - When editing, ensure to run the launchd linter: `plutil -lint <file>`
 - `install.sh` - **Gitignored**; built by CI/CD and distributed via GitHub releases only
 - `dotfiles/` - Configuration files managed with GNU Stow, organized by package
 

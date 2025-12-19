@@ -133,11 +133,9 @@ pub fun configure_mas_sudo(): Null {
             warning("Could not verify sudo configuration")
         }
 
-        if not is_empty(verify) {
-            if not text_contains(verify, "NOPASSWD") or not text_contains(verify, "mas upgrade") {
+        if is_empty(verify) or not text_contains(verify, "NOPASSWD") or not text_contains(verify, "mas upgrade") {
                 warning("Sudo rule may not be active - check with: sudo -l")
-            }
-        }
+        } 
 
         info("Passwordless sudo configured for mas upgrade")
     } else {

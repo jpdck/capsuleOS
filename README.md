@@ -27,7 +27,6 @@ Idempotent. Re-run anytime to update packages and refresh dotfiles.
 9. Installs Amber framework
 10. Installs Python packages via conda
 
-
 ## Requirements
 
 - macOS (tested on Tahoe 26.2)
